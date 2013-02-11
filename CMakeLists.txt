@@ -17,17 +17,11 @@
 # the Free Software Foundation, Inc., 51 Franklin Street,
 # Boston, MA 02110-1301, USA.
 
-include_directories(
-	${GR_AUDIO_INCLUDE_DIRS}
-	${GNURADIO_CORE_INCLUDE_DIRS}
-        ${GRUEL_INCLUDE_DIRS}
-        ${Boost_INCLUDE_DIRS}
-)
-add_executable(filecopy filecopy.cc)
-target_link_libraries(filecopy gnuradio-audio)
 
-INSTALL(TARGETS
-    filecopy
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-    COMPONENT "test"
-)
+#cmake_minimum_required (VERSION 2.8)
+# Recurse into all the subdirectories under darpa dir. This does not actually
+# cause another cmake executable to run. The same process will walk through
+# the project's entire directory structure.
+add_subdirectory (test)
+
+
