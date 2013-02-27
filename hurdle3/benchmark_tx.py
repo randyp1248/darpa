@@ -32,7 +32,7 @@ from gnuradio import digital
 from transmit_path import transmit_path
 from uhd_interface import uhd_transmitter
 
-import time, struct, sys, socket
+import time, struct, sys
 
 #import os 
 #print os.getpid()
@@ -50,8 +50,8 @@ class my_top_block(gr.top_block):
             self.sink = uhd_transmitter(options.args, symbol_rate,
                                         options.samples_per_symbol,
                                         options.tx_freq, options.tx_gain,
-                                        options.spec, options.antenna,1)
-                                        #options.verbose)
+                                        options.spec, options.antenna,
+                                        options.verbose)
             options.samples_per_symbol = self.sink._sps
             
         elif(options.to_file is not None):
@@ -86,10 +86,10 @@ def main():
                       help="Select modulation from: %s [default=%%default]"
                             % (', '.join(mods.keys()),))
 
- #    parser.add_option("-s", "--size", type="eng_float", default=1442,
- #                     help="set packet size [default=%default]")
- #   parser.add_option("-M", "--megabytes", type="eng_float", default=1.0,
- #                     help="set megabytes to transmit [default=%default]")
+    parser.add_option("-s", "--size", type="eng_float", default=1500,
+                      help="set packet size [default=%default]")
+    parser.add_option("-M", "--megabytes", type="eng_float", default=1.0,
+                      help="set megabytes to transmit [default=%default]")
     parser.add_option("","--discontinuous", action="store_true", default=False,
                       help="enable discontinous transmission (bursts of 5 packets)")
     parser.add_option("","--from-file", default=None,
@@ -120,61 +120,18 @@ def main():
         print "Warning: failed to enable realtime scheduling"
 
     tb.start()                       # start flow graph
+    print("Setting frequency to %d\n" % options.tx_freq+625000
+    self.txpath.set_frequency(options.tx_freq+625000)
         
-    # log parameter to OML
-    cmd1 = "/root/OML/omlcli --out h2_benchmark --line \""
-    cmd1 = cmd1 + " tx-freq=" + str(options.tx_freq)
-    cmd1 = cmd1 + " modulation=" + str(options.modulation)
-    cmd1 = cmd1 + " tx-gain=" + str(options.tx_gain)
-    cmd1 = cmd1 + " bitrate=" + str(options.bitrate)
-    cmd1 = cmd1 + " sps=" + str(options.samples_per_symbol)
-    cmd1 = cmd1 + " hostname=" + socket.gethostname()
-    cmd1 = cmd1 + "\""
-
-    from subprocess import os
-    os.system(cmd1)
-
-
-    # Fetch packets from server
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(10)
-    TCP_IP='10.10.0.51'
-    TCP_PORT=5123    
-    try:
-       s.connect((TCP_IP, TCP_PORT))
-    except socket.timeout: 
-       print"Connection timed out, try again later"
-       return
-    except socket.error:
-       print"Connection error"
-       return
-
-   
+    # generate and send packets
+    nbytes = int(1e6 * options.megabytes)
     n = 0
     pktno = 0
-    pkt_size = int(1442)
-    MESSAGE = struct.pack('!l',pkt_size-2)
+    pkt_size = int(options.size)
 
-    while 1: #n < nbytes:
+    while n < nbytes:
         if options.from_file is None:
-            try:
-               s.send(MESSAGE)
-               data=s.recv(pkt_size-2)
-            except socket.timeout: 
-               print"Connection timed out, try again later"
-               return
-            except socket.error:
-               print"Connection closed"
-               return
-            if data.__len__() < 8:
-               print "Connection timed out, try again later"
-               break
-            if options.verbose:
-                # First 4 bytes are checksum followed by the 4 byte sequence number
-                   crc,sn = struct.unpack('!LL',data[:8])
-                   print "Seq #:", sn, " with CRC [", hex(crc), "]"
-                
+            data = (pkt_size - 2) * chr(pktno & 0xff) 
         else:
             data = source_file.read(pkt_size - 2)
             if data == '':
@@ -186,11 +143,17 @@ def main():
         sys.stderr.write('.')
         if options.discontinuous and pktno % 5 == 4:
             time.sleep(1)
+
+        if pktno % 50 == 25-1:
+            print("Setting frequency to %d\n" % options.tx_freq-625000
+            self.txpath.set_frequency(options.tx_freq-625000)
+
+        if pktno % 25 == 50-1:
+            print("Setting frequency to %d\n" % options.tx_freq+625000
+            self.txpath.set_frequency(options.tx_freq+625000)
+
         pktno += 1
         
-    if options.from_file is None:
-        s.close()
-    time.sleep(5)
     send_pkt(eof=True)
 
     tb.wait()                       # wait for it to finish
@@ -200,4 +163,3 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         pass
-

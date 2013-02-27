@@ -24,7 +24,6 @@ from gnuradio import gr, gru
 from gnuradio import eng_notation
 from gnuradio.eng_option import eng_option
 from optparse import OptionParser
-import time
 
 # From gr-digital
 from gnuradio import digital
@@ -34,7 +33,7 @@ from receive_path import receive_path
 from uhd_interface import uhd_receiver
 
 import struct
-import sys, socket
+import sys
 
 #import os
 #print os.getpid()
@@ -52,8 +51,8 @@ class my_top_block(gr.top_block):
             self.source = uhd_receiver(options.args, symbol_rate,
                                        options.samples_per_symbol,
                                        options.rx_freq, options.rx_gain,
-                                       options.spec, options.antenna,1)
-                                       #options.verbose)
+                                       options.spec, options.antenna,
+                                       options.verbose)
             options.samples_per_symbol = self.source._sps
 
         elif(options.from_file is not None):
@@ -78,54 +77,19 @@ class my_top_block(gr.top_block):
 global n_rcvd, n_right
 
 def main():
-    global n_rcvd, n_right, start_time, stop_rcv
-    
-    TIMEOUT = 60 # 60sec for hurdle 2
+    global n_rcvd, n_right
+
     n_rcvd = 0
     n_right = 0
-    start_time = 0
-    mstr_cnt = 0
-    stop_rcv = 0
-    
-
-
-    TCP_IP='10.10.0.51'
-    TCP_PORT=5125
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try: 
-       s.connect((TCP_IP, TCP_PORT))
-    except socket.error as e:
-       print "Error connecting to the packet sink: %s" %e.strerror
-       return
     
     def rx_callback(ok, payload):
-        global n_rcvd, n_right, start_time, stop_rcv
-        (pktno,crc,sn) = struct.unpack('!HLL', payload[0:10])
+        global n_rcvd, n_right
+        (pktno,) = struct.unpack('!H', payload[0:2])
         n_rcvd += 1
         if ok:
             n_right += 1
-            try:            
-               data = s.recv(4) # if a ready packet is received
-               s.send(payload[2:])
-            except socket.error as e:
-               print "Socket error: %s" %e.strerror
-               stop_rcv = 1
-               return
-            if data.__len__() == 0:
-               print "Connection closed"
-               stop_rcv = 1
-               return
-            if n_right == 1:
-               start_time = time.time()
-            if n_right == 2000:
-               t = time.time() - start_time              
-               print"Mod : %5s, Rate : %8d, Time for 2000 pkts : %f sec\n" %(options.modulation, options.bitrate, t)
-               stop_rcv = 1;
-              
 
-            
-        if options.verbose:
-           print "ok = %5s  pktno = %4d  n_rcvd = %4d  n_right = %4d" %(
+        print "ok = %5s  pktno = %4d  n_rcvd = %4d  n_right = %4d" % (
             ok, pktno, n_rcvd, n_right)
 
     demods = digital.modulation_utils.type_1_demods()
@@ -167,37 +131,11 @@ def main():
     if r != gr.RT_OK:
         print "Warning: Failed to enable realtime scheduling."
 
-    # log parameters to OML
-    cmd1 = "/root/OML/omlcli --out h2_benchmark --line \""
-    cmd1 = cmd1 + " rx-freq=" + str(options.rx_freq)
-    cmd1 = cmd1 + " modulation=" + str(options.modulation)
-    cmd1 = cmd1 + " rx-gain=" + str(options.rx_gain)
-    cmd1 = cmd1 + " bitrate=" + str(options.bitrate)
-    cmd1 = cmd1 + " sps=" + str(options.samples_per_symbol)
-    cmd1 = cmd1 + " hostname=" + socket.gethostname()
-    cmd1 = cmd1 + "\""
-
-    from subprocess import os
-    os.system(cmd1)
-
-
     tb.start()        # start flow graph
-   # tb.wait()         # wait for it to finish
-    
-    while mstr_cnt < TIMEOUT*1000:
-       if stop_rcv == 1:
-          break;
-       mstr_cnt = mstr_cnt + 1
-       time.sleep(0.001)
-
-    if stop_rcv == 0:
-       print "Receiver timed out, received %d packets successfully in %d sec" %(n_right, TIMEOUT)
-
-    s.close()
+    tb.wait()         # wait for it to finish
 
 if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
         pass
-
