@@ -34,6 +34,7 @@ from uhd_interface import uhd_receiver
 
 import struct
 import sys
+import time
 
 #import os
 #print os.getpid()
@@ -77,7 +78,10 @@ class my_top_block(gr.top_block):
 global n_rcvd, n_right
 
 def main():
-    global n_rcvd, n_right
+    global n_rcvd, n_right, per_wait, last_n_rcvd, freq_offset
+
+    per_wait = 0.2
+    freq_offset = 625000
 
     n_rcvd = 0
     n_right = 0
@@ -132,6 +136,28 @@ def main():
         print "Warning: Failed to enable realtime scheduling."
 
     tb.start()        # start flow graph
+
+    last_n_rcvd = n_rcvd
+    cur_freq_offset = freq_offset
+    tb.source.set_freq(options.rx_freq+cur_freq_offset)
+    
+    while 1:
+        global n_rcvd, n_right, per_wait, last_n_rcvd, freq_offset
+        
+        time.sleep(per_wait)
+        if last_n_rcvd == n_rcvd:
+            if cur_freq_offset > 0:
+                cur_freq_offset = 0-freq_offset
+            else:
+                cur_freq_offset = freq_offset
+
+            print "Switching frequency to %d\n" % (options.rx_freq+cur_freq_offset)
+            tb.source.set_freq(options.rx_freq+cur_freq_offset)
+
+        else:
+            print "Not switching frequencies since we are still receiving\n"
+            last_n_rcvd = n_rcvd
+
     tb.wait()         # wait for it to finish
 
 if __name__ == '__main__':
