@@ -121,7 +121,7 @@ def main():
 
     tb.start()                       # start flow graph
     print "Setting frequency to %d\n" % (options.tx_freq+625000)
-    tb.txpath.set_frequency(options.tx_freq+625000)
+    tb.sink.set_freq(options.tx_freq+625000)
         
     # generate and send packets
     nbytes = int(1e6 * options.megabytes)
@@ -146,11 +146,11 @@ def main():
 
         if pktno % 50 == 25-1:
             print "Setting frequency to %d\n" % (options.tx_freq-625000)
-            tb.txpath.set_frequency(options.tx_freq-625000)
+            tb.sink.set_freq(options.tx_freq-625000)
 
-        if pktno % 25 == 50-1:
+        if pktno % 50 == 50-1:
             print "Setting frequency to %d\n" % (options.tx_freq+625000)
-            tb.txpath.set_frequency(options.tx_freq+625000)
+            tb.sink.set_freq(options.tx_freq+625000)
 
         pktno += 1
         

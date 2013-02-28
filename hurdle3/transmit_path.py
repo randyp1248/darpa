@@ -76,9 +76,6 @@ class transmit_path(gr.hier_block2):
         self._tx_amplitude = max(0.0, min(ampl, 1))
         self.amp.set_k(self._tx_amplitude)
 
-    def set_frequency(self, freq):
-        self.packet_transmitter.frequency = freq
-        
     def send_pkt(self, payload='', eof=False):
         """
         Calls the transmitter method to send a packet
