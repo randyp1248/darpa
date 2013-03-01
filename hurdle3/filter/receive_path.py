@@ -34,8 +34,8 @@ import collections
 
 
 class circular_buffer_block(gr.hier_block2):
-    def __init__(self, args):
-        gr.block.__init__(self, name="circular_buffer_block", in_sig=[numpy.float32], out_sig=[])
+    def __init__(self):
+        gr.__init__(self, name="circular_buffer_block", in_sig=[numpy.float32], out_sig=[])
         self.set_auto_consume(False)
         self.deque = collections.deque(maxlen=100)
 
@@ -92,11 +92,11 @@ class receive_path(gr.hier_block2):
             -0.128315103082374,
             0.011857823032443]
 
-        self.lp = gr.filter.fir_filter_ccf(1, low_pass_taps)
-        self.hp = gr.filter.fir_filter_ccf(1, high_pass_taps)
+        self.lp = gr.fir_filter_ccf(1, low_pass_taps)
+        self.hp = gr.fir_filter_ccf(1, high_pass_taps)
 
-        power_low_pass = gr.blocks.complex_to_mag_squared()
-        power_high_pass = gr.blocks.complex_to_mag_squared()
+        power_low_pass = gr.complex_to_mag_squared()
+        power_high_pass = gr.complex_to_mag_squared()
 
         power_low_pass_buf = circular_buffer_block()
         power_high_pass_buf = circular_buffer_block()
