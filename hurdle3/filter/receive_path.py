@@ -35,8 +35,9 @@ import collections
 
 class circular_buffer_block(gr.hier_block2):
     def __init__(self):
-        gr.__init__(self, name="circular_buffer_block", in_sig=[numpy.float32], out_sig=[])
-        self.set_auto_consume(False)
+        gr.hier_block2.__init__(self, "receive_path",
+                                gr.io_signature(1, 1, 4), #gr.sizeof_gr_float),
+                                gr.io_signature(0, 0, 0))
         self.deque = collections.deque(maxlen=100)
 
     def forecast(self, noutput_items, ninput_items_required):
@@ -95,14 +96,24 @@ class receive_path(gr.hier_block2):
         self.lp = gr.fir_filter_ccf(1, low_pass_taps)
         self.hp = gr.fir_filter_ccf(1, high_pass_taps)
 
-        power_low_pass = gr.complex_to_mag_squared()
-        power_high_pass = gr.complex_to_mag_squared()
+        self.power_low_pass = gr.complex_to_mag_squared()
+        self.power_high_pass = gr.complex_to_mag_squared()
 
-        power_low_pass_buf = circular_buffer_block()
-        power_high_pass_buf = circular_buffer_block()
+        self.power_low_pass_buf = circular_buffer_block()
+        self.power_high_pass_buf = circular_buffer_block()
 
-        self.connect(self, self.lp, low_power, power_low_pass_buf)
-        self.connect(self, self.hp, high_power, power_high_pass_buf)
+
+        self.connect(self, self.lp, self.power_low_pass, self.power_low_pass_buf)
+        self.connect(self, self.hp, self.power_high_pass, self.power_high_pass_buf)
+
+	#self.kcopy = gr.kludge_copy(gr.sizeof_gr_complex)
+        #self.connect(self, self.kcopy)
+        #self.connect(self.kcopy, self.lp)
+        #self.connect(self.lp, self.power_low_pass)
+        #self.connect(self.power_low_pass, self.power_low_pass_buf)
+        #self.connect(self.kcopy, self.hp)
+        #self.connect(self.hp, self.power_high_pass)
+        #self.connect(self.power_high_pass, self.power_high_pass_buf)
         
         options = copy.copy(options)    # make a copy so we can destructively modify
 
