@@ -140,8 +140,11 @@ class receive_path(gr.hier_block2):
             -0.128315103082374,
             0.011857823032443]
 
-        self.lp = filter.adaptive_fir_ccf("lp", 1, low_pass_taps)
-        self.hp = filter.adaptive_fir_ccf("hp", 1, high_pass_taps)
+        #self.lp = filter.adaptive_fir_ccf("lp", 1, low_pass_taps)
+        #self.hp = filter.adaptive_fir_ccf("hp", 1, high_pass_taps)
+
+        self.lp = gr.fft_filter_ccc(1, low_pass_taps)
+        self.hp = gr.fft_filter_ccc(1, high_pass_taps)
 
         self.power_low_pass = gr.complex_to_mag_squared()
         self.power_high_pass = gr.complex_to_mag_squared()
