@@ -27,17 +27,17 @@ from gnuradio import digital
 import copy
 import sys
 import collections
+import filter_swig as filter
 
 # /////////////////////////////////////////////////////////////////////////////
 #                              receive path
 # /////////////////////////////////////////////////////////////////////////////
 
-
-class circular_buffer_block(gr.hier_block2):
+class circular_buffer_block(gr.gr_basic_block):
     def __init__(self):
-        gr.hier_block2.__init__(self, "receive_path",
-                                gr.io_signature(1, 1, 4), #gr.sizeof_gr_float),
-                                gr.io_signature(0, 0, 0))
+#        gr.gr_basic_block.__init__(self, "receive_path",
+#                                gr.io_signature(1, 1, 4),
+#                                gr.io_signature(0, 0, 0))
         self.deque = collections.deque(maxlen=100)
 
     def forecast(self, noutput_items, ninput_items_required):
@@ -62,10 +62,57 @@ class circular_buffer_block(gr.hier_block2):
 
 class receive_path(gr.hier_block2):
     def __init__(self, demod_class, rx_callback, options):
-        gr.hier_block2.__init__(self, "receive_path",
-                                gr.io_signature(1, 1, gr.sizeof_gr_complex),
-                                gr.io_signature(0, 0, 0))
+	gr.hier_block2.__init__(self, "receive_path",
+				gr.io_signature(1, 1, gr.sizeof_gr_complex),
+				gr.io_signature(0, 0, 0))
+        
+        options = copy.copy(options)    # make a copy so we can destructively modify
 
+        self._verbose     = options.verbose
+        self._bitrate     = options.bitrate  # desired bit rate
+
+        self._rx_callback = rx_callback  # this callback is fired when a packet arrives
+        self._demod_class = demod_class  # the demodulator_class we're using
+
+        self._chbw_factor = options.chbw_factor # channel filter bandwidth factor
+
+        # Get demod_kwargs
+        demod_kwargs = self._demod_class.extract_kwargs_from_options(options)
+
+        # Build the demodulator
+        self.demodulator = self._demod_class(**demod_kwargs)
+
+        # Make sure the channel BW factor is between 1 and sps/2
+        # or the filter won't work.
+        if(self._chbw_factor < 1.0 or self._chbw_factor > self.samples_per_symbol()/2):
+            sys.stderr.write("Channel bandwidth factor ({0}) must be within the range [1.0, {1}].\n".format(self._chbw_factor, self.samples_per_symbol()/2))
+            sys.exit(1)
+        
+        # Design filter to get actual channel we want
+        sw_decim = 1
+        chan_coeffs = gr.firdes.low_pass (1.0,                  # gain
+                                          sw_decim * self.samples_per_symbol(), # sampling rate
+                                          self._chbw_factor,    # midpoint of trans. band
+                                          0.5,                  # width of trans. band
+                                          gr.firdes.WIN_HANN)   # filter type
+        self.channel_filter = gr.fft_filter_ccc(sw_decim, chan_coeffs)
+        
+        # receiver
+        self.packet_receiver = \
+            digital.demod_pkts(self.demodulator,
+                               access_code=None,
+                               callback=self._rx_callback,
+                               threshold=-1)
+
+        # Carrier Sensing Blocks
+        alpha = 0.001
+        thresh = 30   # in dB, will have to adjust
+        self.probe_lp = gr.probe_avg_mag_sqrd_c(thresh,alpha)
+        self.probe_hp = gr.probe_avg_mag_sqrd_c(thresh,alpha)
+
+        # Display some information about the setup
+        if self._verbose:
+            self._print_verbage()
 
         low_pass_taps = [
             -0.011857823032443,
@@ -93,8 +140,8 @@ class receive_path(gr.hier_block2):
             -0.128315103082374,
             0.011857823032443]
 
-        self.lp = gr.fir_filter_ccf(1, low_pass_taps)
-        self.hp = gr.fir_filter_ccf(1, high_pass_taps)
+        self.lp = filter.adaptive_fir_ccf("lp", 1, low_pass_taps)
+        self.hp = filter.adaptive_fir_ccf("hp", 1, high_pass_taps)
 
         self.power_low_pass = gr.complex_to_mag_squared()
         self.power_high_pass = gr.complex_to_mag_squared()
@@ -102,45 +149,22 @@ class receive_path(gr.hier_block2):
         self.power_low_pass_buf = circular_buffer_block()
         self.power_high_pass_buf = circular_buffer_block()
 
-
-        self.connect(self, self.lp, self.power_low_pass, self.power_low_pass_buf)
-        self.connect(self, self.hp, self.power_high_pass, self.power_high_pass_buf)
-
-	#self.kcopy = gr.kludge_copy(gr.sizeof_gr_complex)
-        #self.connect(self, self.kcopy)
-        #self.connect(self.kcopy, self.lp)
-        #self.connect(self.lp, self.power_low_pass)
+        self.connect(self, self.lp)
+        self.connect(self.lp, self.probe_lp)
+        self.connect(self, self.hp)
+        self.connect(self.hp, self.probe_hp)
         #self.connect(self.power_low_pass, self.power_low_pass_buf)
-        #self.connect(self.kcopy, self.hp)
-        #self.connect(self.hp, self.power_high_pass)
-        #self.connect(self.power_high_pass, self.power_high_pass_buf)
-        
-        options = copy.copy(options)    # make a copy so we can destructively modify
+        #self.connect(self, self.lp, self.power_low_pass, self.power_low_pass_buf)
+        #self.connect(self, self.hp, self.power_high_pass, self.power_high_pass_buf)
 
-        self._verbose     = options.verbose
-        self._bitrate     = options.bitrate  # desired bit rate
+	# connect block input to channel filter
+	#self.connect(self, self.channel_filter)
 
-        self._rx_callback = rx_callback  # this callback is fired when a packet arrives
-        self._demod_class = demod_class  # the demodulator_class we're using
+        # connect the channel input filter to the carrier power detector
+        #self.connect(self.channel_filter, self.probe)
 
-        self._chbw_factor = options.chbw_factor # channel filter bandwidth factor
-
-        # Get demod_kwargs
-        demod_kwargs = self._demod_class.extract_kwargs_from_options(options)
-
-        # Build the demodulator
-        self.demodulator = self._demod_class(**demod_kwargs)
-
-        # Make sure the channel BW factor is between 1 and sps/2
-        # or the filter won't work.
-        if(self._chbw_factor < 1.0 or self._chbw_factor > self.samples_per_symbol()/2):
-            sys.stderr.write("Channel bandwidth factor ({0}) must be within the range [1.0, {1}].\n".format(self._chbw_factor, self.samples_per_symbol()/2))
-            sys.exit(1)
-        
-        # Display some information about the setup
-        if self._verbose:
-            self._print_verbage()
-
+        # connect channel filter to the packet receiver
+        #self.connect(self.channel_filter, self.packet_receiver)
 
     def bitrate(self):
         return self._bitrate

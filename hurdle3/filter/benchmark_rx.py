@@ -139,16 +139,16 @@ def main():
 
     last_n_rcvd = n_rcvd
     cur_freq_offset = freq_offset
-    tb.source.set_freq(options.rx_freq+cur_freq_offset)
+    #tb.source.set_freq(options.rx_freq+cur_freq_offset)
     
     while 1:
         
         time.sleep(per_wait)
 
-        low_sum = tb.rxpath.power_low_pass_buf.sum()
-        high_sum = tb.rxpath.power_high_pass_buf.sum()
+        low_sum = tb.rxpath.probe_lp.level()
+        high_sum = tb.rxpath.probe_hp.level()
 
-	print "low=%f\nhigh=%f\n" % low_sum, high_sum
+	print "low=%f\nhigh=%f\n" % (low_sum, high_sum)
 
         if last_n_rcvd == n_rcvd:
             if cur_freq_offset > 0:
@@ -156,8 +156,8 @@ def main():
             else:
                 cur_freq_offset = freq_offset
 
-            print "Switching frequency to %d\n" % (options.rx_freq+cur_freq_offset)
-            tb.source.set_freq(options.rx_freq+cur_freq_offset)
+            #print "Switching frequency to %d\n" % (options.rx_freq+cur_freq_offset)
+            #tb.source.set_freq(options.rx_freq+cur_freq_offset)
 
         else:
             print "Not switching frequencies since we are still receiving\n"
