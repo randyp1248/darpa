@@ -130,7 +130,7 @@ class receive_path(gr.hier_block2):
         Adds receiver-specific options to the Options Parser
         """
         if not normal.has_option("--bitrate"):
-            normal.add_option("-r", "--bitrate", type="eng_float", default=400e3,
+            normal.add_option("-r", "--bitrate", type="eng_float", default=2500e3,
                               help="specify bitrate [default=%default].")
         normal.add_option("-v", "--verbose", action="store_true", default=False)
         expert.add_option("-S", "--samples-per-symbol", type="float", default=2,

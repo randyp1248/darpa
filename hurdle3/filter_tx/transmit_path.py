@@ -97,7 +97,7 @@ class transmit_path(gr.hier_block2):
         """
         if not normal.has_option('--bitrate'):
             normal.add_option("-r", "--bitrate", type="eng_float",
-                              default=400e3,
+                              default=2500e3,
                               help="specify bitrate [default=%default].")
         normal.add_option("", "--tx-amplitude", type="eng_float",
                           default=0.50, metavar="AMPL",
