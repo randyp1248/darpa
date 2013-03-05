@@ -1,0 +1,9 @@
+linux; GNU C++ version 4.6.3; Boost_104800; UHD_003.005.001-25-ge134b863
+
+-- Opening a USRP2/N-Series device...
+-- Current recv frame size: 1472 bytes
+-- Current send frame size: 1472 bytes
+Using Volk machine: sse4_1_32
+1498750000.000000
+Setting frequency to 1500625000
+
