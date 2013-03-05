@@ -54,6 +54,9 @@ class my_top_block(gr.top_block):
                                        options.rx_freq, options.rx_gain,
                                        options.spec, options.antenna,
                                        options.verbose)
+
+            print "symbol rate %f samples_per_symbol %f " % (symbol_rate, options.samples_per_symbol)
+
             options.samples_per_symbol = self.source._sps
 
         elif(options.from_file is not None):
@@ -148,7 +151,7 @@ def main():
         low_sum = tb.rxpath.probe_lp.level()
         high_sum = tb.rxpath.probe_hp.level()
 
-	print "low=%f\nhigh=%f\n" % (low_sum, high_sum)
+	print " low=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
 
         if last_n_rcvd == n_rcvd:
             if cur_freq_offset > 0:
