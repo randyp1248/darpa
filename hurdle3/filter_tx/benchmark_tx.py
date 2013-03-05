@@ -37,10 +37,6 @@ import time, struct, sys
 import filter_swig as filter
 import copy
 
-#import os 
-#print os.getpid()
-#raw_input('Attach and press enter')
-
 class filter_top_block(gr.top_block):
     def __init__(self, options):
         gr.top_block.__init__(self)
@@ -108,7 +104,7 @@ class filter_top_block(gr.top_block):
 	    -0.0389]
 
         # Carrier Sensing Blocks
-        alpha = 0.001
+        alpha = 0.5
         thresh = 30   # in dB, will have to adjust
         self.probe_lp = gr.probe_avg_mag_sqrd_c(thresh,alpha)
         self.probe_hp = gr.probe_avg_mag_sqrd_c(thresh,alpha)
@@ -132,25 +128,25 @@ class my_top_block(gr.top_block):
             args = modulator.extract_kwargs_from_options(options)
             symbol_rate = options.bitrate / modulator(**args).bits_per_symbol()
 
-            #self.sink = uhd_transmitter(options.args, symbol_rate,
-                                        #options.samples_per_symbol,
-                                        #options.tx_freq, options.tx_gain,
-                                        #options.spec, options.antenna,
-                                        #options.verbose)
-            #options.samples_per_symbol = self.sink._sps
+            self.sink = uhd_transmitter(options.args, symbol_rate,
+                                        options.samples_per_symbol,
+                                        options.tx_freq, options.tx_gain,
+                                        options.spec, options.antenna,
+                                        options.verbose)
+            options.samples_per_symbol = self.sink._sps
             
         elif(options.to_file is not None):
             sys.stderr.write(("Saving samples to '%s'.\n\n" % (options.to_file)))
-            #self.sink = gr.file_sink(gr.sizeof_gr_complex, options.to_file)
+            self.sink = gr.file_sink(gr.sizeof_gr_complex, options.to_file)
         else:
             sys.stderr.write("No sink defined, dumping samples to null sink.\n\n")
-            #self.sink = gr.null_sink(gr.sizeof_gr_complex)
+            self.sink = gr.null_sink(gr.sizeof_gr_complex)
 
         # do this after for any adjustments to the options that may
         # occur in the sinks (specifically the UHD sink)
         self.txpath = transmit_path(modulator, options)
 
-        #self.connect(self.txpath, self.sink)
+        self.connect(self.txpath, self.sink)
 
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main
@@ -205,13 +201,13 @@ def main():
     if r != gr.RT_OK:
         print "Warning: failed to enable realtime scheduling"
 
-    #tb.start()                       # start flow graph
+    tb.start()                       # start flow graph
     #tb.sink.set_gain(-10)
-    #ftb.start()
+    ftb.start()
     #ftb.lock()
 
     print "Setting frequency to %d\n" % (options.tx_freq+625000)
-    #tb.sink.set_freq(options.tx_freq+625000)
+    tb.sink.set_freq(options.tx_freq+625000)
         
     # generate and send packets
     nbytes = int(1e6 * options.megabytes)
@@ -234,43 +230,37 @@ def main():
         if options.discontinuous and pktno % 5 == 4:
             time.sleep(1)
 
-	tb.stop()
-	ftb.start()
-        while 1:
-            time.sleep(0.1)
-            low_sum = ftb.probe_lp.level()
-            high_sum = ftb.probe_hp.level()
-            print " low=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
+#	tb.stop()
+#        tb.sink.set_gain(-60)
+	#ftb.start()
+#        while 1:
+#            time.sleep(0.1)
+#            low_sum = ftb.probe_lp.level()
+#            high_sum = ftb.probe_hp.level()
+#            print " low=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
 
-        #if pktno % 20 == 20-1:
-        if pktno == 1:
-
-            #tb.sink.set_gain(-60)
-            #tb.lock()
-            tb.stop()
-            #tb.wait()
-            #ftb.unlock()
-	    ftb.start()
-            time.sleep(0.1)
+        if pktno % 25 == 25-1:
+            tb.sink.set_gain(-60)
+            time.sleep(0.250)
             low_sum = ftb.probe_lp.level()
             high_sum = ftb.probe_hp.level()
                 
-            while 1:
-                time.sleep(0.1)
-                low_sum = ftb.probe_lp.level()
-                high_sum = ftb.probe_hp.level()
-                print " low=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
+            #while 1:
+                #low_sum = ftb.probe_lp.level()
+                #high_sum = ftb.probe_hp.level()
+                #print " low=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
+                #time.sleep(0.150)
  
             print "\nlow=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
 
             if low_sum > high_sum:
                 print "Setting frequency to %d\n" % (options.tx_freq+625000)
-                #tb.sink.set_freq(options.tx_freq+625000)
+                tb.sink.set_freq(options.tx_freq+625000)
             else:
                 print "Setting frequency to %d\n" % (options.tx_freq-625000)
-                #tb.sink.set_freq(options.tx_freq-625000)
+                tb.sink.set_freq(options.tx_freq-625000)
 
-            #tb.sink.set_gain(30)
+            tb.sink.set_gain(30)
 
         #if pktno % 50 == 50-1:
         #    print "Setting frequency to %d\n" % (options.tx_freq+625000)
