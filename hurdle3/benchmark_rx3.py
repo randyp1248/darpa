@@ -52,8 +52,8 @@ class my_top_block(gr.top_block):
             self.source = uhd_receiver(options.args, symbol_rate,
                                        options.samples_per_symbol,
                                        options.rx_freq, options.rx_gain,
-                                       options.spec, options.antenna,1)
-                                       #options.verbose)
+                                       options.spec, options.antenna,
+                                       options.verbose)
             options.samples_per_symbol = self.source._sps
 
         elif(options.from_file is not None):
@@ -78,8 +78,10 @@ class my_top_block(gr.top_block):
 global n_rcvd, n_right
 
 def main():
-    global n_rcvd, n_right, start_time, stop_rcv
+    global n_rcvd, n_right, start_time, stop_rcv, per_wait, last_n_rcvd, freq_offset
     
+    per_wait = 200 # 0.2 seconds
+    freq_offset = 625000
     TIMEOUT = 600 # 600 sec for hurdle 3
     n_rcvd = 0
     n_right = 0
@@ -135,7 +137,7 @@ def main():
     expert_grp = parser.add_option_group("Expert")
 
     parser.add_option("-m", "--modulation", type="choice", choices=demods.keys(), 
-                      default='psk',
+                      default='dqpsk',
                       help="Select modulation from: %s [default=%%default]"
                             % (', '.join(demods.keys()),))
     parser.add_option("","--from-file", default=None,
@@ -179,6 +181,9 @@ def main():
     from subprocess import os
     os.system(cmd1)
 
+    last_n_rcvd = n_rcvd
+    cur_freq_offset = freq_offset
+    tb.source.set_freq(options.rx_freq+cur_freq_offset)
 
     tb.start()        # start flow graph
    # tb.wait()         # wait for it to finish
@@ -188,6 +193,20 @@ def main():
           break;
        mstr_cnt = mstr_cnt + 1
        time.sleep(0.001)
+
+       if (mstr_cnt % per_wait == per_wait-1):
+           if last_n_rcvd == n_rcvd:
+               if cur_freq_offset > 0:
+                   cur_freq_offset = 0-freq_offset
+               else:
+                   cur_freq_offset = freq_offset
+
+               print "Switching frequency to %d\n" % (options.rx_freq+cur_freq_offset)
+               tb.source.set_freq(options.rx_freq+cur_freq_offset)
+
+           else:
+               print "Not switching frequencies since we are still receiving\n"
+               last_n_rcvd = n_rcvd
 
     if stop_rcv == 0:
        print "Receiver timed out, received %d packets successfully in %d sec" %(n_right, TIMEOUT)

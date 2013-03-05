@@ -31,12 +31,97 @@ from gnuradio import digital
 # from current dir
 from transmit_path import transmit_path
 from uhd_interface import uhd_transmitter
+from uhd_interface import uhd_receiver
 
 import time, struct, sys, socket
+import filter_swig as filter
+import copy
 
 #import os 
 #print os.getpid()
 #raw_input('Attach and press enter')
+
+class filter_top_block(gr.top_block):
+    def __init__(self, options):
+        gr.top_block.__init__(self)
+
+        options = copy.copy(options)
+        symbol_rate = 2500000
+
+ 
+ 
+        print "%f" % (options.tx_freq-1.25e6)
+        #print "==========================================\n"
+        #print "Samp per sym = %d\n" % options.samples_per_symbol
+        #print "==========================================\n"
+
+        self.source = uhd_receiver(options.args, symbol_rate, 
+                                   1, #options.samples_per_symbol,
+                                   options.tx_freq-1.25e6, 30,
+                                   options.spec, options.antenna,
+                                   options.verbose)
+
+        low_pass_taps = [
+	    -0.0401,
+	    0.0663,
+	    0.0468,
+	    -0.0235,
+	    -0.0222,
+	    0.0572,
+	    0.0299,
+	    -0.1001,
+	    -0.0294,
+	    0.3166,
+	    0.5302,
+	    0.3166,
+	    -0.0294,
+	    -0.1001,
+	    0.0299,
+	    0.0572,
+	    -0.0222,
+	    -0.0235,
+	    0.0468,
+	    0.0663,
+	    -0.0401]
+
+	high_pass_taps = [
+	    -0.0389,
+	    -0.0026,
+	    0.0302,
+	    0.0181,
+	    -0.0357,
+	    -0.0394,
+	    0.0450,
+	    0.0923,
+	    -0.0472,
+	    -0.3119,
+	    0.5512,
+	    -0.3119,
+	    -0.0472,
+	    0.0923,
+	    0.0450,
+	    -0.0394,
+	    -0.0357,
+	    0.0181,
+	    0.0302,
+	    -0.0026,
+	    -0.0389]
+
+        # Carrier Sensing Blocks
+        alpha = 0.5
+        thresh = 30   # in dB, will have to adjust
+        self.probe_lp = gr.probe_avg_mag_sqrd_c(thresh,alpha)
+        self.probe_hp = gr.probe_avg_mag_sqrd_c(thresh,alpha)
+
+        self.lp = gr.fft_filter_ccc(32, low_pass_taps)
+        self.hp = gr.fft_filter_ccc(32, high_pass_taps)
+
+        self.connect(self.source, self.lp)
+        self.connect(self.lp, self.probe_lp)
+
+        self.connect(self.source, self.hp)
+        self.connect(self.hp, self.probe_hp)
+        
 
 class my_top_block(gr.top_block):
     def __init__(self, modulator, options):
@@ -50,8 +135,8 @@ class my_top_block(gr.top_block):
             self.sink = uhd_transmitter(options.args, symbol_rate,
                                         options.samples_per_symbol,
                                         options.tx_freq, options.tx_gain,
-                                        options.spec, options.antenna,1)
-                                        #options.verbose)
+                                        options.spec, options.antenna,
+                                        options.verbose)
             options.samples_per_symbol = self.sink._sps
             
         elif(options.to_file is not None):
@@ -82,7 +167,7 @@ def main():
     expert_grp = parser.add_option_group("Expert")
 
     parser.add_option("-m", "--modulation", type="choice", choices=mods.keys(),
-                      default='psk',
+                      default='dqpsk',
                       help="Select modulation from: %s [default=%%default]"
                             % (', '.join(mods.keys()),))
 
@@ -114,12 +199,14 @@ def main():
 
     # build the graph
     tb = my_top_block(mods[options.modulation], options)
+    ftb = filter_top_block(options)
 
     r = gr.enable_realtime_scheduling()
     if r != gr.RT_OK:
         print "Warning: failed to enable realtime scheduling"
 
     tb.start()                       # start flow graph
+    ftb.start()
         
     # log parameter to OML
     cmd1 = "/root/OML/omlcli --out h2_benchmark --line \""
@@ -149,6 +236,8 @@ def main():
        print"Connection error"
        return
 
+    print "Setting frequency to %d\n" % (options.tx_freq+625000)
+    tb.sink.set_freq(options.tx_freq+625000)
    
     n = 0
     pktno = 0
@@ -185,6 +274,34 @@ def main():
         sys.stderr.write('.')
         if options.discontinuous and pktno % 5 == 4:
             time.sleep(1)
+
+        if pktno % 25 == 25-1:
+            tb.sink.set_gain(-60)
+            time.sleep(0.250)
+            low_sum = ftb.probe_lp.level()
+            high_sum = ftb.probe_hp.level()
+                
+            #while 1:
+                #time.sleep(0.1)
+                #low_sum = ftb.probe_lp.level()
+                #high_sum = ftb.probe_hp.level()
+                #print " low=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
+ 
+            print "\n low=%f\nhigh=%f\n" % (low_sum*100000, high_sum*100000)
+
+            if low_sum > high_sum:
+                print "Setting frequency to %d\n" % (options.tx_freq+625000)
+                tb.sink.set_freq(options.tx_freq+625000)
+            else:
+                print "Setting frequency to %d\n" % (options.tx_freq-625000)
+                tb.sink.set_freq(options.tx_freq-625000)
+
+            tb.sink.set_gain(30)
+
+        #if pktno % 50 == 50-1:
+        #    print "Setting frequency to %d\n" % (options.tx_freq+625000)
+            #tb.sink.set_freq(options.tx_freq+625000)
+
         pktno += 1
         
     if options.from_file is None:
