@@ -144,11 +144,11 @@ def main():
         if options.discontinuous and pktno % 5 == 4:
             time.sleep(1)
 
-        if pktno % 50 == 25-1:
+        if pktno % 500 == 500-1:
             print "Setting frequency to %d\n" % (options.tx_freq-625000)
             tb.sink.set_freq(options.tx_freq-625000)
 
-        if pktno % 50 == 50-1:
+        if pktno % 500 == 250-1:
             print "Setting frequency to %d\n" % (options.tx_freq+625000)
             tb.sink.set_freq(options.tx_freq+625000)
 
