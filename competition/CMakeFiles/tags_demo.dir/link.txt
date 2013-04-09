@@ -1,0 +1,1 @@
+/usr/bin/c++       CMakeFiles/tags_demo.dir/tags_demo.o  -o tags_demo -rdynamic -lgnuradio-uhd 
