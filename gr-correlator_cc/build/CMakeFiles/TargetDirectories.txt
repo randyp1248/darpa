@@ -1,0 +1,9 @@
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/swig/CMakeFiles/_correlator_cc_swig.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/swig/CMakeFiles/_correlator_cc_swig_doc_tag.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/swig/CMakeFiles/_correlator_cc_swig_swig_tag.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/lib/CMakeFiles/gnuradio-correlator_cc.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/apps/CMakeFiles/pygen_apps_9a6dd.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/python/CMakeFiles/pygen_python_de627.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/swig/CMakeFiles/pygen_swig_a5f74.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/lib/CMakeFiles/test-correlator_cc.dir
+/home/kenchin/gnuradio/gnuradio/darpa/gr-correlator_cc/build/CMakeFiles/uninstall.dir
