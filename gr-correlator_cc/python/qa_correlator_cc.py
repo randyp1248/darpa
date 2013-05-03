@@ -31,8 +31,27 @@ class qa_correlator_cc (gr_unittest.TestCase):
 
     def test_001_t (self):
 
-        src_data        = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(-1+0j),(-1+0j),(-1+0j),(+1+0j),(-1+0j),(-1+0j),(+1+0j),(+1+0j),(-1+0j),(+1+0j),(-1+0j), (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
-        expected_data   = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+        src_data        = (
+			   # Random samples
+			   (+1+1j),(+1-1j),(-1-1j),(-1+1j),(-1+1j),(+1-1j),(+1+1j),(-1-1j),(+1-1j),(+1+1j),
+			   # PN Sequence
+                           (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(-1+0j),(-1+0j),(-1+0j),
+                           (+1+0j),(+1+0j),(-1+0j),(+1+0j),(+1+0j),(+1+0j),(-1+0j),(+1+0j),
+                           (-1+0j),(+1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(+1+0j),(-1+0j),
+                           (-1+0j),(+1+0j),(-1+0j),(+1+0j),(+1+0j),(-1+0j),(-1+0j),
+			   # First frame data
+			   (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
+			   # Random samples
+			   (+1+1j),(+1-1j),(-1-1j),(-1+1j),(-1+1j),(+1-1j),(+1+1j),(-1-1j),(+1-1j),(+1+1j),
+			   # PN Sequence
+                           (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(-1+0j),(-1+0j),(-1+0j),
+                           (+1+0j),(+1+0j),(-1+0j),(+1+0j),(+1+0j),(+1+0j),(-1+0j),(+1+0j),
+                           (-1+0j),(+1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(+1+0j),(-1+0j),
+                           (-1+0j),(+1+0j),(-1+0j),(+1+0j),(+1+0j),(-1+0j),(-1+0j),
+			   # Second frame data
+			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+        expected_data   = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
+			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
@@ -40,8 +59,8 @@ class qa_correlator_cc (gr_unittest.TestCase):
         self.tb.connect(dut, sink)
         self.tb.run()
         result_data = sink.data()
-        print expected_data
-        print result_data
+        #print expected_data
+        #print result_data
         self.assertEqual(expected_data, result_data)
 
 

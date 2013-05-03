@@ -35,9 +35,10 @@
 namespace gr {
 namespace correlator_cc {
 
-//Taps: [ 4 3 ]
-const int correlator_cc_impl::_sequence[15] = {
-   +1, +1, +1, +1, -1, -1, -1, +1, -1, -1, +1, +1, -1, +1, -1
+//Taps: [ 5 3 ]
+const int correlator_cc_impl::_sequence[31] = {
+   +1, +1, +1, +1, +1, -1, -1, -1, +1, +1, -1, +1, +1, +1, -1, +1, 
+   -1, +1, -1, -1, -1, -1, +1, -1, -1, +1, -1, +1, +1, -1, -1
 };
 
 static const int MIN_IN = 1;  // mininum number of input streams
@@ -95,6 +96,42 @@ correlator_cc_impl::detect_peak(long real, long imag)
 
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
@@ -107,14 +144,10 @@ correlator_cc_impl::detect_peak(long real, long imag)
    _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
@@ -132,7 +165,7 @@ correlator_cc_impl::detect_peak(long real, long imag)
    double accImag = (double)_accImag[_accIndex];
    if (sqrt(accReal*accReal + accImag*accImag) > 65536.0/2*CODE_LENGTH)
    {
-      printf("Peak on sample %ld\n", _sampleNum);
+      //printf("Peak on sample %ld\n", _sampleNum);
       _capsuleLen = 10;  // TODO put this constant in a common header
    }
 
@@ -170,6 +203,7 @@ correlator_cc_impl::general_work (
 	 out[samplesOutput++] = in[samplesRead];
 	 ++samplesRead;
 	 --samplesRemaining;
+	 --_capsuleLen;
       }
 
       while (samplesRemaining && !_capsuleLen)

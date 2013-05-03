@@ -37,7 +37,8 @@ for($tap=$numStages; $tap>=1; --$tap)
    if ($taps[$tap] == 1) {$tapString .= "$tap ";};
 }
 
-$pnSequence = "";
+$pnSequenceI = "";
+$pnSequenceIQ = "";
 $correlateRealCode = "";
 $correlateImagCode = "";
 #iternate over the pn sequence
@@ -45,7 +46,7 @@ for($iter=0; $iter<$codeLength; ++$iter)
 {
    if ($stage[$numStages])
    {
-      $output = "+1";
+      $outputI = "+1";
       $newline = <<END;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
@@ -54,7 +55,7 @@ END
    }
    else
    {
-      $output = "-1";
+      $outputI = "-1";
       $newline = <<END;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
@@ -68,10 +69,14 @@ END
       $stage[$stageNum] = $stage[$stageNum-1];
    }
    $stage[1] = $newshift;
-   if ($iter%16 == 0) {$pnSequence .= "   ";};
-   $pnSequence .= $output;
-   if ($iter < $codeLength-1) {$pnSequence .= ", ";};
-   if ($iter%16 == 15) {$pnSequence .= "\n";};
+   if ($iter%16 == 0) {$pnSequenceI .= "   ";}
+   if ($iter%8 == 0) {$pnSequenceIQ .= "                           ";}
+   $pnSequenceI .= $outputI;
+   $pnSequenceIQ .= "\($outputI+0j\)";
+   if ($iter < $codeLength-1) {$pnSequenceI .= ", ";}
+   $pnSequenceIQ .= ",";
+   if ($iter%16 == 15) {$pnSequenceI .= "\n";};
+   if (($iter < $codeLength-1) &&($iter%8 == 7)) {$pnSequenceIQ .= "\n";};
 }
 
 
@@ -83,6 +88,7 @@ END
 
 open(HEADER, '>correlator_cc_impl.h');
 open(CODE, '>correlator_cc_impl.cc');
+open(TESTCODE, '>../python/qa_correlator_cc.py');
 
 
 
@@ -201,7 +207,7 @@ namespace correlator_cc {
 
 //Taps: [ $tapString]
 const int correlator_cc_impl::_sequence[$codeLength] = {
-$pnSequence
+$pnSequenceI
 };
 
 static const int MIN_IN = 1;  // mininum number of input streams
@@ -266,7 +272,7 @@ $correlate
    double accImag = (double)_accImag[_accIndex];
    if (sqrt(accReal*accReal + accImag*accImag) > 65536.0/2*CODE_LENGTH)
    {
-      printf("Peak on sample %ld\\n", _sampleNum);
+      //printf("Peak on sample %ld\\n", _sampleNum);
       _capsuleLen = 10;  // TODO put this constant in a common header
    }
 
@@ -304,6 +310,7 @@ correlator_cc_impl::general_work (
 	 out[samplesOutput++] = in[samplesRead];
 	 ++samplesRead;
 	 --samplesRemaining;
+	 --_capsuleLen;
       }
 
       while (samplesRemaining && !_capsuleLen)
@@ -325,6 +332,78 @@ correlator_cc_impl::general_work (
 } /* namespace gr */
 END
 
+####################################################################################
+####################################################################################
+#####                             Test Generation                              #####
+####################################################################################
+####################################################################################
+
+print TESTCODE <<END;
+#!/usr/bin/env python
+# 
+# Copyright 2013 <+YOU OR YOUR COMPANY+>.
+# 
+# This is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3, or (at your option)
+# any later version.
+# 
+# This software is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this software; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 51 Franklin Street,
+# Boston, MA 02110-1301, USA.
+# 
+
+from gnuradio import gr, gr_unittest
+import correlator_cc_swig as correlator_cc
+
+class qa_correlator_cc (gr_unittest.TestCase):
+
+    def setUp (self):
+        self.tb = gr.top_block ()
+
+    def tearDown (self):
+        self.tb = None
+
+    def test_001_t (self):
+
+        src_data        = (
+			   # Random samples
+			   (+1+1j),(+1-1j),(-1-1j),(-1+1j),(-1+1j),(+1-1j),(+1+1j),(-1-1j),(+1-1j),(+1+1j),
+			   # PN Sequence
+$pnSequenceIQ
+			   # First frame data
+			   (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
+			   # Random samples
+			   (+1+1j),(+1-1j),(-1-1j),(-1+1j),(-1+1j),(+1-1j),(+1+1j),(-1-1j),(+1-1j),(+1+1j),
+			   # PN Sequence
+$pnSequenceIQ
+			   # Second frame data
+			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+        expected_data   = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
+			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+        source = gr.vector_source_c(src_data)
+	dut = correlator_cc.correlator_cc()
+        sink = gr.vector_sink_c()
+        self.tb.connect(source, dut)
+        self.tb.connect(dut, sink)
+        self.tb.run()
+        result_data = sink.data()
+        #print expected_data
+        #print result_data
+        self.assertEqual(expected_data, result_data)
+
+
+if __name__ == '__main__':
+    gr_unittest.run(qa_correlator_cc, "qa_correlator_cc.xml")
+END
+
+close(TESTCODE);
 close(CODE);
 close(HEADER);
 

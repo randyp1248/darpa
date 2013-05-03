@@ -26,7 +26,7 @@
 
 #include <correlator_cc/correlator_cc.h>
 
-#define CODE_LENGTH (15)
+#define CODE_LENGTH (31)
 #define ACCUMULATOR_LENGTH (2048)
 #define ACCUMULATOR_LENGTH_MASK (0x7ff)
 
