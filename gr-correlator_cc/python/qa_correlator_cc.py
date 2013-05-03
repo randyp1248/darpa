@@ -30,9 +30,19 @@ class qa_correlator_cc (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t (self):
-        # set up fg
-        self.tb.run ()
-        # check data
+
+        src_data        = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(-1+0j),(-1+0j),(-1+0j),(+1+0j),(-1+0j),(-1+0j),(+1+0j),(+1+0j),(-1+0j),(+1+0j),(-1+0j), (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+        expected_data   = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+        source = gr.vector_source_c(src_data)
+	dut = correlator_cc.correlator_cc()
+        sink = gr.vector_sink_c()
+        self.tb.connect(source, dut)
+        self.tb.connect(dut, sink)
+        self.tb.run()
+        result_data = sink.data()
+        print expected_data
+        print result_data
+        self.assertEqual(expected_data, result_data)
 
 
 if __name__ == '__main__':

@@ -47,8 +47,8 @@ for($iter=0; $iter<$codeLength; ++$iter)
    {
       $output = "+1";
       $newline = <<END;
-      _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-      _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
 END
       $correlate = $newline . $correlate;
    }
@@ -56,8 +56,8 @@ END
    {
       $output = "-1";
       $newline = <<END;
-      _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-      _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
 END
       $correlate = $newline . $correlate;
    }
@@ -134,6 +134,7 @@ private:
    long _accImag[ACCUMULATOR_LENGTH];
    int _accIndex;  // Indexes the accumulator that is receiving its last contribution
    unsigned long _sampleNum;
+   unsigned long _capsuleLen;
 
 public:
    correlator_cc_impl();
@@ -220,8 +221,9 @@ correlator_cc::make()
 correlator_cc_impl::correlator_cc_impl()
    : gr_block(
         "correlator_cc",
-        gr_make_io_signature(MIN_IN, MAX_IN, sizeof(std::complex<int>)),
-        gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(std::complex<int>)))
+        gr_make_io_signature(MIN_IN, MAX_IN, sizeof(gr_complex)),
+        gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
+	
 {
    int i;
    for (i=0; i<ACCUMULATOR_LENGTH; ++i)
@@ -231,6 +233,7 @@ correlator_cc_impl::correlator_cc_impl()
       _accIndex = 0;
    }
    _sampleNum = 0;
+   _capsuleLen = 0;
 }
 
 /*
@@ -243,7 +246,7 @@ correlator_cc_impl::~correlator_cc_impl()
 void
 correlator_cc_impl::detect_peak(long real, long imag)
 {
-   int index = _accIndex;
+   int index = _accIndex-1;
    double mag = sqrt(real*real + imag*imag);
    double scale = 65536 / mag;  // Normalize magnitude to 2^16
 
@@ -264,6 +267,7 @@ $correlate
    if (sqrt(accReal*accReal + accImag*accImag) > 65536.0/2*CODE_LENGTH)
    {
       printf("Peak on sample %ld\\n", _sampleNum);
+      _capsuleLen = 10;  // TODO put this constant in a common header
    }
 
    ++_accIndex;
@@ -273,7 +277,7 @@ $correlate
 void
 correlator_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-   /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
+   ninput_items_required[0] = noutput_items;
 }
 
 int
@@ -284,19 +288,37 @@ correlator_cc_impl::general_work (
    gr_vector_void_star &output_items
 )
 {
-   std::complex<int> *in = (std::complex<int> *) &input_items[0];
-   std::complex<int> *out = (std::complex<int> *) &output_items[0];
+   const gr_complex* in = reinterpret_cast<const gr_complex*>(input_items[0]);
+   gr_complex *out = reinterpret_cast<gr_complex*>(output_items[0]);
+   int samplesRemaining = ninput_items[0];
+   int samplesOutput = 0;
+   int samplesRead = 0;
 
-   for(int i=0; i<noutput_items; ++i)
+   while (samplesRemaining)
    {
-      detect_peak(in[i].real(), in[i].imag());
+      while (samplesRemaining && _capsuleLen)
+      {
+         // Peak has been detected, output this sample
+	 // TODO: rotate
+
+	 out[samplesOutput++] = in[samplesRead];
+	 ++samplesRead;
+	 --samplesRemaining;
+      }
+
+      while (samplesRemaining && !_capsuleLen)
+      {
+	 detect_peak(in[samplesRead].real(), in[samplesRead].imag());
+	 ++samplesRead;
+	 --samplesRemaining;
+      }
    }
 
    // Tell runtime system how many input items we consumed on each input stream.
-   consume_each (noutput_items);
+   consume_each (samplesRead);
 
    // Tell runtime system how many output items we produced.
-   return noutput_items;
+   return samplesOutput;
 }
 
 } /* namespace correlator_cc */
