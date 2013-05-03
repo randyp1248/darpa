@@ -26,9 +26,11 @@
 
 #include <correlator_cc/correlator_cc.h>
 
-#define CODE_LENGTH (31)
+#define CODE_LENGTH (15)
 #define ACCUMULATOR_LENGTH (2048)
 #define ACCUMULATOR_LENGTH_MASK (0x7ff)
+
+typedef float sampleType;
 
 namespace gr {
 namespace correlator_cc {
@@ -37,15 +39,17 @@ class correlator_cc_impl : public correlator_cc
 {
 
 private:
-   void detect_peak(long real, long imag);
+   void detect_peak(sampleType real, sampleType imag);
 
    static const int _sequence[CODE_LENGTH];
 
-   long _accReal[ACCUMULATOR_LENGTH];
-   long _accImag[ACCUMULATOR_LENGTH];
+   sampleType _accReal[ACCUMULATOR_LENGTH];
+   sampleType _accImag[ACCUMULATOR_LENGTH];
    int _accIndex;  // Indexes the accumulator that is receiving its last contribution
    unsigned long _sampleNum;
    unsigned long _capsuleLen;
+
+   gr_complex rotator;
 
 public:
    correlator_cc_impl();

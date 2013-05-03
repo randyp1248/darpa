@@ -35,10 +35,9 @@
 namespace gr {
 namespace correlator_cc {
 
-//Taps: [ 5 3 ]
-const int correlator_cc_impl::_sequence[31] = {
-   +1, +1, +1, +1, +1, -1, -1, -1, +1, +1, -1, +1, +1, +1, -1, +1, 
-   -1, +1, -1, -1, -1, -1, +1, -1, -1, +1, -1, +1, +1, -1, -1
+//Taps: [ 4 3 ]
+const int correlator_cc_impl::_sequence[15] = {
+   +1, +1, +1, +1, -1, -1, -1, +1, -1, -1, +1, +1, -1, +1, -1
 };
 
 static const int MIN_IN = 1;  // mininum number of input streams
@@ -81,7 +80,7 @@ correlator_cc_impl::~correlator_cc_impl()
 }
 
 void
-correlator_cc_impl::detect_peak(long real, long imag)
+correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 {
    int index = _accIndex-1;
    double mag = sqrt(real*real + imag*imag);
@@ -91,47 +90,11 @@ correlator_cc_impl::detect_peak(long real, long imag)
    // here it is not because it may weight the transmitter feedback incorrectly.
    // The result is more of a phase correlator.
 
-   real = (long)(real*scale);
-   imag = (long)(imag*scale);
+   real = (sampleType)(real*scale);
+   imag = (sampleType)(imag*scale);
 
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
-   _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
@@ -144,10 +107,14 @@ correlator_cc_impl::detect_peak(long real, long imag)
    _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
@@ -167,6 +134,9 @@ correlator_cc_impl::detect_peak(long real, long imag)
    {
       //printf("Peak on sample %ld\n", _sampleNum);
       _capsuleLen = 10;  // TODO put this constant in a common header
+
+      double mag = sqrt(accReal*accReal + accImag*accImag);
+      rotator = gr_complex(accReal/mag,-accImag/mag);
    }
 
    ++_accIndex;
@@ -200,7 +170,7 @@ correlator_cc_impl::general_work (
          // Peak has been detected, output this sample
 	 // TODO: rotate
 
-	 out[samplesOutput++] = in[samplesRead];
+	 out[samplesOutput++] = in[samplesRead] * rotator;
 	 ++samplesRead;
 	 --samplesRemaining;
 	 --_capsuleLen;
