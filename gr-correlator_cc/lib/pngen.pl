@@ -312,7 +312,6 @@ correlator_cc_impl::general_work (
       while (samplesRemaining && _capsuleLen)
       {
          // Peak has been detected, output this sample
-	 // TODO: rotate
 
 	 out[samplesOutput++] = in[samplesRead] * rotator;
 	 ++samplesRead;
