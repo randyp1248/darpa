@@ -121,8 +121,8 @@ print HEADER <<END;
 #include <correlator_cc/correlator_cc.h>
 
 #define CODE_LENGTH ($codeLength)
-#define ACCUMULATOR_LENGTH (2048)
-#define ACCUMULATOR_LENGTH_MASK (0x7ff)
+#define ACCUMULATOR_LENGTH (1<<($numStages+1))
+#define ACCUMULATOR_LENGTH_MASK (ACCUMULATOR_LENGTH-1)
 
 typedef float sampleType;
 
