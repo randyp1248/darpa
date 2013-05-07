@@ -1,3 +1,6 @@
+#ifndef TRITONS_INCL
+#define TRITONS_INCL
+
 // TODO: this will need to be set by command line parameter
 #define CENTER_FREQUENCY 1500000000
 
@@ -11,7 +14,6 @@
 // K information bits
 // If concatenated codes are used, then multiply both code Ks together here.
 #define CODE_RATE_K 1
-#define 
 
 // Number log2 of the alphabet size, or the code bit to symbol ratio
 #define MODULATION_ORDER_M 2
@@ -41,7 +43,7 @@
 
 // Length of preamble PN Sequence in symbols.
 // TODO: Tune this to be robust against interference.  Initial number for testing purposes.
-#define PREAMBLE_SYMBOL_LENGTH 15
+#define PREAMBLE_SYMBOL_LENGTH 1023
 
 // Length of preamble PN Sequence in samples.
 #define PREAMBLE_SAMPLE_LENGTH (PREAMBLE_SYMBOL_LENGTH * OVERSAMPLE_FACTOR)
@@ -54,7 +56,8 @@
 // Length of capsule is limited by the phase error due to frequency error.
 // The numerator is symbols/s, and the denominator is error cycles/s, which comes to symbols/error cycle.  All of this is
 // multiplied by the fractional allowed cycle (20 degrees).
-#define CAPSULE_SYMBOL_LENGTH (SYMBOL_RATE / (CENTER_FREQUENCY * FREQUENCY_ERROR_PPM/1000000) * 20/360)
+//#define CAPSULE_SYMBOL_LENGTH (SYMBOL_RATE / (CENTER_FREQUENCY * FREQUENCY_ERROR_PPM/1000000) * 20/360)
+#define CAPSULE_SYMBOL_LENGTH 10
 
 // Length of data capsule in samples.
 #define CAPSULE_SAMPLE_LENGTH (CAPSULE_SYMBOL_LENGTH * OVERSAMPLE_FACTOR)
@@ -65,3 +68,4 @@
 // Length of Ack or Nak PN Sequence in samples.
 #define ARQ_SAMPLE_LENGTH (ARQ_SYMBOL_LENGTH * OVERSAMPLE_FACTOR)
 
+#endif //TRITONS_INCL

@@ -30,7 +30,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "correlator_cc_impl.h"
+#include "TRITONS.h"
 
+#if (15 != PREAMBLE_SYMBOL_LENGTH)
+//#error Mismatch preamble length (15 != PREAMBLE_SYMBOL_LENGTH)
+#endif
 
 namespace gr {
 namespace correlator_cc {
@@ -62,6 +66,7 @@ correlator_cc_impl::correlator_cc_impl()
 	
 {
    int i;
+
    for (i=0; i<ACCUMULATOR_LENGTH; ++i)
    {
       _accReal[i] = 0;
@@ -92,6 +97,10 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 
    real = (sampleType)(real*scale);
    imag = (sampleType)(imag*scale);
+
+   // Zero out the accumulator that is getting its first sample
+   _accReal[(index+CODE_LENGTH)&ACCUMULATOR_LENGTH_MASK] = 0;
+   _accImag[(index+CODE_LENGTH)&ACCUMULATOR_LENGTH_MASK] = 0;
 
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
@@ -128,12 +137,12 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    ++_sampleNum;
 
    // Threshold the correlation
-   double accReal = (double)_accReal[_accIndex];
-   double accImag = (double)_accImag[_accIndex];
+   double accReal = (double)_accReal[_accIndex&ACCUMULATOR_LENGTH_MASK];
+   double accImag = (double)_accImag[_accIndex&ACCUMULATOR_LENGTH_MASK];
    if (sqrt(accReal*accReal + accImag*accImag) > 65536.0/2*CODE_LENGTH)
    {
       //printf("Peak on sample %ld\n", _sampleNum);
-      _capsuleLen = 10;  // TODO put this constant in a common header
+      _capsuleLen = CAPSULE_SYMBOL_LENGTH;
 
       double mag = sqrt(accReal*accReal + accImag*accImag);
       rotator = gr_complex(accReal/mag,-accImag/mag);
