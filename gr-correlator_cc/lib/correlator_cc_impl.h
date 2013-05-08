@@ -26,8 +26,8 @@
 
 #include <correlator_cc/correlator_cc.h>
 
-#define CODE_LENGTH (15)
-#define ACCUMULATOR_LENGTH (1<<(4+1))
+#define CODE_LENGTH (255)
+#define ACCUMULATOR_LENGTH (1<<(8+1))
 #define ACCUMULATOR_LENGTH_MASK (ACCUMULATOR_LENGTH-1)
 
 typedef float sampleType;
@@ -41,7 +41,8 @@ class correlator_cc_impl : public correlator_cc
 private:
    void detect_peak(sampleType real, sampleType imag);
 
-   static const int _sequence[CODE_LENGTH];
+   static const int _sequenceI[CODE_LENGTH];
+   static const int _sequenceQ[CODE_LENGTH];
 
    sampleType _accReal[ACCUMULATOR_LENGTH];
    sampleType _accImag[ACCUMULATOR_LENGTH];

@@ -32,16 +32,50 @@
 #include "correlator_cc_impl.h"
 #include "TRITONS.h"
 
-#if (15 != PREAMBLE_SYMBOL_LENGTH)
-//#error Mismatch preamble length (15 != PREAMBLE_SYMBOL_LENGTH)
+#if (255 != PREAMBLE_SYMBOL_LENGTH)
+//#error Mismatch preamble length (255 != PREAMBLE_SYMBOL_LENGTH)
 #endif
 
 namespace gr {
 namespace correlator_cc {
 
-//Taps: [ 4 3 ]
-const int correlator_cc_impl::_sequence[15] = {
-   +1, +1, +1, +1, -1, -1, -1, +1, -1, -1, +1, +1, -1, +1, -1
+//Taps: [ 8 6 5 4 ]
+const int correlator_cc_impl::_sequenceI[255] = {
+   +0, +0, +0, +0, +0, +0, +0, +0, +1, +1, +1, +0, +0, +1, -1, -1, 
+   +0, -1, +0, +1, +0, -1, +0, +1, -1, +1, +1, +0, +1, +1, +1, +1, 
+   +0, +0, +1, +1, +0, +0, -1, +1, +1, +1, -1, +0, +0, +0, +0, +0, 
+   -1, +0, +0, +0, +1, +0, +0, +0, +0, +0, +0, +1, +0, +1, +0, -1, 
+   +1, +0, -1, +0, +0, -1, +0, -1, +0, +1, +0, +0, +1, +1, +0, +0, 
+   +0, +1, -1, +0, -1, -1, +0, +0, -1, +1, +0, +1, -1, -1, +0, +1, 
+   +0, +0, +0, -1, +1, +1, +0, +1, -1, -1, +0, +0, +0, +0, -1, -1, 
+   +0, -1, +0, +0, +0, +0, -1, +1, -1, -1, +0, +1, +0, +1, +1, +1, 
+   +0, +0, +1, +0, +1, +0, +0, +0, +0, +0, +1, +1, +0, +0, +0, +0, 
+   -1, +0, +0, -1, -1, +0, +1, +0, -1, +0, +0, +0, +1, +0, +1, +0, 
+   +0, +1, +0, +0, +0, -1, +1, +0, +0, -1, +0, -1, +1, +0, +0, +1, 
+   +0, +0, -1, +0, +1, -1, -1, +0, +1, -1, +0, +0, +0, -1, +0, +0, 
+   +1, +0, +0, -1, -1, +1, -1, +0, +0, +0, -1, +0, +1, -1, +0, +1, 
+   -1, +0, +1, +1, -1, -1, +1, +0, +1, +0, +0, +1, +1, -1, +0, +0, 
+   +0, +1, +1, +1, -1, -1, -1, +0, +0, +1, +0, +0, +0, +0, -1, +0, 
+   -1, -1, -1, +1, +1, -1, +1, +0, +1, +1, +0, +1, +0, +1, +1
+};
+//Taps: [ 8 6 5 3 ]
+const int correlator_cc_impl::_sequenceQ[255] = {
+   -1, -1, -1, -1, -1, -1, -1, -1, +0, +0, +0, +1, -1, +0, +0, +0, 
+   -1, +0, +1, +0, +1, +0, -1, +0, +0, +0, +0, +1, +0, +0, +0, +0, 
+   -1, +1, +0, +0, -1, -1, +0, +0, +0, +0, +0, +1, +1, -1, +1, -1, 
+   +0, -1, +1, +1, +0, +1, +1, +1, -1, -1, +1, +0, -1, +0, +1, +0, 
+   +0, +1, +0, -1, +1, +0, -1, +0, +1, +0, -1, +1, +0, +0, +1, +1, 
+   -1, +0, +0, +1, +0, +0, +1, -1, +0, +0, -1, +0, +0, +0, +1, +0, 
+   -1, +1, -1, +0, +0, +0, +1, +0, +0, +0, -1, -1, -1, +1, +0, +0, 
+   +1, +0, -1, -1, -1, +1, +0, +0, +0, +0, -1, +0, -1, +0, +0, +0, 
+   -1, +1, +0, +1, +0, -1, -1, +1, -1, -1, +0, +0, +1, -1, -1, -1, 
+   +0, +1, +1, +0, +0, -1, +0, +1, +0, -1, +1, +1, +0, -1, +0, -1, 
+   -1, +0, -1, +1, +1, +0, +0, +1, +1, +0, +1, +0, +0, +1, -1, +0, 
+   -1, +1, +0, +1, +0, +0, +0, -1, +0, +0, -1, -1, +1, +0, -1, +1, 
+   +0, -1, -1, +0, +0, +0, +0, -1, -1, -1, +0, -1, +0, +0, +1, +0, 
+   +0, -1, +0, +0, +0, +0, +0, -1, +0, -1, +1, +0, +0, +0, -1, +1, 
+   +1, +0, +0, +0, +0, +0, +0, +1, -1, +0, -1, +1, -1, +1, +0, -1, 
+   +0, +0, +0, +0, +0, +0, +0, -1, +0, +0, +1, +0, -1, +0, +0
 };
 
 static const int MIN_IN = 1;  // mininum number of input streams
@@ -102,8 +136,22 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    _accReal[(index+CODE_LENGTH)&ACCUMULATOR_LENGTH_MASK] = 0;
    _accImag[(index+CODE_LENGTH)&ACCUMULATOR_LENGTH_MASK] = 0;
 
-   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
-   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
@@ -116,8 +164,26 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
@@ -130,8 +196,456 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    _accImag[index] += imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
+   _accImag[index] -= imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
+   _accImag[index] += imag;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
 
 
    ++_sampleNum;

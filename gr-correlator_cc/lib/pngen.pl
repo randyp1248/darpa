@@ -1,81 +1,157 @@
 #!/usr/bin/perl
 
-
 #initialize the taps
-$numStages= 0;
+$numStagesI = 0;
+$numStagesQ = 0;
 for($tap=0; $tap<100; ++$tap)
 {
-   $taps[$tap] = 0;
+   $tapsI[$tap] = 0;
+   $tapsQ[$tap] = 0;
 }
 
 #read the taps from the command line
 while ($tap = shift)
 {
-   $taps[$tap] = 1;
-   if ($tap > $numStages)
+   if (($tap eq "-i") || ($tap eq "-q"))
    {
-      $numStages = $tap;
+      $tapswitch = $tap;
+      next;
+   }
+   if ($tapswitch eq "-i")
+   {
+      $tapsI[$tap] = 1;
+      if ($tap > $numStagesI)
+      {
+	 $numStagesI = $tap;
+      }
+   }
+   elsif ($tapswitch eq "-q")
+   {
+      $tapsQ[$tap] = 1;
+      if ($tap > $numStagesQ)
+      {
+	 $numStagesQ = $tap;
+      }
+   }
+   else
+   {
+      print "ERROR: tap without -i or -q qualifier.\n";
+      exit(-1);
    }
 }
-$codeLength = (1<<$numStages)-1;
+if ($numStagesQ != $numStagesI)
+{
+   print "ERROR: number of stages in I and Q are imbalanced.\n";
+   exit(-1);
+}
+$codeLength = (1<<$numStagesI)-1;
 
-if ($numStages == 0)
+if ($numStagesI == 0)
 {
    &usage;
    exit(-1);
 }
 
 #initialize the stage delays to all ones
-for($stageNum=1; $stageNum<=$numStages; ++$stageNum)
+for($stageNum=1; $stageNum<=$numStagesI; ++$stageNum)
 {
-   $stage[$stageNum] = 1;
+   $stageI[$stageNum] = 1;
+   $stageQ[$stageNum] = 1;
 }
 
-$tapString = "";
-for($tap=$numStages; $tap>=1; --$tap)
+$tapStringI = "";
+$tapStringQ = "";
+for($tap=$numStagesI; $tap>=1; --$tap)
 {
-   if ($taps[$tap] == 1) {$tapString .= "$tap ";};
+   if ($tapsI[$tap] == 1) {$tapStringI .= "$tap ";};
+   if ($tapsQ[$tap] == 1) {$tapStringQ .= "$tap ";};
 }
 
 $pnSequenceI = "";
+$pnSequenceQ = "";
 $pnSequenceIQ = "";
 $correlateRealCode = "";
 $correlateImagCode = "";
 #iternate over the pn sequence
 for($iter=0; $iter<$codeLength; ++$iter)
 {
-   if ($stage[$numStages])
+   if ((!$stageI[$numStagesI]) && (!$stageQ[$numStagesQ])) # 00 => 1+0j
    {
+#print "00\n";
       $outputI = "+1";
+      $outputQ = "+0";
       $newline = <<END;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += real;
    _accImag[index] += imag;
 END
-      $correlate = $newline . $correlate;
    }
-   else
+   if ((!$stageI[$numStagesI]) && ($stageQ[$numStagesQ])) # 01 => 0+1j
    {
+#print "01\n";
+      $outputI = "+0";
+      $outputQ = "+1";
+      $newline = <<END;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] += imag;
+   _accImag[index] -= real;
+END
+   }
+   if (($stageI[$numStagesI]) && (!$stageQ[$numStagesQ])) # 10 =>-1+0j
+   {
+#print "10\n";
       $outputI = "-1";
+      $outputQ = "+0";
       $newline = <<END;
    _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= real;
    _accImag[index] -= imag;
 END
-      $correlate = $newline . $correlate;
    }
-   $newshift = 0;
-   for($stageNum=$numStages; $stageNum>1; --$stageNum)
+   if (($stageI[$numStagesI]) && ($stageQ[$numStagesQ])) # 11 => 0-1j
    {
-      $newshift ^= ($taps[$stageNum] * $stage[$stageNum]);
-      $stage[$stageNum] = $stage[$stageNum-1];
+#print "11\n";
+      $outputI = "+0";
+      $outputQ = "-1";
+      $newline = <<END;
+   _accReal[++index, index&=ACCUMULATOR_LENGTH_MASK] -= imag;
+   _accImag[index] += real;
+END
    }
-   $stage[1] = $newshift;
-   if ($iter%16 == 0) {$pnSequenceI .= "   ";}
+   $correlate = $newline . $correlate;
+
+
+
+   #print "tapsI  = ";
+   for($stageNum=$numStagesI; $stageNum>=1; --$stageNum)
+   {
+      #print $tapsI[$stageNum] . " ";
+   }
+   #print "\n";
+   #print "stageI = ";
+   for($stageNum=$numStagesI; $stageNum>=1; --$stageNum)
+   {
+      #print $stageI[$stageNum] . " ";
+   }
+   #print "\n\n";
+
+
+   $newshiftI = 0;
+   $newshiftQ = 0;
+   for($stageNum=$numStagesI; $stageNum>1; --$stageNum)
+   {
+      $newshiftI ^= ($tapsI[$stageNum] * $stageI[$stageNum]);
+      $stageI[$stageNum] = $stageI[$stageNum-1];
+      $newshiftQ ^= ($tapsQ[$stageNum] * $stageQ[$stageNum]);
+      $stageQ[$stageNum] = $stageQ[$stageNum-1];
+   }
+   $stageI[1] = $newshiftI ^ ($tapsI[1] * $stageI[1]);
+   $stageQ[1] = $newshiftQ ^ ($tapsQ[1] * $stageQ[1]);
+   if ($iter%16 == 0) {$pnSequenceI .= "   ";$pnSequenceQ .= "   ";}
    if ($iter%8 == 0) {$pnSequenceIQ .= "                           ";}
    $pnSequenceI .= $outputI;
-   $pnSequenceIQ .= "\($outputI+0j\)";
-   if ($iter < $codeLength-1) {$pnSequenceI .= ", ";}
+   $pnSequenceQ .= $outputQ;
+   $pnSequenceIQ .= "\($outputI" . $outputQ . "j\)";
+   if ($iter < $codeLength-1) {$pnSequenceI .= ", ";$pnSequenceQ .= ", ";}
    $pnSequenceIQ .= ",";
-   if ($iter%16 == 15) {$pnSequenceI .= "\n";};
+   if ($iter%16 == 15) {$pnSequenceI .= "\n";$pnSequenceQ .= "\n";};
    if (($iter < $codeLength-1) &&($iter%8 == 7)) {$pnSequenceIQ .= "\n";};
 }
 
@@ -121,7 +197,7 @@ print HEADER <<END;
 #include <correlator_cc/correlator_cc.h>
 
 #define CODE_LENGTH ($codeLength)
-#define ACCUMULATOR_LENGTH (1<<($numStages+1))
+#define ACCUMULATOR_LENGTH (1<<($numStagesI+1))
 #define ACCUMULATOR_LENGTH_MASK (ACCUMULATOR_LENGTH-1)
 
 typedef float sampleType;
@@ -135,7 +211,8 @@ class correlator_cc_impl : public correlator_cc
 private:
    void detect_peak(sampleType real, sampleType imag);
 
-   static const int _sequence[CODE_LENGTH];
+   static const int _sequenceI[CODE_LENGTH];
+   static const int _sequenceQ[CODE_LENGTH];
 
    sampleType _accReal[ACCUMULATOR_LENGTH];
    sampleType _accImag[ACCUMULATOR_LENGTH];
@@ -212,9 +289,13 @@ print CODE <<END;
 namespace gr {
 namespace correlator_cc {
 
-//Taps: [ $tapString]
-const int correlator_cc_impl::_sequence[$codeLength] = {
+//Taps: [ $tapStringI]
+const int correlator_cc_impl::_sequenceI[$codeLength] = {
 $pnSequenceI
+};
+//Taps: [ $tapStringQ]
+const int correlator_cc_impl::_sequenceQ[$codeLength] = {
+$pnSequenceQ
 };
 
 static const int MIN_IN = 1;  // mininum number of input streams
@@ -491,9 +572,10 @@ close(HEADER);
 sub usage
 {
    print <<END;
-Usage: ./pngen.pl <tap>...
-The number of taps must be non-zero.  
+Usage: ./pngen.pl -i <tap>... -q <tap>...
+The number of taps must be non-zero.
 Number of stages is derived from the largest tap.
+The number of stages in the I and Q branches must be equal.
 
 Maximal length taps are:
 =========================
