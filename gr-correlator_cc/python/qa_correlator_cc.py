@@ -122,6 +122,36 @@ class qa_correlator_cc (gr_unittest.TestCase):
 			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
         expected_data   = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
 			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+        src_data = src_data + src_data;
+	expected_data = expected_data + expected_data;
+
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
