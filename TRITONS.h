@@ -30,7 +30,7 @@
 #define SYMBOL_RATE (CODE_BIT_RATE / MODULATION_ORDER_M)
 
 // Code bit rate is the bit rate out of the encoder
-#define CODE_BIT_RATE (BIT_RATE * CODE_RATE_N / CODE_RATE_K)
+#define CODE_BIT_RATE (INFORMATION_BIT_RATE * CODE_RATE_N / CODE_RATE_K)
 
 // The information bit rate is the rate at which bits are fed into the encoder.
 // It is not exactly the true information bit rate because some of those bits
@@ -39,6 +39,7 @@
 // TODO: Tune this number so that the SAMPLE_RATE is close to 5Msps.  Low number for testing purposes.
 #define INFORMATION_BIT_RATE 1000
 
+// TODO: Compute FFT size
 #define FFT_SIZE
 
 // Length of preamble PN Sequence in symbols.
@@ -63,7 +64,7 @@
 #define CAPSULE_SAMPLE_LENGTH (CAPSULE_SYMBOL_LENGTH * OVERSAMPLE_FACTOR)
 
 // Length of Ack or Nak PN Sequence in symbols.
-#define ARQ_SYMBOL_LENGTH (PREAMBLE_LENGTH)
+#define ARQ_SYMBOL_LENGTH (PREAMBLE_SYMBOL_LENGTH)
 
 // Length of Ack or Nak PN Sequence in samples.
 #define ARQ_SAMPLE_LENGTH (ARQ_SYMBOL_LENGTH * OVERSAMPLE_FACTOR)
