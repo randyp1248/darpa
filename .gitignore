@@ -1,2 +1,3 @@
 *.pyc
 gr-correlator_cc/build
+howto/build

@@ -1,0 +1,9 @@
+/home/dave/tritonsporject/gr-howto/build/swig/CMakeFiles/_howto_swig.dir
+/home/dave/tritonsporject/gr-howto/build/swig/CMakeFiles/_howto_swig_doc_tag.dir
+/home/dave/tritonsporject/gr-howto/build/swig/CMakeFiles/_howto_swig_swig_tag.dir
+/home/dave/tritonsporject/gr-howto/build/lib/CMakeFiles/gnuradio-howto.dir
+/home/dave/tritonsporject/gr-howto/build/apps/CMakeFiles/pygen_apps_9a6dd.dir
+/home/dave/tritonsporject/gr-howto/build/python/CMakeFiles/pygen_python_a18c5.dir
+/home/dave/tritonsporject/gr-howto/build/swig/CMakeFiles/pygen_swig_ae4f2.dir
+/home/dave/tritonsporject/gr-howto/build/lib/CMakeFiles/test-howto.dir
+/home/dave/tritonsporject/gr-howto/build/CMakeFiles/uninstall.dir
