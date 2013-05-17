@@ -22,5 +22,6 @@
 ########################################################################
 install(FILES
     api.h
-    correlator_cc.h DESTINATION include/correlator_cc
+    correlator_cc.h
+    preamble_insert_cc.h DESTINATION include/correlator_cc
 )

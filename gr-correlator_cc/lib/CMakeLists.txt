@@ -27,6 +27,7 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 list(APPEND correlator_cc_sources
     correlator_cc_impl.cc
+    preamble_insert_cc_impl.cc
 )
 
 add_library(gnuradio-correlator_cc SHARED ${correlator_cc_sources})

@@ -18,5 +18,6 @@
 # Boston, MA 02110-1301, USA.
 
 install(FILES
-    correlator_cc_correlator_cc.xml DESTINATION share/gnuradio/grc/blocks
+    correlator_cc_correlator_cc.xml
+    correlator_cc_preamble_insert_cc.xml DESTINATION share/gnuradio/grc/blocks
 )

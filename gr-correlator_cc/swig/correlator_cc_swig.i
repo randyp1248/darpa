@@ -9,8 +9,11 @@
 
 %{
 #include "correlator_cc/correlator_cc.h"
+#include "correlator_cc/preamble_insert_cc.h"
 %}
 
 
 %include "correlator_cc/correlator_cc.h"
 GR_SWIG_BLOCK_MAGIC2(correlator_cc, correlator_cc);
+%include "correlator_cc/preamble_insert_cc.h"
+GR_SWIG_BLOCK_MAGIC2(correlator_cc, preamble_insert_cc);
