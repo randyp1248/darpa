@@ -94,7 +94,6 @@ for($iter=0; $iter<$codeLength; ++$iter)
    if (($stageI[$numStagesI]) && ($stageQ[$numStagesQ])) # 11 => 0-1j
    { $outputI = "+0"; $outputQ = "-1"; }
 
-
 #print "$outputI $outputQ j ";
 
    # phaseShift = current / last = (e + fj)/(a + bj)
@@ -263,8 +262,6 @@ private:
    unsigned long _sampleNum;
    unsigned long _capsuleLen;
 
-   gr_complex rotator;
-
 public:
    correlator_cc_impl();
    ~correlator_cc_impl();
@@ -339,6 +336,7 @@ $pnSequenceI
 const int correlator_cc_impl::_sequenceQ[$codeLength] = {
 $pnSequenceQ
 };
+
 
 static const int MIN_IN = 1;  // mininum number of input streams
 static const int MAX_IN = 1;  // maximum number of input streams
@@ -416,9 +414,6 @@ $correlateQ
    {
       printf("Peak on sample %ld\\n", _sampleNum);
       _capsuleLen = CAPSULE_SYMBOL_LENGTH;
-
-      double mag = sqrt(accReal*accReal + accImag*accImag);
-      rotator = gr_complex(accReal/mag,-accImag/mag);
    }
 
    ++_accIndex;
@@ -461,7 +456,7 @@ correlator_cc_impl::general_work (
       {
          // Peak has been detected, output this sample
 
-	 out[samplesOutput++] = in[samplesRead] * rotator;
+	 out[samplesOutput++] = in[samplesRead];
 	 ++samplesRead;
 	 --samplesRemaining;
 	 --_capsuleLen;
@@ -524,6 +519,11 @@ class qa_correlator_cc (gr_unittest.TestCase):
     def tearDown (self):
         self.tb = None
 
+    randomSamples = ((+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j))
+    firstFrame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+    pnSequence = ($pnSequenceIQ)
+    secondFrame = ((-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+
     ####################################################################################
     #  test_001_t
     #
@@ -540,21 +540,8 @@ class qa_correlator_cc (gr_unittest.TestCase):
 
     def test_001_t (self):
 
-        src_data        = (
-			   # Random samples
-			   (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-			   # PN Sequence
-$pnSequenceIQ
-			   # First frame data
-			   (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
-			   # Random samples
-			   (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-			   # PN Sequence
-$pnSequenceIQ
-			   # Second frame data
-			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
-        expected_data   = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
-			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+        src_data = self.randomSamples + self.pnSequence + self.firstFrame + self.randomSamples + self.pnSequence + self.secondFrame
+        expected_data = self.firstFrame + self.secondFrame
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
@@ -585,7 +572,7 @@ $pnSequenceIQ
     #  Test passes if the two frames are passed to the output, but no other samples.
     #  The samples will have to be rotated back for the test to pass.
     ####################################################################################
-    def dontrun_002_t (self):
+    def xxst_002_t (self):
 
         src_data        = (
 			   # Random samples

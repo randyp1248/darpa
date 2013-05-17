@@ -50,8 +50,6 @@ private:
    unsigned long _sampleNum;
    unsigned long _capsuleLen;
 
-   gr_complex rotator;
-
 public:
    correlator_cc_impl();
    ~correlator_cc_impl();

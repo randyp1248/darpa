@@ -78,6 +78,7 @@ const int correlator_cc_impl::_sequenceQ[255] = {
    +0, +0, +0, +0, +0, +0, +0, -1, +0, +0, +1, +0, -1, +0, +0
 };
 
+
 static const int MIN_IN = 1;  // mininum number of input streams
 static const int MAX_IN = 1;  // maximum number of input streams
 static const int MIN_OUT = 1; // minimum number of output streams
@@ -662,9 +663,6 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    {
       printf("Peak on sample %ld\n", _sampleNum);
       _capsuleLen = CAPSULE_SYMBOL_LENGTH;
-
-      double mag = sqrt(accReal*accReal + accImag*accImag);
-      rotator = gr_complex(accReal/mag,-accImag/mag);
    }
 
    ++_accIndex;
@@ -707,7 +705,7 @@ correlator_cc_impl::general_work (
       {
          // Peak has been detected, output this sample
 
-	 out[samplesOutput++] = in[samplesRead] * rotator;
+	 out[samplesOutput++] = in[samplesRead];
 	 ++samplesRead;
 	 --samplesRemaining;
 	 --_capsuleLen;
