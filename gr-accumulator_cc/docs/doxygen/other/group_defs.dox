@@ -1,0 +1,7 @@
+/*!
+ * \defgroup block GNU Radio ACCUMULATOR_CC C++ Signal Processing Blocks
+ * \brief All C++ blocks that can be used from the ACCUMULATOR_CC GNU Radio
+ *        module are listed here or in the subcategories below.
+ *
+ */
+
