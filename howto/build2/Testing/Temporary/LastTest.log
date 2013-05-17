@@ -1,0 +1,35 @@
+Start testing: May 14 11:46 PDT
+----------------------------------------------------------
+1/2 Testing: test_howto
+1/2 Test: test_howto
+Command: "/bin/sh" "/home/dave/tritonsporject/gr-howto/build/lib/test_howto_test.sh"
+Directory: /home/dave/tritonsporject/gr-howto/build/lib
+"test_howto" start time: May 14 11:46 PDT
+Output:
+----------------------------------------------------------
+
+
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"test_howto" end time: May 14 11:46 PDT
+"test_howto" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/2 Testing: qa_square_ff
+2/2 Test: qa_square_ff
+Command: "/bin/sh" "/home/dave/tritonsporject/gr-howto/build/python/qa_square_ff_test.sh"
+Directory: /home/dave/tritonsporject/gr-howto/build/python
+"qa_square_ff" start time: May 14 11:46 PDT
+Output:
+----------------------------------------------------------
+<end of output>
+Test time =   0.33 sec
+----------------------------------------------------------
+Test Passed.
+"qa_square_ff" end time: May 14 11:46 PDT
+"qa_square_ff" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: May 14 11:46 PDT
