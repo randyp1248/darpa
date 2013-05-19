@@ -654,7 +654,7 @@ $correlateQ
       // Reset the correlation magnitude to start looking for next peak.
       _correlationMagnitude = 0.0;
    }
-   if (mag > CODE_LENGTH/2.0)
+   else if (mag > CODE_LENGTH/2.0)
    {
       //printf("Peak on sample %ld\\n", _sampleNum);
       _correlationMagnitude = mag;
@@ -704,10 +704,10 @@ correlator_cc_impl::general_work (
 	 if (_oddSample == _oddData)
 	 {
 	    out[samplesOutput++] = in[samplesRead];
-	    ++samplesRead;
-	    --samplesRemaining;
 	    --_capsuleLen;
 	 }
+	 ++samplesRead;
+	 --samplesRemaining;
 	 _oddSample ^= 1;
       }
 
@@ -799,7 +799,6 @@ class qa_correlator_cc (gr_unittest.TestCase):
         src_data = self.randomSamples + self.pnSequence + self.firstFrame + self.randomSamples + self.pnSequence + self.secondFrame
         src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
         expected_data = self.firstFrame + self.secondFrame
-        expected_data = tuple([val for pair in zip(expected_data,expected_data) for val in pair])
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()

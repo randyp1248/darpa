@@ -90,7 +90,6 @@ class qa_correlator_cc (gr_unittest.TestCase):
         src_data = self.randomSamples + self.pnSequence + self.firstFrame + self.randomSamples + self.pnSequence + self.secondFrame
         src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
         expected_data = self.firstFrame + self.secondFrame
-        expected_data = tuple([val for pair in zip(expected_data,expected_data) for val in pair])
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()

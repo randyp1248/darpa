@@ -654,7 +654,7 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
       // Reset the correlation magnitude to start looking for next peak.
       _correlationMagnitude = 0.0;
    }
-   if (mag > CODE_LENGTH/2.0)
+   else if (mag > CODE_LENGTH/2.0)
    {
       //printf("Peak on sample %ld\n", _sampleNum);
       _correlationMagnitude = mag;
@@ -704,10 +704,10 @@ correlator_cc_impl::general_work (
 	 if (_oddSample == _oddData)
 	 {
 	    out[samplesOutput++] = in[samplesRead];
-	    ++samplesRead;
-	    --samplesRemaining;
 	    --_capsuleLen;
 	 }
+	 ++samplesRead;
+	 --samplesRemaining;
 	 _oddSample ^= 1;
       }
 
