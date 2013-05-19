@@ -70,12 +70,22 @@ correlator_cc_impl::correlator_cc_impl()
 
    for (i=0; i<ACCUMULATOR_LENGTH; ++i)
    {
-      _accReal[i] = 0;
-      _accImag[i] = 0;
-      _accIndex = 0;
+      _accRealOdd[i] = 0;
+      _accImagOdd[i] = 0;
+
+      _accRealEven[i] = 0;
+      _accImagEven[i] = 0;
    }
+   _accIndexOdd = 0;
+   _accIndexEven = 0;
+
    _sampleNum = 0;
    _capsuleLen = 0;
+
+   _oddSample = 0;
+   _oddData = 0;
+
+   _correlationMagnitude = 0.0;
 }
 
 /*
@@ -88,11 +98,21 @@ correlator_cc_impl::~correlator_cc_impl()
 void
 correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 {
-   static sampleType lastReal = 0;
-   static sampleType lastImag = 0;
+   static sampleType lastRealOdd = 0;
+   static sampleType lastImagOdd = 0;
+   static sampleType lastRealEven = 0;
+   static sampleType lastImagEven = 0;
 
-   sampleType* realPtr = _accReal + _accIndex;
-   sampleType* imagPtr = _accImag + _accIndex;
+   sampleType& lastReal = (_oddSample ? lastRealOdd : lastRealEven);
+   sampleType& lastImag = (_oddSample ? lastImagOdd : lastImagEven);
+
+   int& accIndex = (_oddSample ? _accIndexOdd : _accIndexEven);
+
+   sampleType* accRealArr = (_oddSample ? _accRealOdd : _accRealEven);
+   sampleType* accImagArr = (_oddSample ? _accImagOdd : _accImagEven);
+
+   sampleType* realPtr = accRealArr + accIndex;
+   sampleType* imagPtr = accImagArr + accIndex;
 
    sampleType a = lastReal;
    sampleType b = lastImag;
@@ -105,8 +125,8 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    imag = (a*f - e*b) / (a*a + b*b);
 
    // Zero out the accumulator that is getting its first sample
-   _accReal[_accIndex+CODE_LENGTH] = 0;
-   _accImag[_accIndex+CODE_LENGTH] = 0;
+   accRealArr[accIndex+CODE_LENGTH] = 0;
+   accImagArr[accIndex+CODE_LENGTH] = 0;
 
    *(realPtr + 0) += real;
    *(realPtr + 1) += imag;
@@ -622,25 +642,35 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    ++_sampleNum;
 
    // Threshold the correlation
-   double accReal = (double)_accReal[_accIndex];
-   double accImag = (double)_accImag[_accIndex];
-//printf("%f\n",sqrt(accReal*accReal + accImag*accImag));
-   if (sqrt(accReal*accReal + accImag*accImag) > CODE_LENGTH/2.0)
+   double accReal = (double)accRealArr[accIndex];
+   double accImag = (double)accImagArr[accIndex];
+   double mag = sqrt(accReal*accReal + accImag*accImag);
+   if (_correlationMagnitude > 0.0)
    {
-      printf("Peak on sample %ld\n", _sampleNum);
+      // Previous sample was peak.  Check if this one is larger.
+      _oddData = _oddSample ^ ((mag > _correlationMagnitude) ? 0 : 1);
+      // Start passing capsule data out of this block.
       _capsuleLen = CAPSULE_SYMBOL_LENGTH;
+      // Reset the correlation magnitude to start looking for next peak.
+      _correlationMagnitude = 0.0;
+   }
+   if (mag > CODE_LENGTH/2.0)
+   {
+      //printf("Peak on sample %ld\n", _sampleNum);
+      _correlationMagnitude = mag;
    }
 
-   ++_accIndex;
+   ++accIndex;
 
-   if (_accIndex + CODE_LENGTH == ACCUMULATOR_LENGTH)
+   // Prevent need for modulo arithematic for circular buffer.  Instead copy back to start of array.
+   if (accIndex + CODE_LENGTH == ACCUMULATOR_LENGTH)
    {
       for(int i=0; i<CODE_LENGTH; ++i)
       {
-         _accReal[i] = _accReal[_accIndex+i];
-         _accImag[i] = _accImag[_accIndex+i];
+         accRealArr[i] = accRealArr[accIndex+i];
+         accImagArr[i] = accImagArr[accIndex+i];
       }
-      _accIndex = 0;
+      accIndex = 0;
    }
 }
 
@@ -669,12 +699,16 @@ correlator_cc_impl::general_work (
    {
       while (samplesRemaining && _capsuleLen)
       {
-         // Peak has been detected, output this sample
+         // Peak has been detected, output this sample (only correct clock)
 
-	 out[samplesOutput++] = in[samplesRead];
-	 ++samplesRead;
-	 --samplesRemaining;
-	 --_capsuleLen;
+	 if (_oddSample == _oddData)
+	 {
+	    out[samplesOutput++] = in[samplesRead];
+	    ++samplesRead;
+	    --samplesRemaining;
+	    --_capsuleLen;
+	 }
+	 _oddSample ^= 1;
       }
 
       while (samplesRemaining && !_capsuleLen)
@@ -682,6 +716,7 @@ correlator_cc_impl::general_work (
 	 detect_peak(in[samplesRead].real(), in[samplesRead].imag());
 	 ++samplesRead;
 	 --samplesRemaining;
+	 _oddSample ^= 1;
       }
    }
 

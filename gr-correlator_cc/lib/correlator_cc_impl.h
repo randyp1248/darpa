@@ -46,11 +46,19 @@ class correlator_cc_impl : public correlator_cc
 private:
    void detect_peak(sampleType real, sampleType imag);
 
-   sampleType _accReal[ACCUMULATOR_LENGTH];
-   sampleType _accImag[ACCUMULATOR_LENGTH];
-   int _accIndex;  // Indexes the accumulator that is receiving its last contribution
+   sampleType _accRealOdd[ACCUMULATOR_LENGTH];
+   sampleType _accImagOdd[ACCUMULATOR_LENGTH];
+   sampleType _accRealEven[ACCUMULATOR_LENGTH];
+   sampleType _accImagEven[ACCUMULATOR_LENGTH];
+   int _accIndexOdd, _accIndexEven;  // Indexes the accumulator that is receiving its last contribution
    unsigned long _sampleNum;
    unsigned long _capsuleLen;
+
+   int _oddSample; // True if current sample belongs to odd clock
+   int _oddData;   // True if odd clocked data should be output
+
+   double _correlationMagnitude;
+
 
 public:
    correlator_cc_impl();

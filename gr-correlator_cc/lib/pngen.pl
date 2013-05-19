@@ -262,9 +262,7 @@ private:
    static const int _sequenceQ[CODE_LENGTH];
 
    gr_complex _sequenceIQ[CODE_LENGTH];
-   int _sampleIndex;
    gr_complex _prevSample;
-   int _pnIndex;
 
 public:
    preamble_insert_cc_impl();
@@ -355,14 +353,13 @@ preamble_insert_cc_impl::preamble_insert_cc_impl()
 		   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
 		   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)))
 {
-   set_min_output_buffer(0, 2*CODE_LENGTH);
+   set_min_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
+   set_max_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
 
    for(int i=0; i<CODE_LENGTH; ++i)
    {
       _sequenceIQ[i] = gr_complex(_sequenceI[i], _sequenceQ[i]);
    }
-   _sampleIndex = 0;
-   _pnIndex = 0;
 }
 
 preamble_insert_cc_impl::~preamble_insert_cc_impl()
@@ -372,8 +369,7 @@ preamble_insert_cc_impl::~preamble_insert_cc_impl()
 void
 preamble_insert_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-    /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
-    ninput_items_required[0] = noutput_items;
+   ninput_items_required[0] = CAPSULE_SYMBOL_LENGTH;
 }
 
 int
@@ -384,32 +380,24 @@ preamble_insert_cc_impl::general_work (int noutput_items,
 {
    const gr_complex* in = reinterpret_cast<const gr_complex*>(input_items[0]);
    gr_complex *out = reinterpret_cast<gr_complex*>(output_items[0]);
-   int samplesRemaining = ninput_items[0];
    int samplesOutput = 0;
-   int samplesRead = 0;
+   int samplesRead = ninput_items[0];
 
-   while ((samplesOutput < noutput_items) && samplesRemaining)
+   if (samplesRead > CAPSULE_SYMBOL_LENGTH)
    {
-      if ((!_sampleIndex) && (_pnIndex < CODE_LENGTH))
-      {
-	 // New frame.  Start with known previous sample differential encoding.
-	 _prevSample = gr_complex(1.0, 0.0);
+      samplesRead = CAPSULE_SYMBOL_LENGTH;
+   }
 
-	 // Output the preamble
-	 out[samplesOutput++] = _sequenceIQ[_pnIndex++];
-      }
-      else
-      {
-         // Output a sample from the input
-	 out[samplesOutput++] = in[samplesRead++];
-	 --samplesRemaining;
-	 if (++_sampleIndex == CAPSULE_SYMBOL_LENGTH)
-	 {
-	    // Wrap around.  Next sample will be new frame boundary
-	    _sampleIndex = 0;
-	 }
-         _pnIndex = 0;
-      }
+   for(int i=0; i<CODE_LENGTH; ++i)
+   {
+	 out[samplesOutput++] = _sequenceIQ[i];
+	 out[samplesOutput++] = _sequenceIQ[i];
+   }
+
+   for(int i=0; i<samplesRead; ++i)
+   {
+	 out[samplesOutput++] = in[i];
+	 out[samplesOutput++] = in[i];
    }
 
    // Tell runtime system how many input items we consumed on each input stream.
@@ -479,11 +467,19 @@ class correlator_cc_impl : public correlator_cc
 private:
    void detect_peak(sampleType real, sampleType imag);
 
-   sampleType _accReal[ACCUMULATOR_LENGTH];
-   sampleType _accImag[ACCUMULATOR_LENGTH];
-   int _accIndex;  // Indexes the accumulator that is receiving its last contribution
+   sampleType _accRealOdd[ACCUMULATOR_LENGTH];
+   sampleType _accImagOdd[ACCUMULATOR_LENGTH];
+   sampleType _accRealEven[ACCUMULATOR_LENGTH];
+   sampleType _accImagEven[ACCUMULATOR_LENGTH];
+   int _accIndexOdd, _accIndexEven;  // Indexes the accumulator that is receiving its last contribution
    unsigned long _sampleNum;
    unsigned long _capsuleLen;
+
+   int _oddSample; // True if current sample belongs to odd clock
+   int _oddData;   // True if odd clocked data should be output
+
+   double _correlationMagnitude;
+
 
 public:
    correlator_cc_impl();
@@ -582,12 +578,22 @@ correlator_cc_impl::correlator_cc_impl()
 
    for (i=0; i<ACCUMULATOR_LENGTH; ++i)
    {
-      _accReal[i] = 0;
-      _accImag[i] = 0;
-      _accIndex = 0;
+      _accRealOdd[i] = 0;
+      _accImagOdd[i] = 0;
+
+      _accRealEven[i] = 0;
+      _accImagEven[i] = 0;
    }
+   _accIndexOdd = 0;
+   _accIndexEven = 0;
+
    _sampleNum = 0;
    _capsuleLen = 0;
+
+   _oddSample = 0;
+   _oddData = 0;
+
+   _correlationMagnitude = 0.0;
 }
 
 /*
@@ -600,11 +606,21 @@ correlator_cc_impl::~correlator_cc_impl()
 void
 correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 {
-   static sampleType lastReal = 0;
-   static sampleType lastImag = 0;
+   static sampleType lastRealOdd = 0;
+   static sampleType lastImagOdd = 0;
+   static sampleType lastRealEven = 0;
+   static sampleType lastImagEven = 0;
 
-   sampleType* realPtr = _accReal + _accIndex;
-   sampleType* imagPtr = _accImag + _accIndex;
+   sampleType& lastReal = (_oddSample ? lastRealOdd : lastRealEven);
+   sampleType& lastImag = (_oddSample ? lastImagOdd : lastImagEven);
+
+   int& accIndex = (_oddSample ? _accIndexOdd : _accIndexEven);
+
+   sampleType* accRealArr = (_oddSample ? _accRealOdd : _accRealEven);
+   sampleType* accImagArr = (_oddSample ? _accImagOdd : _accImagEven);
+
+   sampleType* realPtr = accRealArr + accIndex;
+   sampleType* imagPtr = accImagArr + accIndex;
 
    sampleType a = lastReal;
    sampleType b = lastImag;
@@ -617,8 +633,8 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    imag = (a*f - e*b) / (a*a + b*b);
 
    // Zero out the accumulator that is getting its first sample
-   _accReal[_accIndex+CODE_LENGTH] = 0;
-   _accImag[_accIndex+CODE_LENGTH] = 0;
+   accRealArr[accIndex+CODE_LENGTH] = 0;
+   accImagArr[accIndex+CODE_LENGTH] = 0;
 
 $correlateI
 $correlateQ
@@ -626,25 +642,35 @@ $correlateQ
    ++_sampleNum;
 
    // Threshold the correlation
-   double accReal = (double)_accReal[_accIndex];
-   double accImag = (double)_accImag[_accIndex];
-//printf("%f\\n",sqrt(accReal*accReal + accImag*accImag));
-   if (sqrt(accReal*accReal + accImag*accImag) > CODE_LENGTH/2.0)
+   double accReal = (double)accRealArr[accIndex];
+   double accImag = (double)accImagArr[accIndex];
+   double mag = sqrt(accReal*accReal + accImag*accImag);
+   if (_correlationMagnitude > 0.0)
    {
-      printf("Peak on sample %ld\\n", _sampleNum);
+      // Previous sample was peak.  Check if this one is larger.
+      _oddData = _oddSample ^ ((mag > _correlationMagnitude) ? 0 : 1);
+      // Start passing capsule data out of this block.
       _capsuleLen = CAPSULE_SYMBOL_LENGTH;
+      // Reset the correlation magnitude to start looking for next peak.
+      _correlationMagnitude = 0.0;
+   }
+   if (mag > CODE_LENGTH/2.0)
+   {
+      //printf("Peak on sample %ld\\n", _sampleNum);
+      _correlationMagnitude = mag;
    }
 
-   ++_accIndex;
+   ++accIndex;
 
-   if (_accIndex + CODE_LENGTH == ACCUMULATOR_LENGTH)
+   // Prevent need for modulo arithematic for circular buffer.  Instead copy back to start of array.
+   if (accIndex + CODE_LENGTH == ACCUMULATOR_LENGTH)
    {
       for(int i=0; i<CODE_LENGTH; ++i)
       {
-         _accReal[i] = _accReal[_accIndex+i];
-         _accImag[i] = _accImag[_accIndex+i];
+         accRealArr[i] = accRealArr[accIndex+i];
+         accImagArr[i] = accImagArr[accIndex+i];
       }
-      _accIndex = 0;
+      accIndex = 0;
    }
 }
 
@@ -673,12 +699,16 @@ correlator_cc_impl::general_work (
    {
       while (samplesRemaining && _capsuleLen)
       {
-         // Peak has been detected, output this sample
+         // Peak has been detected, output this sample (only correct clock)
 
-	 out[samplesOutput++] = in[samplesRead];
-	 ++samplesRead;
-	 --samplesRemaining;
-	 --_capsuleLen;
+	 if (_oddSample == _oddData)
+	 {
+	    out[samplesOutput++] = in[samplesRead];
+	    ++samplesRead;
+	    --samplesRemaining;
+	    --_capsuleLen;
+	 }
+	 _oddSample ^= 1;
       }
 
       while (samplesRemaining && !_capsuleLen)
@@ -686,6 +716,7 @@ correlator_cc_impl::general_work (
 	 detect_peak(in[samplesRead].real(), in[samplesRead].imag());
 	 ++samplesRead;
 	 --samplesRemaining;
+	 _oddSample ^= 1;
       }
    }
 
@@ -766,7 +797,9 @@ class qa_correlator_cc (gr_unittest.TestCase):
     def test_001_t (self):
 
         src_data = self.randomSamples + self.pnSequence + self.firstFrame + self.randomSamples + self.pnSequence + self.secondFrame
+        src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
         expected_data = self.firstFrame + self.secondFrame
+        expected_data = tuple([val for pair in zip(expected_data,expected_data) for val in pair])
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
@@ -883,6 +916,7 @@ class qa_preamble_insert_cc (gr_unittest.TestCase):
     def test_001_t (self):
         src_data = self.firstFrame + self.secondFrame
         expected_data = self.pnSequence + self.firstFrame + self.pnSequence + self.secondFrame
+        expected_data = tuple([val for pair in zip(expected_data,expected_data) for val in pair])
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.preamble_insert_cc()
         sink = gr.vector_sink_c()

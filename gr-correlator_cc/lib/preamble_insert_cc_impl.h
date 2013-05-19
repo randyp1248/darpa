@@ -43,9 +43,7 @@ private:
    static const int _sequenceQ[CODE_LENGTH];
 
    gr_complex _sequenceIQ[CODE_LENGTH];
-   int _sampleIndex;
    gr_complex _prevSample;
-   int _pnIndex;
 
 public:
    preamble_insert_cc_impl();

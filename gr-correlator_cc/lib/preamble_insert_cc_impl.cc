@@ -91,14 +91,13 @@ preamble_insert_cc_impl::preamble_insert_cc_impl()
 		   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
 		   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)))
 {
-   set_min_output_buffer(0, 2*CODE_LENGTH);
+   set_min_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
+   set_max_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
 
    for(int i=0; i<CODE_LENGTH; ++i)
    {
       _sequenceIQ[i] = gr_complex(_sequenceI[i], _sequenceQ[i]);
    }
-   _sampleIndex = 0;
-   _pnIndex = 0;
 }
 
 preamble_insert_cc_impl::~preamble_insert_cc_impl()
@@ -108,8 +107,7 @@ preamble_insert_cc_impl::~preamble_insert_cc_impl()
 void
 preamble_insert_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-    /* <+forecast+> e.g. ninput_items_required[0] = noutput_items */
-    ninput_items_required[0] = noutput_items;
+   ninput_items_required[0] = CAPSULE_SYMBOL_LENGTH;
 }
 
 int
@@ -120,32 +118,24 @@ preamble_insert_cc_impl::general_work (int noutput_items,
 {
    const gr_complex* in = reinterpret_cast<const gr_complex*>(input_items[0]);
    gr_complex *out = reinterpret_cast<gr_complex*>(output_items[0]);
-   int samplesRemaining = ninput_items[0];
    int samplesOutput = 0;
-   int samplesRead = 0;
+   int samplesRead = ninput_items[0];
 
-   while ((samplesOutput < noutput_items) && samplesRemaining)
+   if (samplesRead > CAPSULE_SYMBOL_LENGTH)
    {
-      if ((!_sampleIndex) && (_pnIndex < CODE_LENGTH))
-      {
-	 // New frame.  Start with known previous sample differential encoding.
-	 _prevSample = gr_complex(1.0, 0.0);
+      samplesRead = CAPSULE_SYMBOL_LENGTH;
+   }
 
-	 // Output the preamble
-	 out[samplesOutput++] = _sequenceIQ[_pnIndex++];
-      }
-      else
-      {
-         // Output a sample from the input
-	 out[samplesOutput++] = in[samplesRead++];
-	 --samplesRemaining;
-	 if (++_sampleIndex == CAPSULE_SYMBOL_LENGTH)
-	 {
-	    // Wrap around.  Next sample will be new frame boundary
-	    _sampleIndex = 0;
-	 }
-         _pnIndex = 0;
-      }
+   for(int i=0; i<CODE_LENGTH; ++i)
+   {
+	 out[samplesOutput++] = _sequenceIQ[i];
+	 out[samplesOutput++] = _sequenceIQ[i];
+   }
+
+   for(int i=0; i<samplesRead; ++i)
+   {
+	 out[samplesOutput++] = in[i];
+	 out[samplesOutput++] = in[i];
    }
 
    // Tell runtime system how many input items we consumed on each input stream.

@@ -71,8 +71,11 @@ class qa_preamble_insert_cc (gr_unittest.TestCase):
     secondFrame = ((-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
 
     def test_001_t (self):
-        src_data = self.firstFrame + self.secondFrame
-        expected_data = self.pnSequence + self.firstFrame + self.pnSequence + self.secondFrame
+        #src_data = self.firstFrame + self.secondFrame
+        #expected_data = self.pnSequence + self.firstFrame + self.pnSequence + self.secondFrame
+        src_data = self.firstFrame
+        expected_data = self.pnSequence + self.firstFrame
+        expected_data = tuple([val for pair in zip(expected_data,expected_data) for val in pair])
         source = gr.vector_source_c(src_data)
 	dut = correlator_cc.preamble_insert_cc()
         sink = gr.vector_sink_c()
