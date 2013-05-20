@@ -664,7 +664,7 @@ $correlateQ
    }
    else if (_primed && (mag > 4*_movingSum/CODE_LENGTH)) // 8 times the average
    {
-      //printf("Peak on sample %ld\\n", _sampleNum);
+      printf("Peak on sample %ld\\n", _sampleNum);
       _correlationMagnitude = mag;
    }
 
