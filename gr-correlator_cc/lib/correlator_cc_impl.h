@@ -50,14 +50,18 @@ private:
    sampleType _accImagOdd[ACCUMULATOR_LENGTH];
    sampleType _accRealEven[ACCUMULATOR_LENGTH];
    sampleType _accImagEven[ACCUMULATOR_LENGTH];
-   int _accIndexOdd, _accIndexEven;  // Indexes the accumulator that is receiving its last contribution
+   int _accIndexOdd, _accIndexEven;  // Indexes the accumulator that is recieving its last contribution
    unsigned long _sampleNum;
    unsigned long _capsuleLen;
 
    int _oddSample; // True if current sample belongs to odd clock
    int _oddData;   // True if odd clocked data should be output
 
-   double _correlationMagnitude;
+   double _correlationMagnitude; // Magnitude of a correlation peak.  Maintained for one sample to see if next one is stronger.
+   double _movingSumAddends[2*CODE_LENGTH];
+   double _movingSum;
+   int _movingSumIndex;
+   int _primed;
 
 
 public:

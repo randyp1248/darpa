@@ -66,9 +66,7 @@ correlator_cc_impl::correlator_cc_impl()
         gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
 	
 {
-   int i;
-
-   for (i=0; i<ACCUMULATOR_LENGTH; ++i)
+   for (int i=0; i<ACCUMULATOR_LENGTH; ++i)
    {
       _accRealOdd[i] = 0;
       _accImagOdd[i] = 0;
@@ -86,6 +84,12 @@ correlator_cc_impl::correlator_cc_impl()
    _oddData = 0;
 
    _correlationMagnitude = 0.0;
+
+   _primed = 0;
+   _movingSum = 0.0;
+   _movingSumIndex = 0;
+   for (int i=0; i<2*CODE_LENGTH; ++i)
+      _movingSumAddends[i] = 0.0;
 }
 
 /*
@@ -654,10 +658,20 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
       // Reset the correlation magnitude to start looking for next peak.
       _correlationMagnitude = 0.0;
    }
-   else if (mag > CODE_LENGTH/2.0)
+   else if (_primed && (mag > 4*_movingSum/CODE_LENGTH)) // 8 times the average
    {
       //printf("Peak on sample %ld\n", _sampleNum);
       _correlationMagnitude = mag;
+   }
+
+   // Update the moving sum of magnitudes for threshold comparisons
+   _movingSum -= _movingSumAddends[_movingSumIndex];
+   _movingSumAddends[_movingSumIndex] = mag;
+   _movingSum += mag;
+   _movingSumIndex = (_movingSumIndex+1)%(2*CODE_LENGTH);
+   if (!_movingSumIndex)
+   {
+      _primed = 1;
    }
 
    ++accIndex;
