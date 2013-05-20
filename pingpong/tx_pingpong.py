@@ -7,7 +7,7 @@ from optparse import OptionParser
 
 # From gr-digital
 from gnuradio import digital
-from gr-correlator_cc import preamble_insert_cc, correlator_cc
+from correlator_cc import correlator_cc_swig as correlator_cc
 
 # from current dir
 from uhd_interface import uhd_transmitter
@@ -23,14 +23,14 @@ class my_top_block(gr.top_block):
         gr.top_block.__init__(self)
 
         # some arbitrary data
-        data_capsule = ( (+1+1j), (+1+1j), (-1-1j), (-1-1j),
-                         (-1+1j), (-1+1j), (+1-1j), (+1-1j) )
+        data_capsule = ( (+1+1j), (+1+1j), (-1-1j), (-1-1j), (+1+1j),
+                         (-1+1j), (-1+1j), (+1-1j), (+1-1j), (-1-1j) )
 
         # Work-around to get the modulation's bits_per_symbol
-        symbol_rate = options.bitrate
+        symbol_rate = 200000
 
         self.sink = uhd_transmitter(options.args, symbol_rate,
-                                    options.samples_per_symbol,
+                                    2,
                                     options.tx_freq, options.tx_gain,
                                     options.spec, options.antenna,
                                     options.verbose)

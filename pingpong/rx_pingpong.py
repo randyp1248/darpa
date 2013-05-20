@@ -11,7 +11,7 @@ from gnuradio import digital
 # from current dir
 from uhd_interface import uhd_receiver
 
-import correlator_cc_swig as correlator_cc
+from correlator_cc import correlator_cc_swig as correlator_cc
 
 import struct
 import sys
@@ -25,10 +25,10 @@ class my_top_block(gr.top_block):
     def __init__(self, options):
         gr.top_block.__init__(self)
 
-        symbol_rate = options.bitrate / demodulator(**args).bits_per_symbol()
+        symbol_rate = 200000
 
         self.source = uhd_receiver(options.args, symbol_rate,
-                                   options.samples_per_symbol,
+                                   2,
                                    options.rx_freq, options.rx_gain,
                                    options.spec, options.antenna,
                                    options.verbose)
@@ -55,7 +55,6 @@ def main():
     parser = OptionParser (option_class=eng_option, conflict_handler="resolve")
     expert_grp = parser.add_option_group("Expert")
 
-    receive_path.add_options(parser, expert_grp)
     uhd_receiver.add_options(parser)
 
     (options, args) = parser.parse_args ()
