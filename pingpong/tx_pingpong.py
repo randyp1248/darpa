@@ -27,8 +27,7 @@ class my_top_block(gr.top_block):
                          (-1+1j), (-1+1j), (+1-1j), (+1-1j) )
 
         # Work-around to get the modulation's bits_per_symbol
-        args = modulator.extract_kwargs_from_options(options)
-        symbol_rate = options.bitrate / modulator(**args).bits_per_symbol()
+        symbol_rate = options.bitrate
 
         self.sink = uhd_transmitter(options.args, symbol_rate,
                                     options.samples_per_symbol,
