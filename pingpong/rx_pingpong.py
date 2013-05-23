@@ -25,11 +25,11 @@ class my_top_block(gr.top_block):
     def __init__(self, options):
         gr.top_block.__init__(self)
 
-        symbol_rate = 200000
+        symbol_rate = 500000
 
         self.source = uhd_receiver(options.args, symbol_rate,
                                    2,
-                                   options.rx_freq, options.rx_gain,
+                                   options.rx_freq, 30,
                                    options.spec, options.antenna,
                                    options.verbose)
         options.samples_per_symbol = self.source._sps
@@ -41,9 +41,13 @@ class my_top_block(gr.top_block):
         self.correlator = correlator_cc.correlator_cc()
 
         self.sink = gr.vector_sink_c()
+        self.file_sink = gr.file_sink(gr.sizeof_gr_complex, "out")
 
         self.connect(self.source, self.correlator)
-        self.connect(self.correlator, self.sink)
+        self.connect(self.correlator, self.file_sink)
+        #self.connect(self.source, self.sink)
+   
+        #self.connect(self.source, self.file_sink)
 
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main

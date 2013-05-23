@@ -639,6 +639,11 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 
    real = (a*e + f*b) / (a*a + b*b);
    imag = (a*f - e*b) / (a*a + b*b);
+   if (isnan(real) || isnan(imag))
+   {
+      real = imag = 0.0;
+   }
+
 
    // Zero out the accumulator that is getting its first sample
    accRealArr[accIndex+CODE_LENGTH] = 0;
@@ -646,8 +651,6 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 
 $correlateI
 $correlateQ
-
-   ++_sampleNum;
 
    // Threshold the correlation
    double accReal = (double)accRealArr[accIndex];
@@ -724,6 +727,7 @@ correlator_cc_impl::general_work (
 	    out[samplesOutput++] = in[samplesRead];
 	    --_capsuleLen;
 	 }
+         ++_sampleNum;
 	 ++samplesRead;
 	 --samplesRemaining;
 	 _oddSample ^= 1;
@@ -732,6 +736,7 @@ correlator_cc_impl::general_work (
       while (samplesRemaining && !_capsuleLen)
       {
 	 detect_peak(in[samplesRead].real(), in[samplesRead].imag());
+         ++_sampleNum;
 	 ++samplesRead;
 	 --samplesRemaining;
 	 _oddSample ^= 1;

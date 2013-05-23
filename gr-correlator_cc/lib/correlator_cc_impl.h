@@ -31,8 +31,8 @@
 
 #include <correlator_cc/correlator_cc.h>
 
-#define CODE_LENGTH (255)
-#define ACCUMULATOR_LENGTH (1<<(8+1))
+#define CODE_LENGTH (1023)
+#define ACCUMULATOR_LENGTH (1<<(10+1))
 #define ACCUMULATOR_LENGTH_MASK (ACCUMULATOR_LENGTH-1)
 
 typedef float sampleType;

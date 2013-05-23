@@ -30,7 +30,7 @@
 #include <correlator_cc/preamble_insert_cc.h>
 #include "TRITONS.h"
 
-#define CODE_LENGTH (255)
+#define CODE_LENGTH (1023)
 
 namespace gr {
 namespace correlator_cc {
