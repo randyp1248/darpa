@@ -23,5 +23,6 @@
 install(FILES
     api.h
     correlator_cc.h
-    preamble_insert_cc.h DESTINATION include/correlator_cc
+    preamble_insert_cc.h
+    go_start_cc.h DESTINATION include/correlator_cc
 )

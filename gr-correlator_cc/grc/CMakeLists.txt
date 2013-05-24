@@ -19,5 +19,6 @@
 
 install(FILES
     correlator_cc_correlator_cc.xml
-    correlator_cc_preamble_insert_cc.xml DESTINATION share/gnuradio/grc/blocks
+    correlator_cc_preamble_insert_cc.xml
+    correlator_cc_go_start_cc.xml DESTINATION share/gnuradio/grc/blocks
 )
