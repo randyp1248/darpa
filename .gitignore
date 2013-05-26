@@ -1,4 +1,5 @@
 *.pyc
 gr-correlator_cc/build
 gr-accumulator_cc/build
+gr-print_cc/build
 howto/build
