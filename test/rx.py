@@ -13,6 +13,7 @@ from uhd_interface import uhd_receiver
 from uhd_interface import uhd_transmitter
 
 from correlator_cc import correlator_cc_swig as correlator_cc
+from print_cc import print_cc_swig as print_cc
 
 import struct
 import sys

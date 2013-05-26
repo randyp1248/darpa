@@ -25,7 +25,7 @@ class my_top_block(gr.top_block):
 
         # Source block
         frame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
-        src_data = self.frame
+        src_data = frame
         self.source = gr.vector_source_c(src_data)
 
 	# Preamble insert block
