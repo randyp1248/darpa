@@ -31,8 +31,8 @@
 
 #include <correlator_cc/correlator_cc.h>
 
-#define CODE_LENGTH (1023)
-#define ACCUMULATOR_LENGTH (1<<(10+1))
+#define CODE_LENGTH (255)
+#define ACCUMULATOR_LENGTH (1<<(8+1))
 #define ACCUMULATOR_LENGTH_MASK (ACCUMULATOR_LENGTH-1)
 
 typedef float sampleType;
@@ -63,6 +63,7 @@ private:
    int _movingSumIndex;
    int _primed;
 
+   gr_complex _prevSample;
 
 public:
    correlator_cc_impl();
@@ -71,9 +72,9 @@ public:
    void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
    int general_work(int noutput_items,
-		    gr_vector_int &ninput_items,
-		    gr_vector_const_void_star &input_items,
-		    gr_vector_void_star &output_items);
+                    gr_vector_int &ninput_items,
+                    gr_vector_const_void_star &input_items,
+                    gr_vector_void_star &output_items);
 }; // correlator_cc_impl
 
 } // namespace correlator_cc

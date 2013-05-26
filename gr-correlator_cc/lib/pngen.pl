@@ -28,7 +28,7 @@ while ($tap = shift)
       $tapsI[$tap] = 1;
       if ($tap > $numStagesI)
       {
-	 $numStagesI = $tap;
+         $numStagesI = $tap;
       }
    }
    elsif ($tapswitch eq "-q")
@@ -36,7 +36,7 @@ while ($tap = shift)
       $tapsQ[$tap] = 1;
       if ($tap > $numStagesQ)
       {
-	 $numStagesQ = $tap;
+         $numStagesQ = $tap;
       }
    }
    else
@@ -262,7 +262,6 @@ private:
    static const int _sequenceQ[CODE_LENGTH];
 
    gr_complex _sequenceIQ[CODE_LENGTH];
-   gr_complex _prevSample;
 
 public:
    preamble_insert_cc_impl();
@@ -271,9 +270,9 @@ public:
    void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
    int general_work(int noutput_items,
-		    gr_vector_int &ninput_items,
-		    gr_vector_const_void_star &input_items,
-		    gr_vector_void_star &output_items);
+                    gr_vector_int &ninput_items,
+                    gr_vector_const_void_star &input_items,
+                    gr_vector_void_star &output_items);
 };
 
 } // namespace correlator_cc
@@ -350,8 +349,8 @@ preamble_insert_cc::make()
 
 preamble_insert_cc_impl::preamble_insert_cc_impl()
   : gr_block("preamble_insert_cc",
-		   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
-		   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)))
+                   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
+                   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)))
 {
    set_min_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
    set_max_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
@@ -374,14 +373,15 @@ preamble_insert_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_item
 
 int
 preamble_insert_cc_impl::general_work (int noutput_items,
-		    gr_vector_int &ninput_items,
-		    gr_vector_const_void_star &input_items,
-		    gr_vector_void_star &output_items)
+                    gr_vector_int &ninput_items,
+                    gr_vector_const_void_star &input_items,
+                    gr_vector_void_star &output_items)
 {
    const gr_complex* in = reinterpret_cast<const gr_complex*>(input_items[0]);
    gr_complex *out = reinterpret_cast<gr_complex*>(output_items[0]);
    int samplesOutput = 0;
    int samplesRead = ninput_items[0];
+   gr_complex prevSample = _sequenceIQ[CODE_LENGTH-1];
 
    if (samplesRead > CAPSULE_SYMBOL_LENGTH)
    {
@@ -390,14 +390,16 @@ preamble_insert_cc_impl::general_work (int noutput_items,
 
    for(int i=0; i<CODE_LENGTH; ++i)
    {
-	 out[samplesOutput++] = _sequenceIQ[i];
-	 out[samplesOutput++] = _sequenceIQ[i];
+      out[samplesOutput++] = _sequenceIQ[i];
+      out[samplesOutput++] = _sequenceIQ[i];
    }
 
    for(int i=0; i<samplesRead; ++i)
    {
-	 out[samplesOutput++] = in[i];
-	 out[samplesOutput++] = in[i];
+      //out[samplesOutput++] = out[samplesOutput++] = (prevSample *= in[i]);
+      gr_complex outputVal = prevSample *= in[i];
+      out[samplesOutput++] = outputVal;
+      out[samplesOutput++] = outputVal;
    }
 
    // Tell runtime system how many input items we consumed on each input stream.
@@ -484,6 +486,7 @@ private:
    int _movingSumIndex;
    int _primed;
 
+   gr_complex _prevSample;
 
 public:
    correlator_cc_impl();
@@ -492,9 +495,9 @@ public:
    void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
    int general_work(int noutput_items,
-		    gr_vector_int &ninput_items,
-		    gr_vector_const_void_star &input_items,
-		    gr_vector_void_star &output_items);
+                    gr_vector_int &ninput_items,
+                    gr_vector_const_void_star &input_items,
+                    gr_vector_void_star &output_items);
 }; // correlator_cc_impl
 
 } // namespace correlator_cc
@@ -576,7 +579,7 @@ correlator_cc_impl::correlator_cc_impl()
         "correlator_cc",
         gr_make_io_signature(MIN_IN, MAX_IN, sizeof(gr_complex)),
         gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
-	
+        
 {
    for (int i=0; i<ACCUMULATOR_LENGTH; ++i)
    {
@@ -722,24 +725,30 @@ correlator_cc_impl::general_work (
       {
          // Peak has been detected, output this sample (only correct clock)
 
-	 if (_oddSample == _oddData)
-	 {
-	    out[samplesOutput++] = in[samplesRead];
-	    --_capsuleLen;
-	 }
+         if (_oddSample == _oddData)
+         {
+            out[samplesOutput++] = in[samplesRead]/_prevSample;
+            _prevSample = in[samplesRead];
+            --_capsuleLen;
+         }
          ++_sampleNum;
-	 ++samplesRead;
-	 --samplesRemaining;
-	 _oddSample ^= 1;
+         ++samplesRead;
+         --samplesRemaining;
+         _oddSample ^= 1;
       }
 
       while (samplesRemaining && !_capsuleLen)
       {
-	 detect_peak(in[samplesRead].real(), in[samplesRead].imag());
+         detect_peak(in[samplesRead].real(), in[samplesRead].imag());
          ++_sampleNum;
-	 ++samplesRead;
-	 --samplesRemaining;
-	 _oddSample ^= 1;
+         ++samplesRead;
+         --samplesRemaining;
+         _oddSample ^= 1;
+         if ((_capsuleLen && (_oddSample != _oddData)) || //    peak detected and next sample is not output
+            (!_capsuleLen))                               // or peak not detected
+         {
+            _prevSample = in[samplesRead];
+         }
       }
    }
 
@@ -789,89 +798,37 @@ print TESTCODE <<END;
 
 from gnuradio import gr, gr_unittest
 import correlator_cc_swig as correlator_cc
+import random
+import cmath
 
 class qa_correlator_cc (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
+        random.seed(None)
+	self.randomSamples[:] = []
+        for x in range(1, $codeLength * 4):
+            self.randomSamples.append(cmath.rect(1, random.uniform(0,3.141529)))
+        self.recvFirstFrame[:] = []
+        prev = self.pnSequence[len(self.pnSequence)-1]
+        for x in range(len(self.firstFrame)):
+	    prev = prev * self.firstFrame[x]
+	    self.recvFirstFrame.append(prev)
+        self.recvSecondFrame[:] = []
+        prev = self.pnSequence[len(self.pnSequence)-1]
+        for x in range(len(self.secondFrame)):
+	    prev = prev * self.secondFrame[x]
+	    self.recvSecondFrame.append(prev)
 
     def tearDown (self):
         self.tb = None
 
-    randomSamples = (
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-       (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j))
+    randomSamples = []
     firstFrame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+    recvFirstFrame = []
     pnSequence = ($pnSequenceIQ)
     secondFrame = ((-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+    recvSecondFrame = []
 
     ####################################################################################
     #  test_001_t
@@ -888,18 +845,27 @@ class qa_correlator_cc (gr_unittest.TestCase):
     ####################################################################################
 
     def test_001_t (self):
-
-        src_data = self.randomSamples + self.pnSequence + self.firstFrame + self.randomSamples + self.pnSequence + self.secondFrame
+        src_data =  \\
+	    tuple(self.randomSamples) +  \\
+	    self.pnSequence +  \\
+	    tuple(self.recvFirstFrame) +  \\
+	    tuple(self.randomSamples) +  \\
+	    self.pnSequence +  \\
+	    tuple(self.recvSecondFrame)
         src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
-        expected_data = self.firstFrame + self.secondFrame
+        expected_data =  \\
+	    self.firstFrame +  \\
+	    self.secondFrame
         source = gr.vector_source_c(src_data)
-	dut = correlator_cc.correlator_cc()
+        dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
         self.tb.connect(source, dut)
         self.tb.connect(dut, sink)
         self.tb.run()
         result_data = sink.data()
+        #print "Expected\\n"
         #print expected_data
+        #print "Results\\n"
         #print result_data
         self.assertEqual(expected_data, result_data)
 
@@ -923,32 +889,19 @@ class qa_correlator_cc (gr_unittest.TestCase):
     #  The samples will have to be rotated back for the test to pass.
     ####################################################################################
     def xxst_002_t (self):
-
-        src_data        = (
-			   # Random samples
-			   (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-			   # PN Sequence
-$pnSequenceIQ
-			   # First frame data
-			   (+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
-			   # Random samples
-			   (+2+2j),(+2-2j),(-2-2j),(-2+2j),(-2+2j),(+2-2j),(+2+2j),(-2-2j),(+2-2j),(+2+2j),
-			   # PN Sequence
-$pnSequenceIQ
-			   # Second frame data
-			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
-        expected_data   = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),
-			   (-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
-
-        # Rotate the samples by pi/2
-        source = gr.vector_source_c(tuple([z * (0+1j) for z in src_data]))
-	dut = correlator_cc.correlator_cc()
+        src_data = self.randomSamples + self.pnSequence + self.firstFrame + self.randomSamples + self.pnSequence + self.secondFrame
+        src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
+        expected_data = self.firstFrame + self.secondFrame
+        source = gr.vector_source_c(src_data)
+        dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
         self.tb.connect(source, dut)
         self.tb.connect(dut, sink)
         self.tb.run()
         result_data = sink.data()
+        #print "Expected\\n"
         #print expected_data
+        #print "Results\\n"
         #print result_data
         self.assertEqual(expected_data, result_data)
 
@@ -997,28 +950,40 @@ class qa_preamble_insert_cc (gr_unittest.TestCase):
 
     def setUp (self):
         self.tb = gr.top_block ()
+        self.tmitFirstFrame[:] = []
+        self.tmitSecondFrame[:] = []
+        prev = self.pnSequence[len(self.pnSequence)-1]
+        for x in range(len(self.firstFrame)):
+	    prev = prev * self.firstFrame[x]
+	    self.tmitFirstFrame.append(prev)
+        prev = self.pnSequence[len(self.pnSequence)-1]
+        for x in range(len(self.secondFrame)):
+	    prev = prev * self.secondFrame[x]
+	    self.tmitSecondFrame.append(prev)
 
     def tearDown (self):
         self.tb = None
 
     firstFrame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+    tmitFirstFrame = []
     pnSequence = ($pnSequenceIQ)
     secondFrame = ((-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j),(-1+0j))
+    tmitSecondFrame = []
 
     def test_001_t (self):
         src_data = self.firstFrame + self.secondFrame
-        expected_data = self.pnSequence + self.firstFrame + self.pnSequence + self.secondFrame
+        expected_data = self.pnSequence + tuple(self.tmitFirstFrame) + self.pnSequence + tuple(self.tmitSecondFrame)
         expected_data = tuple([val for pair in zip(expected_data,expected_data) for val in pair])
         source = gr.vector_source_c(src_data)
-	dut = correlator_cc.preamble_insert_cc()
+        dut = correlator_cc.preamble_insert_cc()
         sink = gr.vector_sink_c()
         self.tb.connect(source, dut)
         self.tb.connect(dut, sink)
         self.tb.run()
         result_data = sink.data()
-	#print "Expected:\\n"
+        #print "Expected:\\n"
         #print expected_data
-	#print "Result:\\n"
+        #print "Result:\\n"
         #print result_data
         self.assertEqual(expected_data, result_data)
 

@@ -30,7 +30,7 @@
 #include <correlator_cc/preamble_insert_cc.h>
 #include "TRITONS.h"
 
-#define CODE_LENGTH (1023)
+#define CODE_LENGTH (255)
 
 namespace gr {
 namespace correlator_cc {
@@ -43,7 +43,6 @@ private:
    static const int _sequenceQ[CODE_LENGTH];
 
    gr_complex _sequenceIQ[CODE_LENGTH];
-   gr_complex _prevSample;
 
 public:
    preamble_insert_cc_impl();
@@ -52,9 +51,9 @@ public:
    void forecast (int noutput_items, gr_vector_int &ninput_items_required);
 
    int general_work(int noutput_items,
-		    gr_vector_int &ninput_items,
-		    gr_vector_const_void_star &input_items,
-		    gr_vector_void_star &output_items);
+                    gr_vector_int &ninput_items,
+                    gr_vector_const_void_star &input_items,
+                    gr_vector_void_star &output_items);
 };
 
 } // namespace correlator_cc
