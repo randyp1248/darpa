@@ -63,7 +63,7 @@ namespace gr {
         for(int i=0; i<noutput_items; i++)
         {
             out[i] = in[i];
-            printf("Sample %d: %f+j%f\n", i, in[i].real(), in[i].imag());
+            printf("Sample %08d: %f+%fj\n", i, in[i].real(), in[i].imag());
         }
 
         // Tell runtime system how many output items we produced.
