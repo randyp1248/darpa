@@ -11,6 +11,7 @@ from correlator_cc import correlator_cc_swig as correlator_cc
 
 # from current dir
 from uhd_interface import uhd_transmitter
+from uhd_interface import uhd_receiver
 
 import time, struct, sys
 
@@ -26,22 +27,39 @@ class my_top_block(gr.top_block):
         data_capsule = ( (+1+1j), (+1+1j), (-1-1j), (-1-1j), (+1+1j),
                          (-1+1j), (-1+1j), (+1-1j), (+1-1j), (-1-1j) )
 
+
         # Work-around to get the modulation's bits_per_symbol
-        symbol_rate = 200000
+        symbol_rate = 500000
 
         self.sink = uhd_transmitter(options.args, symbol_rate,
                                     2,
-                                    options.tx_freq, options.tx_gain,
-                                    options.spec, options.antenna,
+                                    options.tx_freq, 30,
+                                    options.spec, "TX/RX",
                                     options.verbose)
+
+        self.rx = uhd_receiver(options.args, symbol_rate,
+                               2, 
+                               options.rx_freq, 30, 
+                               options.spec, "RX2",
+                               options.verbose)
 
         options.samples_per_symbol = self.sink._sps
 
-        self.source = gr.vector_source_c(data_capsule)
-        self.inserter = correlator_cc.preamble_insert_cc()
-        self.connect(self.source, self.inserter)
-        self.connect(self.inserter, self.sink)
+        self.serve = gr.vector_source_c(data_capsule)
+        #self.inserter = correlator_cc.preamble_insert_cc()
+        #self.connect(self.source, self.inserter)
+        #self.connect(self.inserter, self.sink)
 
+        self.server = correlator_cc.go_start_cc()
+        self.inserter = correlator_cc.preamble_insert_cc()
+        self.correlator = correlator_cc.correlator_cc()
+
+        self.connect(self.rx, self.correlator)
+        self.connect(self.serve, (self.server,0))
+        self.connect(self.correlator, (self.server,1))
+        self.connect(self.server, self.inserter)
+        self.connect(self.inserter, self.sink)
+  
 # /////////////////////////////////////////////////////////////////////////////
 #                                   main
 # /////////////////////////////////////////////////////////////////////////////
@@ -52,6 +70,7 @@ def main():
     expert_grp = parser.add_option_group("Expert")
 
     uhd_transmitter.add_options(parser)
+    uhd_receiver.add_options(parser)
 
     (options, args) = parser.parse_args ()
 
