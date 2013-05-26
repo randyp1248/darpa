@@ -27,6 +27,7 @@
 from gnuradio import gr, gr_unittest
 import correlator_cc_swig as correlator_cc
 import random
+import math
 import cmath
 
 class qa_correlator_cc (gr_unittest.TestCase):
@@ -147,11 +148,22 @@ class qa_correlator_cc (gr_unittest.TestCase):
     #  Test passes if the two frames are passed to the output, but no other samples.
     #  The samples will have to be rotated back for the test to pass.
     ####################################################################################
-    def xxst_002_t (self):
-        src_data = self.randomSamples + self.pnSequence + self.firstFrame + self.randomSamples + self.pnSequence + self.secondFrame
+    def test_002_t (self):
+        src_data =  \
+	    tuple(self.randomSamples) +  \
+	    self.pnSequence +  \
+	    tuple(self.recvFirstFrame) +  \
+	    tuple(self.randomSamples) +  \
+	    self.pnSequence +  \
+	    tuple(self.recvSecondFrame)
         src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
-        expected_data = self.firstFrame + self.secondFrame
-        source = gr.vector_source_c(src_data)
+        expected_data =  \
+	    self.firstFrame +  \
+	    self.secondFrame
+        rotatedSrcData = []
+        for x in range(len(src_data)):
+	    rotatedSrcData.append(src_data[x]*(0+1j))
+        source = gr.vector_source_c(tuple(rotatedSrcData))
         dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
         self.tb.connect(source, dut)
@@ -163,6 +175,64 @@ class qa_correlator_cc (gr_unittest.TestCase):
         #print "Results\n"
         #print result_data
         self.assertEqual(expected_data, result_data)
+
+    ####################################################################################
+    #  test_003_t
+    #
+    #  This is the same as test_001_t except that the samples are now rotated by a frequency error
+    #  before passed into the correlator block.  The correlator needs to derotate these
+    #  samples before outputing.
+    #
+    #  Test the sequence:
+    #     Random samples - should not correlate, and should all be dropped
+    #     PN Sequence - should be detected, but not output
+    #     First frame - should be output
+    #     Random samples - should not correlate, and should all be dropped
+    #     PN Sequence - should be detected, but not output
+    #     First frame - should be output
+    #
+    #  Test passes if the two frames are passed to the output, but no other samples.
+    #  The samples will have to be rotated back for the test to pass.
+    ####################################################################################
+    def test_003_t (self):
+        src_data =  \
+	    tuple(self.randomSamples) +  \
+	    self.pnSequence +  \
+	    tuple(self.recvFirstFrame) +  \
+	    tuple(self.randomSamples) +  \
+	    self.pnSequence +  \
+	    tuple(self.recvSecondFrame)
+        src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
+        expected_data =  \
+	    self.firstFrame +  \
+	    self.secondFrame
+        rotatedSrcData = []
+	# Frequency error 1000 samples/cycle
+	phaseChangePerSample = cmath.rect(1, 2*math.pi/1000)
+	currentPhase = (1 + 0j)
+        for x in range(len(src_data)):
+	    rotatedSrcData.append(src_data[x]*currentPhase)
+	    currentPhase = currentPhase * phaseChangePerSample
+        source = gr.vector_source_c(tuple(rotatedSrcData))
+        dut = correlator_cc.correlator_cc()
+        sink = gr.vector_sink_c()
+        self.tb.connect(source, dut)
+        self.tb.connect(dut, sink)
+        self.tb.run()
+        result_data = sink.data()
+        #print "Expected\n"
+        #print expected_data
+        #print "Results\n"
+        #print result_data
+	self.assertEqual(len(expected_data), len(result_data))
+        for x in range(len(expected_data)):
+	    angle = cmath.polar(expected_data[x]/result_data[x])[1]
+	    #print "Angle = " + str(angle)
+	    #print expected_data[x]
+	    #print result_data[x]
+	    if angle > math.pi:
+	        angle = 2*math.pi - angle
+	    self.assertLess(abs(angle), 2*math.pi/400)
 
 if __name__ == '__main__':
     gr_unittest.run(qa_correlator_cc, "qa_correlator_cc.xml")

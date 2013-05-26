@@ -740,7 +740,7 @@ correlator_cc_impl::general_work (
          if ((_capsuleLen && (_oddSample != _oddData)) || //    peak detected and next sample is not output
             (!_capsuleLen))                               // or peak not detected
          {
-            _prevSample = in[samplesRead];
+            _prevSample = in[samplesRead-1];
          }
       }
    }
