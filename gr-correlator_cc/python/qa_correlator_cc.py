@@ -53,7 +53,8 @@ class qa_correlator_cc (gr_unittest.TestCase):
         self.tb = None
 
     randomSamples = []
-    firstFrame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+    #firstFrame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+    firstFrame =  ((+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j))
     recvFirstFrame = []
     pnSequence = (                           (+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),(+0-1j),
                            (+1+0j),(+1+0j),(+1+0j),(+0+1j),(+0-1j),(+1+0j),(-1+0j),(-1+0j),
