@@ -8,6 +8,7 @@ from optparse import OptionParser
 # From gr-digital
 from gnuradio import digital
 from correlator_cc import correlator_cc_swig as correlator_cc
+from spreader import spreader_swig as spreader
 
 # from current dir
 from uhd_interface import uhd_transmitter
@@ -24,9 +25,13 @@ class my_top_block(gr.top_block):
         gr.top_block.__init__(self)
 
         # Source block
-        frame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
-        src_data = frame
-        self.source = gr.vector_source_c(src_data)
+        #frame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
+        
+        data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0, 0x0, 0xd)
+        self.source = gr.vector_source_b(data)
+
+        # Spreader
+        self.spreader = spreader.spreader_bc()
 
 	# Preamble insert block
         self.inserter = correlator_cc.preamble_insert_cc()
@@ -42,7 +47,10 @@ class my_top_block(gr.top_block):
 
 
 	# Connect the blocks
-        self.connect(self.source, self.inserter)
+        #self.connect(self.source, self.inserter)
+        #self.connect(self.inserter, self.sink)
+        self.connect(self.source, self.spreader)
+        self.connect(self.spreader, self.inserter)
         self.connect(self.inserter, self.sink)
   
 # /////////////////////////////////////////////////////////////////////////////
