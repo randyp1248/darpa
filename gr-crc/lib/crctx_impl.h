@@ -29,7 +29,7 @@ namespace gr {
     class crctx_impl : public crctx
     {
     private:
-      // Nothing to declare in this block.
+      bool flag;
 
     public:
       crctx_impl();

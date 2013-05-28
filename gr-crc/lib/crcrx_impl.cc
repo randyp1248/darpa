@@ -32,6 +32,8 @@
 #include <cstring>
 #define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
 
+static bool debug_var_rx = false;
+
 namespace gr {
   namespace crc {
 
@@ -47,8 +49,9 @@ namespace gr {
 		      gr_make_io_signature(1,1, sizeof (char)),	//input signature
 		      gr_make_io_signature(1,1, sizeof (char)))	//output signature    
     {
-	set_min_noutput_items(FRAME_SIZE);	//Fix the minimum output buffer size (Tx_Capsule - CRC)
+	set_min_noutput_items(FRAME_SIZE -4);	//Fix the minimum output buffer size (Tx_Capsule - CRC)
 	set_max_noutput_items(FRAME_SIZE);	//Fix the maximum output buffer size (Tx_Capsule - CRC)
+	filesize = 0;
     }
 
     /* Our virtual destructor */
@@ -58,7 +61,7 @@ namespace gr {
     void
     crcrx_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-	ninput_items_required[0] = noutput_items + 4;	
+      ninput_items_required[0] = FRAME_SIZE + 4;
     }
 
     int
@@ -69,38 +72,60 @@ namespace gr {
     {
 	const char * input = (const char *) input_items[0];
         char * out = (char *) output_items[0];
+	int dataToCopy = FRAME_SIZE;
 
 /***********************************************************************************************/	
 /*************** Input data, calculate CRC and Append (4 bytes) ********************************/
 
 	int static initial_ninputs = ninput_items[0];		// Locks value to first read
-	unsigned char * crctemp[4];
+	int crctemp;
         int crcRcvd;	
 	int crc32;
-	std::cout << "RX INPUT = " << input << std::endl;		// Print the input buffer
+	std::cout << "RX INPUT BUFFER RECEIVED = " << input << std::endl;		// Print the input buffer
 
+	// if we got less than framesize then we're done
 	if (ninput_items[0] < FRAME_SIZE+4)	
-	    return (-1);					//terminate
-	else
 	{
-	   memcpy(out, input, FRAME_SIZE);			
-	   crc32 = digital_crc32(out);			
-	   memcpy(crctemp, (unsigned char *) (void *) input + FRAME_SIZE, 4);
-           crcRcvd = *((int*)(input+FRAME_SIZE));	
+            std::cout << "RX EOF "<< std::endl;
+	    return (-1);					//terminate at end of file
+	}	
+	else 
+	{
+            //char *pOut = out;
+	    const char * pInput = input;
+            memcpy((char *)&crctemp, input + FRAME_SIZE, 4);
+            crc32 = digital_crc32((const unsigned char *)input, FRAME_SIZE);	
+		
+	    if(crc32 == crctemp)
+            {
+	        if(flag == false)
+                {
+		    filesize = *(int *)input;
+		    flag = true;
+		    dataToCopy = FRAME_SIZE - 4;	
+		    pInput +=4;
+		}
+	        memcpy(out, pInput, dataToCopy);			//copy x 4byte CRC to data capsule
+                if(debug_var_rx == false) 
+                {
+                  if(flag == true) 
+	          {
+                    debug_var_rx = true;
+                  }
+                  std::cout << "RX OUTPUT on First Iteration = " << out << std::endl;
+                }
+	    }
+	    else
+	    {
+	   	std::cout << "CRC's ARE NOT EQUAL = " << out << std::endl;		
+	        return (-1);					//terminate at end of file
+	    }
 	}
 
-        std::cout << "CRC = " << crc32 << std::endl;
-        std::cout << "CRCRcvd = " << crcRcvd << std::endl;
-	if (crcRcvd != crc32)
-	{ 
-		std::cout << "CRC NOT EQUAL" << out << std::endl;		
-		printf("****\n");
-	}
-	
 	std::cout << "RX OUTPUT WITHOUT CRC = " << out << std::endl;		
 
-	consume_each (FRAME_SIZE+4);
-	return noutput_items;			//FRAME_SIZE
+	consume_each (FRAME_SIZE + 4);
+	return dataToCopy;			//FRAME_SIZE
     }
   } /* namespace crc */
 } /* namespace gr */
