@@ -35,8 +35,8 @@ class qa_despreader_cb (gr_unittest.TestCase):
     def setUp (self):
         self.tb = gr.top_block ()
         random.seed(None)
-	self.randomBytes[:] = []
-        for x in range(1, 3):
+        self.randomBytes[:] = []
+        for x in range(0, 3):
             self.randomBytes.append(random.randint(0,255));
 
     def tearDown (self):
@@ -46,19 +46,19 @@ class qa_despreader_cb (gr_unittest.TestCase):
         src_data = self.randomBytes
         expected_data = self.randomBytes
         source = gr.vector_source_b(src_data)
-	spread = spreader.spreader_bc()
-	despread = spreader.despreader_cb()
+        spread = spreader.spreader_bc()
+        despread = spreader.despreader_cb()
         sink = gr.vector_sink_b()
         self.tb.connect(source, spread)
         self.tb.connect(spread, despread)
         self.tb.connect(despread, sink)
         self.tb.run()
         result_data = sink.data()
-        print "Expected\n"
-        print expected_data
-        print "Results\n"
-        print result_data
-        self.assertEqual(expected_data, result_data)
+        #print "Expected\n"
+        #print expected_data
+        #print "Results\n"
+        #print result_data
+        self.assertEqual(tuple(expected_data), result_data)
 
 
 if __name__ == '__main__':

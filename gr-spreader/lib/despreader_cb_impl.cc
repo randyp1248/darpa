@@ -33,6 +33,7 @@
 
 #include <gr_io_signature.h>
 #include "despreader_cb_impl.h"
+#include <stdio.h>
 
 namespace gr {
 namespace spreader {
@@ -50,10 +51,9 @@ despreader_cb::make()
 
 despreader_cb_impl::despreader_cb_impl()
    : gr_block("despreader_cb",
-		  gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
-		  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof (unsigned char)))
+                  gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
+                  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof (unsigned char)))
 {
-
    set_min_noutput_items(3);
    set_max_noutput_items(3);
 }
@@ -70,9 +70,9 @@ despreader_cb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_req
 
 int
 despreader_cb_impl::general_work (int noutput_items,
-		   gr_vector_int &ninput_items,
-		   gr_vector_const_void_star &input_items,
-		   gr_vector_void_star &output_items)
+                   gr_vector_int &ninput_items,
+                   gr_vector_const_void_star &input_items,
+                   gr_vector_void_star &output_items)
 {
    const gr_complex* in = (gr_complex*) input_items[0];
    unsigned char* out = (unsigned char*) output_items[0];
@@ -95,10 +95,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      - in[1+0*8/2].real() - in[1+0*8/2].imag()
-      - in[2+0*8/2].real() - in[2+0*8/2].imag()
-      - in[3+0*8/2].real() - in[3+0*8/2].imag();
+      - in[0+0*8/2].real() + in[0+0*8/2].imag()
+      - in[1+0*8/2].real() + in[1+0*8/2].imag()
+      - in[2+0*8/2].real() + in[2+0*8/2].imag()
+      - in[3+0*8/2].real() + in[3+0*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -117,10 +117,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      + in[1+0*8/2].real() + in[1+0*8/2].imag()
-      - in[2+0*8/2].real() - in[2+0*8/2].imag()
-      + in[3+0*8/2].real() + in[3+0*8/2].imag();
+      - in[0+0*8/2].real() + in[0+0*8/2].imag()
+      + in[1+0*8/2].real() - in[1+0*8/2].imag()
+      - in[2+0*8/2].real() + in[2+0*8/2].imag()
+      + in[3+0*8/2].real() - in[3+0*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -139,10 +139,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      - in[1+0*8/2].real() - in[1+0*8/2].imag()
-      + in[2+0*8/2].real() + in[2+0*8/2].imag()
-      + in[3+0*8/2].real() + in[3+0*8/2].imag();
+      - in[0+0*8/2].real() + in[0+0*8/2].imag()
+      - in[1+0*8/2].real() + in[1+0*8/2].imag()
+      + in[2+0*8/2].real() - in[2+0*8/2].imag()
+      + in[3+0*8/2].real() - in[3+0*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -161,20 +161,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      + in[1+0*8/2].real() + in[1+0*8/2].imag()
-      + in[2+0*8/2].real() + in[2+0*8/2].imag()
-      - in[3+0*8/2].real() - in[3+0*8/2].imag();
+      - in[0+0*8/2].real() + in[0+0*8/2].imag()
+      + in[1+0*8/2].real() - in[1+0*8/2].imag()
+      + in[2+0*8/2].real() - in[2+0*8/2].imag()
+      - in[3+0*8/2].real() + in[3+0*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[0])<<24) | 
-	  (((unsigned)out[0+1])<<16) | 
-	  (((unsigned)out[0+2])<<8) | 
-	  (((unsigned)out[0+3]));
+          (((unsigned)out[0+1])<<16) | 
+          (((unsigned)out[0+2])<<8) | 
+          (((unsigned)out[0+3]));
    temp &= ~(((1<<3)-1) << (32-0-3));
    temp |= maxCorrelationIndex << (32-0-3);
    out[0]   = (temp>>24) & 0xff;
@@ -196,10 +197,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      - in[1+1*8/2].real() - in[1+1*8/2].imag()
-      - in[2+1*8/2].real() - in[2+1*8/2].imag()
-      - in[3+1*8/2].real() - in[3+1*8/2].imag();
+      - in[0+1*8/2].real() + in[0+1*8/2].imag()
+      - in[1+1*8/2].real() + in[1+1*8/2].imag()
+      - in[2+1*8/2].real() + in[2+1*8/2].imag()
+      - in[3+1*8/2].real() + in[3+1*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -218,10 +219,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      + in[1+1*8/2].real() + in[1+1*8/2].imag()
-      - in[2+1*8/2].real() - in[2+1*8/2].imag()
-      + in[3+1*8/2].real() + in[3+1*8/2].imag();
+      - in[0+1*8/2].real() + in[0+1*8/2].imag()
+      + in[1+1*8/2].real() - in[1+1*8/2].imag()
+      - in[2+1*8/2].real() + in[2+1*8/2].imag()
+      + in[3+1*8/2].real() - in[3+1*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -240,10 +241,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      - in[1+1*8/2].real() - in[1+1*8/2].imag()
-      + in[2+1*8/2].real() + in[2+1*8/2].imag()
-      + in[3+1*8/2].real() + in[3+1*8/2].imag();
+      - in[0+1*8/2].real() + in[0+1*8/2].imag()
+      - in[1+1*8/2].real() + in[1+1*8/2].imag()
+      + in[2+1*8/2].real() - in[2+1*8/2].imag()
+      + in[3+1*8/2].real() - in[3+1*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -262,20 +263,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      + in[1+1*8/2].real() + in[1+1*8/2].imag()
-      + in[2+1*8/2].real() + in[2+1*8/2].imag()
-      - in[3+1*8/2].real() - in[3+1*8/2].imag();
+      - in[0+1*8/2].real() + in[0+1*8/2].imag()
+      + in[1+1*8/2].real() - in[1+1*8/2].imag()
+      + in[2+1*8/2].real() - in[2+1*8/2].imag()
+      - in[3+1*8/2].real() + in[3+1*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[0])<<24) | 
-	  (((unsigned)out[0+1])<<16) | 
-	  (((unsigned)out[0+2])<<8) | 
-	  (((unsigned)out[0+3]));
+          (((unsigned)out[0+1])<<16) | 
+          (((unsigned)out[0+2])<<8) | 
+          (((unsigned)out[0+3]));
    temp &= ~(((1<<3)-1) << (32-3-3));
    temp |= maxCorrelationIndex << (32-3-3);
    out[0]   = (temp>>24) & 0xff;
@@ -297,10 +299,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      - in[1+2*8/2].real() - in[1+2*8/2].imag()
-      - in[2+2*8/2].real() - in[2+2*8/2].imag()
-      - in[3+2*8/2].real() - in[3+2*8/2].imag();
+      - in[0+2*8/2].real() + in[0+2*8/2].imag()
+      - in[1+2*8/2].real() + in[1+2*8/2].imag()
+      - in[2+2*8/2].real() + in[2+2*8/2].imag()
+      - in[3+2*8/2].real() + in[3+2*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -319,10 +321,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      + in[1+2*8/2].real() + in[1+2*8/2].imag()
-      - in[2+2*8/2].real() - in[2+2*8/2].imag()
-      + in[3+2*8/2].real() + in[3+2*8/2].imag();
+      - in[0+2*8/2].real() + in[0+2*8/2].imag()
+      + in[1+2*8/2].real() - in[1+2*8/2].imag()
+      - in[2+2*8/2].real() + in[2+2*8/2].imag()
+      + in[3+2*8/2].real() - in[3+2*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -341,10 +343,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      - in[1+2*8/2].real() - in[1+2*8/2].imag()
-      + in[2+2*8/2].real() + in[2+2*8/2].imag()
-      + in[3+2*8/2].real() + in[3+2*8/2].imag();
+      - in[0+2*8/2].real() + in[0+2*8/2].imag()
+      - in[1+2*8/2].real() + in[1+2*8/2].imag()
+      + in[2+2*8/2].real() - in[2+2*8/2].imag()
+      + in[3+2*8/2].real() - in[3+2*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -363,20 +365,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      + in[1+2*8/2].real() + in[1+2*8/2].imag()
-      + in[2+2*8/2].real() + in[2+2*8/2].imag()
-      - in[3+2*8/2].real() - in[3+2*8/2].imag();
+      - in[0+2*8/2].real() + in[0+2*8/2].imag()
+      + in[1+2*8/2].real() - in[1+2*8/2].imag()
+      + in[2+2*8/2].real() - in[2+2*8/2].imag()
+      - in[3+2*8/2].real() + in[3+2*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[0])<<24) | 
-	  (((unsigned)out[0+1])<<16) | 
-	  (((unsigned)out[0+2])<<8) | 
-	  (((unsigned)out[0+3]));
+          (((unsigned)out[0+1])<<16) | 
+          (((unsigned)out[0+2])<<8) | 
+          (((unsigned)out[0+3]));
    temp &= ~(((1<<3)-1) << (32-6-3));
    temp |= maxCorrelationIndex << (32-6-3);
    out[0]   = (temp>>24) & 0xff;
@@ -398,10 +401,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      - in[1+3*8/2].real() - in[1+3*8/2].imag()
-      - in[2+3*8/2].real() - in[2+3*8/2].imag()
-      - in[3+3*8/2].real() - in[3+3*8/2].imag();
+      - in[0+3*8/2].real() + in[0+3*8/2].imag()
+      - in[1+3*8/2].real() + in[1+3*8/2].imag()
+      - in[2+3*8/2].real() + in[2+3*8/2].imag()
+      - in[3+3*8/2].real() + in[3+3*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -420,10 +423,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      + in[1+3*8/2].real() + in[1+3*8/2].imag()
-      - in[2+3*8/2].real() - in[2+3*8/2].imag()
-      + in[3+3*8/2].real() + in[3+3*8/2].imag();
+      - in[0+3*8/2].real() + in[0+3*8/2].imag()
+      + in[1+3*8/2].real() - in[1+3*8/2].imag()
+      - in[2+3*8/2].real() + in[2+3*8/2].imag()
+      + in[3+3*8/2].real() - in[3+3*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -442,10 +445,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      - in[1+3*8/2].real() - in[1+3*8/2].imag()
-      + in[2+3*8/2].real() + in[2+3*8/2].imag()
-      + in[3+3*8/2].real() + in[3+3*8/2].imag();
+      - in[0+3*8/2].real() + in[0+3*8/2].imag()
+      - in[1+3*8/2].real() + in[1+3*8/2].imag()
+      + in[2+3*8/2].real() - in[2+3*8/2].imag()
+      + in[3+3*8/2].real() - in[3+3*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -464,20 +467,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      + in[1+3*8/2].real() + in[1+3*8/2].imag()
-      + in[2+3*8/2].real() + in[2+3*8/2].imag()
-      - in[3+3*8/2].real() - in[3+3*8/2].imag();
+      - in[0+3*8/2].real() + in[0+3*8/2].imag()
+      + in[1+3*8/2].real() - in[1+3*8/2].imag()
+      + in[2+3*8/2].real() - in[2+3*8/2].imag()
+      - in[3+3*8/2].real() + in[3+3*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[1])<<24) | 
-	  (((unsigned)out[1+1])<<16) | 
-	  (((unsigned)out[1+2])<<8) | 
-	  (((unsigned)out[1+3]));
+          (((unsigned)out[1+1])<<16) | 
+          (((unsigned)out[1+2])<<8) | 
+          (((unsigned)out[1+3]));
    temp &= ~(((1<<3)-1) << (32-1-3));
    temp |= maxCorrelationIndex << (32-1-3);
    out[1]   = (temp>>24) & 0xff;
@@ -499,10 +503,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      - in[1+4*8/2].real() - in[1+4*8/2].imag()
-      - in[2+4*8/2].real() - in[2+4*8/2].imag()
-      - in[3+4*8/2].real() - in[3+4*8/2].imag();
+      - in[0+4*8/2].real() + in[0+4*8/2].imag()
+      - in[1+4*8/2].real() + in[1+4*8/2].imag()
+      - in[2+4*8/2].real() + in[2+4*8/2].imag()
+      - in[3+4*8/2].real() + in[3+4*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -521,10 +525,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      + in[1+4*8/2].real() + in[1+4*8/2].imag()
-      - in[2+4*8/2].real() - in[2+4*8/2].imag()
-      + in[3+4*8/2].real() + in[3+4*8/2].imag();
+      - in[0+4*8/2].real() + in[0+4*8/2].imag()
+      + in[1+4*8/2].real() - in[1+4*8/2].imag()
+      - in[2+4*8/2].real() + in[2+4*8/2].imag()
+      + in[3+4*8/2].real() - in[3+4*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -543,10 +547,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      - in[1+4*8/2].real() - in[1+4*8/2].imag()
-      + in[2+4*8/2].real() + in[2+4*8/2].imag()
-      + in[3+4*8/2].real() + in[3+4*8/2].imag();
+      - in[0+4*8/2].real() + in[0+4*8/2].imag()
+      - in[1+4*8/2].real() + in[1+4*8/2].imag()
+      + in[2+4*8/2].real() - in[2+4*8/2].imag()
+      + in[3+4*8/2].real() - in[3+4*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -565,20 +569,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      + in[1+4*8/2].real() + in[1+4*8/2].imag()
-      + in[2+4*8/2].real() + in[2+4*8/2].imag()
-      - in[3+4*8/2].real() - in[3+4*8/2].imag();
+      - in[0+4*8/2].real() + in[0+4*8/2].imag()
+      + in[1+4*8/2].real() - in[1+4*8/2].imag()
+      + in[2+4*8/2].real() - in[2+4*8/2].imag()
+      - in[3+4*8/2].real() + in[3+4*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[1])<<24) | 
-	  (((unsigned)out[1+1])<<16) | 
-	  (((unsigned)out[1+2])<<8) | 
-	  (((unsigned)out[1+3]));
+          (((unsigned)out[1+1])<<16) | 
+          (((unsigned)out[1+2])<<8) | 
+          (((unsigned)out[1+3]));
    temp &= ~(((1<<3)-1) << (32-4-3));
    temp |= maxCorrelationIndex << (32-4-3);
    out[1]   = (temp>>24) & 0xff;
@@ -600,10 +605,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      - in[1+5*8/2].real() - in[1+5*8/2].imag()
-      - in[2+5*8/2].real() - in[2+5*8/2].imag()
-      - in[3+5*8/2].real() - in[3+5*8/2].imag();
+      - in[0+5*8/2].real() + in[0+5*8/2].imag()
+      - in[1+5*8/2].real() + in[1+5*8/2].imag()
+      - in[2+5*8/2].real() + in[2+5*8/2].imag()
+      - in[3+5*8/2].real() + in[3+5*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -622,10 +627,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      + in[1+5*8/2].real() + in[1+5*8/2].imag()
-      - in[2+5*8/2].real() - in[2+5*8/2].imag()
-      + in[3+5*8/2].real() + in[3+5*8/2].imag();
+      - in[0+5*8/2].real() + in[0+5*8/2].imag()
+      + in[1+5*8/2].real() - in[1+5*8/2].imag()
+      - in[2+5*8/2].real() + in[2+5*8/2].imag()
+      + in[3+5*8/2].real() - in[3+5*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -644,10 +649,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      - in[1+5*8/2].real() - in[1+5*8/2].imag()
-      + in[2+5*8/2].real() + in[2+5*8/2].imag()
-      + in[3+5*8/2].real() + in[3+5*8/2].imag();
+      - in[0+5*8/2].real() + in[0+5*8/2].imag()
+      - in[1+5*8/2].real() + in[1+5*8/2].imag()
+      + in[2+5*8/2].real() - in[2+5*8/2].imag()
+      + in[3+5*8/2].real() - in[3+5*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -666,20 +671,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      + in[1+5*8/2].real() + in[1+5*8/2].imag()
-      + in[2+5*8/2].real() + in[2+5*8/2].imag()
-      - in[3+5*8/2].real() - in[3+5*8/2].imag();
+      - in[0+5*8/2].real() + in[0+5*8/2].imag()
+      + in[1+5*8/2].real() - in[1+5*8/2].imag()
+      + in[2+5*8/2].real() - in[2+5*8/2].imag()
+      - in[3+5*8/2].real() + in[3+5*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[1])<<24) | 
-	  (((unsigned)out[1+1])<<16) | 
-	  (((unsigned)out[1+2])<<8) | 
-	  (((unsigned)out[1+3]));
+          (((unsigned)out[1+1])<<16) | 
+          (((unsigned)out[1+2])<<8) | 
+          (((unsigned)out[1+3]));
    temp &= ~(((1<<3)-1) << (32-7-3));
    temp |= maxCorrelationIndex << (32-7-3);
    out[1]   = (temp>>24) & 0xff;
@@ -701,10 +707,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      - in[1+6*8/2].real() - in[1+6*8/2].imag()
-      - in[2+6*8/2].real() - in[2+6*8/2].imag()
-      - in[3+6*8/2].real() - in[3+6*8/2].imag();
+      - in[0+6*8/2].real() + in[0+6*8/2].imag()
+      - in[1+6*8/2].real() + in[1+6*8/2].imag()
+      - in[2+6*8/2].real() + in[2+6*8/2].imag()
+      - in[3+6*8/2].real() + in[3+6*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -723,10 +729,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      + in[1+6*8/2].real() + in[1+6*8/2].imag()
-      - in[2+6*8/2].real() - in[2+6*8/2].imag()
-      + in[3+6*8/2].real() + in[3+6*8/2].imag();
+      - in[0+6*8/2].real() + in[0+6*8/2].imag()
+      + in[1+6*8/2].real() - in[1+6*8/2].imag()
+      - in[2+6*8/2].real() + in[2+6*8/2].imag()
+      + in[3+6*8/2].real() - in[3+6*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -745,10 +751,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      - in[1+6*8/2].real() - in[1+6*8/2].imag()
-      + in[2+6*8/2].real() + in[2+6*8/2].imag()
-      + in[3+6*8/2].real() + in[3+6*8/2].imag();
+      - in[0+6*8/2].real() + in[0+6*8/2].imag()
+      - in[1+6*8/2].real() + in[1+6*8/2].imag()
+      + in[2+6*8/2].real() - in[2+6*8/2].imag()
+      + in[3+6*8/2].real() - in[3+6*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -767,20 +773,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      + in[1+6*8/2].real() + in[1+6*8/2].imag()
-      + in[2+6*8/2].real() + in[2+6*8/2].imag()
-      - in[3+6*8/2].real() - in[3+6*8/2].imag();
+      - in[0+6*8/2].real() + in[0+6*8/2].imag()
+      + in[1+6*8/2].real() - in[1+6*8/2].imag()
+      + in[2+6*8/2].real() - in[2+6*8/2].imag()
+      - in[3+6*8/2].real() + in[3+6*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[2])<<24) | 
-	  (((unsigned)out[2+1])<<16) | 
-	  (((unsigned)out[2+2])<<8) | 
-	  (((unsigned)out[2+3]));
+          (((unsigned)out[2+1])<<16) | 
+          (((unsigned)out[2+2])<<8) | 
+          (((unsigned)out[2+3]));
    temp &= ~(((1<<3)-1) << (32-2-3));
    temp |= maxCorrelationIndex << (32-2-3);
    out[2]   = (temp>>24) & 0xff;
@@ -802,10 +809,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      - in[1+7*8/2].real() - in[1+7*8/2].imag()
-      - in[2+7*8/2].real() - in[2+7*8/2].imag()
-      - in[3+7*8/2].real() - in[3+7*8/2].imag();
+      - in[0+7*8/2].real() + in[0+7*8/2].imag()
+      - in[1+7*8/2].real() + in[1+7*8/2].imag()
+      - in[2+7*8/2].real() + in[2+7*8/2].imag()
+      - in[3+7*8/2].real() + in[3+7*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -824,10 +831,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      + in[1+7*8/2].real() + in[1+7*8/2].imag()
-      - in[2+7*8/2].real() - in[2+7*8/2].imag()
-      + in[3+7*8/2].real() + in[3+7*8/2].imag();
+      - in[0+7*8/2].real() + in[0+7*8/2].imag()
+      + in[1+7*8/2].real() - in[1+7*8/2].imag()
+      - in[2+7*8/2].real() + in[2+7*8/2].imag()
+      + in[3+7*8/2].real() - in[3+7*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -846,10 +853,10 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      - in[1+7*8/2].real() - in[1+7*8/2].imag()
-      + in[2+7*8/2].real() + in[2+7*8/2].imag()
-      + in[3+7*8/2].real() + in[3+7*8/2].imag();
+      - in[0+7*8/2].real() + in[0+7*8/2].imag()
+      - in[1+7*8/2].real() + in[1+7*8/2].imag()
+      + in[2+7*8/2].real() - in[2+7*8/2].imag()
+      + in[3+7*8/2].real() - in[3+7*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
@@ -868,20 +875,21 @@ despreader_cb_impl::general_work (int noutput_items,
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      + in[1+7*8/2].real() + in[1+7*8/2].imag()
-      + in[2+7*8/2].real() + in[2+7*8/2].imag()
-      - in[3+7*8/2].real() - in[3+7*8/2].imag();
+      - in[0+7*8/2].real() + in[0+7*8/2].imag()
+      + in[1+7*8/2].real() - in[1+7*8/2].imag()
+      + in[2+7*8/2].real() - in[2+7*8/2].imag()
+      - in[3+7*8/2].real() + in[3+7*8/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[2])<<24) | 
-	  (((unsigned)out[2+1])<<16) | 
-	  (((unsigned)out[2+2])<<8) | 
-	  (((unsigned)out[2+3]));
+          (((unsigned)out[2+1])<<16) | 
+          (((unsigned)out[2+2])<<8) | 
+          (((unsigned)out[2+3]));
    temp &= ~(((1<<3)-1) << (32-5-3));
    temp |= maxCorrelationIndex << (32-5-3);
    out[2]   = (temp>>24) & 0xff;

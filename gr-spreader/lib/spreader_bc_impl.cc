@@ -32,6 +32,7 @@
 
 #include <gr_io_signature.h>
 #include "spreader_bc_impl.h"
+#include <stdio.h>
 
 namespace gr {
 namespace spreader {
@@ -61,8 +62,8 @@ spreader_bc::make()
 
 spreader_bc_impl::spreader_bc_impl()
    : gr_block("spreader_bc",
-		  gr_make_io_signature(MIN_IN, MAX_IN, sizeof(unsigned char)),
-		  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
+                  gr_make_io_signature(MIN_IN, MAX_IN, sizeof(unsigned char)),
+                  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
 {
    set_min_noutput_items(3 * 8 / 3 * 8);
    set_max_noutput_items(3 * 8 / 3 * 8);
@@ -80,9 +81,9 @@ spreader_bc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_requi
 
 int
 spreader_bc_impl::general_work (int noutput_items,
-		   gr_vector_int &ninput_items,
-		   gr_vector_const_void_star &input_items,
-		   gr_vector_void_star &output_items)
+                   gr_vector_int &ninput_items,
+                   gr_vector_const_void_star &input_items,
+                   gr_vector_void_star &output_items)
 {
    const unsigned char* in = (unsigned char*) input_items[0];
    gr_complex* out = (gr_complex*) output_items[0];
@@ -93,68 +94,148 @@ spreader_bc_impl::general_work (int noutput_items,
       return 0;
    }
 
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[0])<<24) | 
+         (((unsigned)in[0+1])<<16) | 
+         (((unsigned)in[0+2])<<8) | 
+         (((unsigned)in[0+3]))
+      ) >> (32-0-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+0*8/2, &walshTable[
       (((
-	 (((unsigned)in[0])<<24) | 
-	 (((unsigned)in[0+1])<<16) | 
-	 (((unsigned)in[0+2])<<8) | 
-	 (((unsigned)in[0+3]))
+         (((unsigned)in[0])<<24) | 
+         (((unsigned)in[0+1])<<16) | 
+         (((unsigned)in[0+2])<<8) | 
+         (((unsigned)in[0+3]))
       ) >> (32-0-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[0])<<24) | 
+         (((unsigned)in[0+1])<<16) | 
+         (((unsigned)in[0+2])<<8) | 
+         (((unsigned)in[0+3]))
+      ) >> (32-3-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+1*8/2, &walshTable[
       (((
-	 (((unsigned)in[0])<<24) | 
-	 (((unsigned)in[0+1])<<16) | 
-	 (((unsigned)in[0+2])<<8) | 
-	 (((unsigned)in[0+3]))
+         (((unsigned)in[0])<<24) | 
+         (((unsigned)in[0+1])<<16) | 
+         (((unsigned)in[0+2])<<8) | 
+         (((unsigned)in[0+3]))
       ) >> (32-3-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[0])<<24) | 
+         (((unsigned)in[0+1])<<16) | 
+         (((unsigned)in[0+2])<<8) | 
+         (((unsigned)in[0+3]))
+      ) >> (32-6-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+2*8/2, &walshTable[
       (((
-	 (((unsigned)in[0])<<24) | 
-	 (((unsigned)in[0+1])<<16) | 
-	 (((unsigned)in[0+2])<<8) | 
-	 (((unsigned)in[0+3]))
+         (((unsigned)in[0])<<24) | 
+         (((unsigned)in[0+1])<<16) | 
+         (((unsigned)in[0+2])<<8) | 
+         (((unsigned)in[0+3]))
       ) >> (32-6-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[1])<<24) | 
+         (((unsigned)in[1+1])<<16) | 
+         (((unsigned)in[1+2])<<8) | 
+         (((unsigned)in[1+3]))
+      ) >> (32-1-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+3*8/2, &walshTable[
       (((
-	 (((unsigned)in[1])<<24) | 
-	 (((unsigned)in[1+1])<<16) | 
-	 (((unsigned)in[1+2])<<8) | 
-	 (((unsigned)in[1+3]))
+         (((unsigned)in[1])<<24) | 
+         (((unsigned)in[1+1])<<16) | 
+         (((unsigned)in[1+2])<<8) | 
+         (((unsigned)in[1+3]))
       ) >> (32-1-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[1])<<24) | 
+         (((unsigned)in[1+1])<<16) | 
+         (((unsigned)in[1+2])<<8) | 
+         (((unsigned)in[1+3]))
+      ) >> (32-4-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+4*8/2, &walshTable[
       (((
-	 (((unsigned)in[1])<<24) | 
-	 (((unsigned)in[1+1])<<16) | 
-	 (((unsigned)in[1+2])<<8) | 
-	 (((unsigned)in[1+3]))
+         (((unsigned)in[1])<<24) | 
+         (((unsigned)in[1+1])<<16) | 
+         (((unsigned)in[1+2])<<8) | 
+         (((unsigned)in[1+3]))
       ) >> (32-4-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[1])<<24) | 
+         (((unsigned)in[1+1])<<16) | 
+         (((unsigned)in[1+2])<<8) | 
+         (((unsigned)in[1+3]))
+      ) >> (32-7-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+5*8/2, &walshTable[
       (((
-	 (((unsigned)in[1])<<24) | 
-	 (((unsigned)in[1+1])<<16) | 
-	 (((unsigned)in[1+2])<<8) | 
-	 (((unsigned)in[1+3]))
+         (((unsigned)in[1])<<24) | 
+         (((unsigned)in[1+1])<<16) | 
+         (((unsigned)in[1+2])<<8) | 
+         (((unsigned)in[1+3]))
       ) >> (32-7-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[2])<<24) | 
+         (((unsigned)in[2+1])<<16) | 
+         (((unsigned)in[2+2])<<8) | 
+         (((unsigned)in[2+3]))
+      ) >> (32-2-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+6*8/2, &walshTable[
       (((
-	 (((unsigned)in[2])<<24) | 
-	 (((unsigned)in[2+1])<<16) | 
-	 (((unsigned)in[2+2])<<8) | 
-	 (((unsigned)in[2+3]))
+         (((unsigned)in[2])<<24) | 
+         (((unsigned)in[2+1])<<16) | 
+         (((unsigned)in[2+2])<<8) | 
+         (((unsigned)in[2+3]))
       ) >> (32-2-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
+/*
+   printf("Spreading index: %d\n",
+      (((
+         (((unsigned)in[2])<<24) | 
+         (((unsigned)in[2+1])<<16) | 
+         (((unsigned)in[2+2])<<8) | 
+         (((unsigned)in[2+3]))
+      ) >> (32-5-3)) & ((1<<3)-1))
+   );
+*/
    memcpy(out+7*8/2, &walshTable[
       (((
-	 (((unsigned)in[2])<<24) | 
-	 (((unsigned)in[2+1])<<16) | 
-	 (((unsigned)in[2+2])<<8) | 
-	 (((unsigned)in[2+3]))
+         (((unsigned)in[2])<<24) | 
+         (((unsigned)in[2+1])<<16) | 
+         (((unsigned)in[2+2])<<8) | 
+         (((unsigned)in[2+3]))
       ) >> (32-5-3)) & ((1<<3)-1))
    ][0], 8/2*sizeof(gr_complex));
 

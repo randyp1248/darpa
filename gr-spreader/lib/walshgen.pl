@@ -88,12 +88,22 @@ while ($inputBitPos < 8*$minBytes)
    $inputBitPosWithinByte = $inputBitPos % 8;
 
    $spreaderCode .= <<END;
+/*
+   printf("Spreading index: %d\\n",
+      (((
+         (((unsigned)in[$inputBytePos])<<24) | 
+         (((unsigned)in[$inputBytePos+1])<<16) | 
+         (((unsigned)in[$inputBytePos+2])<<8) | 
+         (((unsigned)in[$inputBytePos+3]))
+      ) >> (32-$inputBitPosWithinByte-$spreadingBits)) & ((1<<$spreadingBits)-1))
+   );
+*/
    memcpy(out+$spreaderOutputBufferIndex*$spreadingWidth/2, &walshTable[
       (((
-	 (((unsigned)in[$inputBytePos])<<24) | 
-	 (((unsigned)in[$inputBytePos+1])<<16) | 
-	 (((unsigned)in[$inputBytePos+2])<<8) | 
-	 (((unsigned)in[$inputBytePos+3]))
+         (((unsigned)in[$inputBytePos])<<24) | 
+         (((unsigned)in[$inputBytePos+1])<<16) | 
+         (((unsigned)in[$inputBytePos+2])<<8) | 
+         (((unsigned)in[$inputBytePos+3]))
       ) >> (32-$inputBitPosWithinByte-$spreadingBits)) & ((1<<$spreadingBits)-1))
    ][0], $spreadingWidth/2*sizeof(gr_complex));
 END
@@ -112,39 +122,39 @@ END
 END
       for($chipIndex=0; $chipIndex<$spreadingWidth/2; ++$chipIndex)
       {
-         if    ( (&index($walshIndex, $chipIndex*2) == +1) &&
-	         (&index($walshIndex, $chipIndex*2) == +1))
+         if    ( (&index($walshIndex, $chipIndex*2  ) == +1) &&
+                 (&index($walshIndex, $chipIndex*2+1) == +1))
          {
-	    $despreaderCode .= <<END;
+            $despreaderCode .= <<END;
       + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
 END
-	 }
-         elsif ( (&index($walshIndex, $chipIndex*2) == +1) &&
-	         (&index($walshIndex, $chipIndex*2) == -1))
+         }
+         elsif ( (&index($walshIndex, $chipIndex*2  ) == +1) &&
+                 (&index($walshIndex, $chipIndex*2+1) == -1))
          {
-	    $despreaderCode .= <<END;
+            $despreaderCode .= <<END;
       + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
 END
-	 }
-         elsif ( (&index($walshIndex, $chipIndex*2) == -1) &&
-	         (&index($walshIndex, $chipIndex*2) == +1))
+         }
+         elsif ( (&index($walshIndex, $chipIndex*2  ) == -1) &&
+                 (&index($walshIndex, $chipIndex*2+1) == +1))
          {
-	    $despreaderCode .= <<END;
+            $despreaderCode .= <<END;
       - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
 END
-	 }
-         elsif ( (&index($walshIndex, $chipIndex*2) == -1) &&
-	         (&index($walshIndex, $chipIndex*2) == -1))
+         }
+         elsif ( (&index($walshIndex, $chipIndex*2  ) == -1) &&
+                 (&index($walshIndex, $chipIndex*2+1) == -1))
          {
-	    $despreaderCode .= <<END;
+            $despreaderCode .= <<END;
       - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
 END
-	 }
-	 else
-	 {
-	    print "ERROR in walsh table.  Not one of the four possibilities.\n";
-	    exit 1;
-	 }
+         }
+         else
+         {
+            print "ERROR in walsh table.  Not one of the four possibilities.\n";
+            exit 1;
+         }
       }
       chop $despreaderCode;
       $despreaderCode .= ";\n";
@@ -159,10 +169,11 @@ END
    }
 
    $despreaderCode .= <<END;
+   //printf("Despreading index: %d\\n", maxCorrelationIndex);
    temp = (((unsigned)out[$inputBytePos])<<24) | 
-	  (((unsigned)out[$inputBytePos+1])<<16) | 
-	  (((unsigned)out[$inputBytePos+2])<<8) | 
-	  (((unsigned)out[$inputBytePos+3]));
+          (((unsigned)out[$inputBytePos+1])<<16) | 
+          (((unsigned)out[$inputBytePos+2])<<8) | 
+          (((unsigned)out[$inputBytePos+3]));
    temp &= ~(((1<<$spreadingBits)-1) << (32-$inputBitPosWithinByte-$spreadingBits));
    temp |= maxCorrelationIndex << (32-$inputBitPosWithinByte-$spreadingBits);
    out[$inputBytePos]   = (temp>>24) & 0xff;
@@ -188,15 +199,15 @@ sub orthogonalityTest
       {
          $dotProduct = 0;
          for ($column=0; $column<$spreadingWidth; ++$column)
-	 {
-	    $dotProduct = $dotProduct + &index($firstRow, $column) * &index($secondRow, $column);
-	 }
-	 if ((($firstRow == $secondRow) && ($dotProduct != $spreadingWidth)) ||
-	     (($firstRow != $secondRow) && ($dotProduct != 0)))
-	 {
-	    print "Error: $firstRow . $secondRow = $dotProduct\n";
-	    exit 1;
-	 }
+         {
+            $dotProduct = $dotProduct + &index($firstRow, $column) * &index($secondRow, $column);
+         }
+         if ((($firstRow == $secondRow) && ($dotProduct != $spreadingWidth)) ||
+             (($firstRow != $secondRow) && ($dotProduct != 0)))
+         {
+            print "Error: $firstRow . $secondRow = $dotProduct\n";
+            exit 1;
+         }
       }
    }
 }
@@ -341,6 +352,7 @@ print SPREAD_CODE <<END;
 
 #include <gr_io_signature.h>
 #include "spreader_bc_impl.h"
+#include <stdio.h>
 
 namespace gr {
 namespace spreader {
@@ -363,8 +375,8 @@ spreader_bc::make()
 
 spreader_bc_impl::spreader_bc_impl()
    : gr_block("spreader_bc",
-		  gr_make_io_signature(MIN_IN, MAX_IN, sizeof(unsigned char)),
-		  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
+                  gr_make_io_signature(MIN_IN, MAX_IN, sizeof(unsigned char)),
+                  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
 {
    set_min_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth);
    set_max_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth);
@@ -382,9 +394,9 @@ spreader_bc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_requi
 
 int
 spreader_bc_impl::general_work (int noutput_items,
-		   gr_vector_int &ninput_items,
-		   gr_vector_const_void_star &input_items,
-		   gr_vector_void_star &output_items)
+                   gr_vector_int &ninput_items,
+                   gr_vector_const_void_star &input_items,
+                   gr_vector_void_star &output_items)
 {
    const unsigned char* in = (unsigned char*) input_items[0];
    gr_complex* out = (gr_complex*) output_items[0];
@@ -512,6 +524,7 @@ print DESPREAD_CODE <<END;
 
 #include <gr_io_signature.h>
 #include "despreader_cb_impl.h"
+#include <stdio.h>
 
 namespace gr {
 namespace spreader {
@@ -529,10 +542,9 @@ despreader_cb::make()
 
 despreader_cb_impl::despreader_cb_impl()
    : gr_block("despreader_cb",
-		  gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
-		  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof (unsigned char)))
+                  gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
+                  gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof (unsigned char)))
 {
-
    set_min_noutput_items($minBytes);
    set_max_noutput_items($minBytes);
 }
@@ -549,9 +561,9 @@ despreader_cb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_req
 
 int
 despreader_cb_impl::general_work (int noutput_items,
-		   gr_vector_int &ninput_items,
-		   gr_vector_const_void_star &input_items,
-		   gr_vector_void_star &output_items)
+                   gr_vector_int &ninput_items,
+                   gr_vector_const_void_star &input_items,
+                   gr_vector_void_star &output_items)
 {
    const gr_complex* in = (gr_complex*) input_items[0];
    unsigned char* out = (unsigned char*) output_items[0];
@@ -669,8 +681,8 @@ class qa_despreader_cb (gr_unittest.TestCase):
     def setUp (self):
         self.tb = gr.top_block ()
         random.seed(None)
-	self.randomBytes[:] = []
-        for x in range(1, $minBytes):
+        self.randomBytes[:] = []
+        for x in range(0, $minBytes):
             self.randomBytes.append(random.randint(0,255));
 
     def tearDown (self):
@@ -680,19 +692,19 @@ class qa_despreader_cb (gr_unittest.TestCase):
         src_data = self.randomBytes
         expected_data = self.randomBytes
         source = gr.vector_source_b(src_data)
-	spread = spreader.spreader_bc()
-	despread = spreader.despreader_cb()
+        spread = spreader.spreader_bc()
+        despread = spreader.despreader_cb()
         sink = gr.vector_sink_b()
         self.tb.connect(source, spread)
         self.tb.connect(spread, despread)
         self.tb.connect(despread, sink)
         self.tb.run()
         result_data = sink.data()
-        print "Expected\\n"
-        print expected_data
-        print "Results\\n"
-        print result_data
-        self.assertEqual(expected_data, result_data)
+        #print "Expected\\n"
+        #print expected_data
+        #print "Results\\n"
+        #print result_data
+        self.assertEqual(tuple(expected_data), result_data)
 
 
 if __name__ == '__main__':
