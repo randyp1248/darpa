@@ -1,6 +1,10 @@
 *.pyc
+*.swp
 gr-correlator_cc/build
 gr-accumulator_cc/build
 gr-print_cc/build
+gr-spreader/build
 gr-crc/build
+gr-rscoding_bb/build
+gr-print_bb/build
 howto/build
