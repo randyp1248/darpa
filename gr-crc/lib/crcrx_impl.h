@@ -29,8 +29,8 @@ namespace gr {
     class crcrx_impl : public crcrx
     {
     private:
-      // Nothing to declare in this block.
-
+      bool flag;
+      int filesize;
     public:
       crcrx_impl();
       ~crcrx_impl();

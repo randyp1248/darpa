@@ -31,6 +31,10 @@
 #include "TRITONS.h"
 #include <cstring>
 #define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
+#define FILE_SIZE 80
+
+static bool debug_var = false;	
+
 namespace gr {
   namespace crc {
 
@@ -48,6 +52,7 @@ namespace gr {
     {
 	set_min_noutput_items(FRAME_SIZE+4);	//Fix the minimum output buffer size (CRC + Capsule)
 	set_max_noutput_items(FRAME_SIZE+4);	//Fix the maximum output buffer size (CRC + Capsule)
+	flag = false;
     }
 
     /* Our virtual destructor */
@@ -57,7 +62,14 @@ namespace gr {
     void
     crctx_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
     {
-	    ninput_items_required[0] = noutput_items-4;	//Output - CRC(4 bytes)
+        if(flag == false) 
+        {
+	   ninput_items_required[0] = FRAME_SIZE-4;	//Output - CRC(4 bytes)
+	}
+	else
+	{
+	   ninput_items_required[0] = FRAME_SIZE;	//Output - CRC(4 bytes)
+	}
     }
 
     int
@@ -68,25 +80,53 @@ namespace gr {
     {
 	const char * input = (const char *) input_items[0];
         char * out = (char *) output_items[0];
+	int dataToCopy = FRAME_SIZE;
 
 /***********************************************************************************************/	
 /*************** Input data, calculate CRC and Append (4 bytes) ********************************/
 
 	int static initial_ninputs = ninput_items[0];		// Locks value to first read	
-	//char crc32[] = {"1234"};
+	int crc32;
+
 	std::cout << "TX INPUT = " << input << std::endl;		// Print the input buffer
 
+	// prepending file size to the data
+	if (flag == false) 
+	{
+	   *((int *) out) = FILE_SIZE;
+           std::cout << "TX OUTPUT with Filesize ONLY = " << out << std::endl;
+	}	    			
+	// if we got less than framesize then we're done
 	if (ninput_items[0] < FRAME_SIZE)	
-	    return (-1);					//terminate
+	{
+            std::cout << "TX EOF "<< std::endl;
+	    return (-1);					//terminate at end of file
+	}
+	// else, add the data
 	else
 	{
-	    memcpy(out, input, FRAME_SIZE);			
-	    int crc32 = digital_crc32(out);			// %%%%% ADD BACK IN AFTER DEBUGGING %%%%%%			
-	    memcpy(out + FRAME_SIZE, (unsigned char *) (void *) &crc32, 4);	
+            char *pOut = out;
+	    if(flag == false) 
+	    {
+                pOut += 4;
+  		dataToCopy = FRAME_SIZE - 4;
+ 		flag = true;
+	    }
+	    memcpy(pOut, input, dataToCopy);			//copy x 4byte CRC to data capsule
+            if(debug_var == false) 
+            {
+               if(flag == true) 
+	       {
+                  debug_var = true;
+               }
+               std::cout << "TX OUTPUT on First Iteration with NO CRC = " << pOut << std::endl;
+            }
+	    int crc32 = digital_crc32((const unsigned char *)out, FRAME_SIZE);						
+	    memcpy(out + FRAME_SIZE, (unsigned char *)&crc32, 4);	
 	}		
 	std::cout << "TX OUTPUT with CRC = " << out << std::endl;		
 
-	consume_each (FRAME_SIZE);
+	consume_each (dataToCopy);
 	return noutput_items;			//FRAME_SIZE + 4
     }
   } /* namespace crc */
