@@ -63,7 +63,7 @@ namespace gr {
         for(int i=0; i<noutput_items; i++)
         {
             out[i] = in[i];
-            printf("element %04d of %04d: 0x%X\n", i, noutput_items, in[i]);
+            printf("element %04d of %04d: 0x%X\n", i+1, noutput_items, in[i]);
         }
 
         // Tell runtime system how many output items we produced.

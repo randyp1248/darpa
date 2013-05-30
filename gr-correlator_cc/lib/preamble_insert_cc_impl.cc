@@ -21,7 +21,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this software; see the file COPYING.  If not, write to
  * the Free Software Foundation, Inc., 51 Franklin Street,
- * Boston, MA 02110-1301, USA.
  */
 
 #ifdef HAVE_CONFIG_H
@@ -32,6 +31,11 @@
 #include "preamble_insert_cc_impl.h"
 #include <stdio.h>
 #include "TRITONS.h"
+
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 namespace gr {
 namespace correlator_cc {
@@ -140,6 +144,11 @@ preamble_insert_cc_impl::general_work (int noutput_items,
       out[samplesOutput++] = outputVal;
       out[samplesOutput++] = outputVal;
    }
+
+   // Sleep for 100ms.
+   struct timeval timeout = {0, 200000};
+   select(0,0,0,0,&timeout);
+
 
    // Tell runtime system how many input items we consumed on each input stream.
    consume_each (samplesRead);

@@ -26,6 +26,7 @@
 #include "print_cc_impl.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 namespace gr {
   namespace print_cc {
@@ -62,8 +63,12 @@ namespace gr {
 
         for(int i=0; i<noutput_items; i++)
         {
+            double phase;
+            const double PI = 3.14159265;
             out[i] = in[i];
-            printf("Sample %08d: %f+%fj\n", i, in[i].real(), in[i].imag());
+            phase = atan2(in[i].imag(), in[i].real());
+            phase *= 180 / PI;
+            printf("Sample %08d: %f+%fj: phase: %f\n", i, in[i].real(), in[i].imag(), phase);
         }
 
         // Tell runtime system how many output items we produced.

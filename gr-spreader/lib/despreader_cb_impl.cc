@@ -54,8 +54,8 @@ despreader_cb_impl::despreader_cb_impl()
                   gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
                   gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof (unsigned char)))
 {
-   set_min_noutput_items(3);
-   set_max_noutput_items(3);
+   set_min_noutput_items(5);
+   set_max_noutput_items(5);
 }
 
 despreader_cb_impl::~despreader_cb_impl()
@@ -65,7 +65,7 @@ despreader_cb_impl::~despreader_cb_impl()
 void
 despreader_cb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-   ninput_items_required[0] = (3 * 8 / 3 * 8);
+   ninput_items_required[0] = (5 * 8 / 5 * 32/2);
 }
 
 int
@@ -84,100 +84,782 @@ despreader_cb_impl::general_work (int noutput_items,
    
    maxCorrelationValue = 0.0;
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      - in[1+0*8/2].real() - in[1+0*8/2].imag()
-      - in[2+0*8/2].real() - in[2+0*8/2].imag()
-      - in[3+0*8/2].real() - in[3+0*8/2].imag();
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 0;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+0*8/2].real() + in[0+0*8/2].imag()
-      - in[1+0*8/2].real() + in[1+0*8/2].imag()
-      - in[2+0*8/2].real() + in[2+0*8/2].imag()
-      - in[3+0*8/2].real() + in[3+0*8/2].imag();
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 1;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      + in[1+0*8/2].real() + in[1+0*8/2].imag()
-      - in[2+0*8/2].real() - in[2+0*8/2].imag()
-      + in[3+0*8/2].real() + in[3+0*8/2].imag();
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 2;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+0*8/2].real() + in[0+0*8/2].imag()
-      + in[1+0*8/2].real() - in[1+0*8/2].imag()
-      - in[2+0*8/2].real() + in[2+0*8/2].imag()
-      + in[3+0*8/2].real() - in[3+0*8/2].imag();
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 3;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      - in[1+0*8/2].real() - in[1+0*8/2].imag()
-      + in[2+0*8/2].real() + in[2+0*8/2].imag()
-      + in[3+0*8/2].real() + in[3+0*8/2].imag();
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 4;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+0*8/2].real() + in[0+0*8/2].imag()
-      - in[1+0*8/2].real() + in[1+0*8/2].imag()
-      + in[2+0*8/2].real() - in[2+0*8/2].imag()
-      + in[3+0*8/2].real() - in[3+0*8/2].imag();
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 5;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+0*8/2].real() - in[0+0*8/2].imag()
-      + in[1+0*8/2].real() + in[1+0*8/2].imag()
-      + in[2+0*8/2].real() + in[2+0*8/2].imag()
-      - in[3+0*8/2].real() - in[3+0*8/2].imag();
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 6;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+0*8/2].real() + in[0+0*8/2].imag()
-      + in[1+0*8/2].real() - in[1+0*8/2].imag()
-      + in[2+0*8/2].real() - in[2+0*8/2].imag()
-      - in[3+0*8/2].real() + in[3+0*8/2].imag();
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 8;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 9;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 10;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 11;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 12;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 13;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      - in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 14;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      - in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 15;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      - in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      + in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      - in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      + in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      - in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      + in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      + in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      - in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      - in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      + in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      + in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      - in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      - in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      + in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      + in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      - in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      + in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      - in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      - in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      + in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      - in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      + in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      + in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      - in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      + in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      - in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      - in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      + in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() - in[0+0*32/2].imag()
+      + in[1+0*32/2].real() + in[1+0*32/2].imag()
+      + in[2+0*32/2].real() + in[2+0*32/2].imag()
+      - in[3+0*32/2].real() - in[3+0*32/2].imag()
+      + in[4+0*32/2].real() + in[4+0*32/2].imag()
+      - in[5+0*32/2].real() - in[5+0*32/2].imag()
+      - in[6+0*32/2].real() - in[6+0*32/2].imag()
+      + in[7+0*32/2].real() + in[7+0*32/2].imag()
+      + in[8+0*32/2].real() + in[8+0*32/2].imag()
+      - in[9+0*32/2].real() - in[9+0*32/2].imag()
+      - in[10+0*32/2].real() - in[10+0*32/2].imag()
+      + in[11+0*32/2].real() + in[11+0*32/2].imag()
+      - in[12+0*32/2].real() - in[12+0*32/2].imag()
+      + in[13+0*32/2].real() + in[13+0*32/2].imag()
+      + in[14+0*32/2].real() + in[14+0*32/2].imag()
+      - in[15+0*32/2].real() - in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+0*32/2].real() + in[0+0*32/2].imag()
+      + in[1+0*32/2].real() - in[1+0*32/2].imag()
+      + in[2+0*32/2].real() - in[2+0*32/2].imag()
+      - in[3+0*32/2].real() + in[3+0*32/2].imag()
+      + in[4+0*32/2].real() - in[4+0*32/2].imag()
+      - in[5+0*32/2].real() + in[5+0*32/2].imag()
+      - in[6+0*32/2].real() + in[6+0*32/2].imag()
+      + in[7+0*32/2].real() - in[7+0*32/2].imag()
+      + in[8+0*32/2].real() - in[8+0*32/2].imag()
+      - in[9+0*32/2].real() + in[9+0*32/2].imag()
+      - in[10+0*32/2].real() + in[10+0*32/2].imag()
+      + in[11+0*32/2].real() - in[11+0*32/2].imag()
+      - in[12+0*32/2].real() + in[12+0*32/2].imag()
+      + in[13+0*32/2].real() - in[13+0*32/2].imag()
+      + in[14+0*32/2].real() - in[14+0*32/2].imag()
+      - in[15+0*32/2].real() + in[15+0*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
    //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[0])<<24) | 
           (((unsigned)out[0+1])<<16) | 
           (((unsigned)out[0+2])<<8) | 
           (((unsigned)out[0+3]));
-   temp &= ~(((1<<3)-1) << (32-0-3));
-   temp |= maxCorrelationIndex << (32-0-3);
+   temp &= ~(((1<<5)-1) << (32-0-5));
+   temp |= maxCorrelationIndex << (32-0-5);
    out[0]   = (temp>>24) & 0xff;
    out[0+1] = (temp>>16) & 0xff;
    out[0+2] = (temp>>8 ) & 0xff;
@@ -186,100 +868,782 @@ despreader_cb_impl::general_work (int noutput_items,
 
    maxCorrelationValue = 0.0;
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      - in[1+1*8/2].real() - in[1+1*8/2].imag()
-      - in[2+1*8/2].real() - in[2+1*8/2].imag()
-      - in[3+1*8/2].real() - in[3+1*8/2].imag();
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 0;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+1*8/2].real() + in[0+1*8/2].imag()
-      - in[1+1*8/2].real() + in[1+1*8/2].imag()
-      - in[2+1*8/2].real() + in[2+1*8/2].imag()
-      - in[3+1*8/2].real() + in[3+1*8/2].imag();
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 1;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      + in[1+1*8/2].real() + in[1+1*8/2].imag()
-      - in[2+1*8/2].real() - in[2+1*8/2].imag()
-      + in[3+1*8/2].real() + in[3+1*8/2].imag();
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 2;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+1*8/2].real() + in[0+1*8/2].imag()
-      + in[1+1*8/2].real() - in[1+1*8/2].imag()
-      - in[2+1*8/2].real() + in[2+1*8/2].imag()
-      + in[3+1*8/2].real() - in[3+1*8/2].imag();
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 3;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      - in[1+1*8/2].real() - in[1+1*8/2].imag()
-      + in[2+1*8/2].real() + in[2+1*8/2].imag()
-      + in[3+1*8/2].real() + in[3+1*8/2].imag();
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 4;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+1*8/2].real() + in[0+1*8/2].imag()
-      - in[1+1*8/2].real() + in[1+1*8/2].imag()
-      + in[2+1*8/2].real() - in[2+1*8/2].imag()
-      + in[3+1*8/2].real() - in[3+1*8/2].imag();
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 5;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+1*8/2].real() - in[0+1*8/2].imag()
-      + in[1+1*8/2].real() + in[1+1*8/2].imag()
-      + in[2+1*8/2].real() + in[2+1*8/2].imag()
-      - in[3+1*8/2].real() - in[3+1*8/2].imag();
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 6;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+1*8/2].real() + in[0+1*8/2].imag()
-      + in[1+1*8/2].real() - in[1+1*8/2].imag()
-      + in[2+1*8/2].real() - in[2+1*8/2].imag()
-      - in[3+1*8/2].real() + in[3+1*8/2].imag();
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 8;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 9;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 10;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 11;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 12;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 13;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      - in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 14;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      - in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 15;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      - in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      + in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      - in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      + in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      - in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      + in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      + in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      - in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      - in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      + in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      + in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      - in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      - in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      + in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      + in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      - in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      + in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      - in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      - in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      + in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      - in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      + in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      + in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      - in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      + in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      - in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      - in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      + in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() - in[0+1*32/2].imag()
+      + in[1+1*32/2].real() + in[1+1*32/2].imag()
+      + in[2+1*32/2].real() + in[2+1*32/2].imag()
+      - in[3+1*32/2].real() - in[3+1*32/2].imag()
+      + in[4+1*32/2].real() + in[4+1*32/2].imag()
+      - in[5+1*32/2].real() - in[5+1*32/2].imag()
+      - in[6+1*32/2].real() - in[6+1*32/2].imag()
+      + in[7+1*32/2].real() + in[7+1*32/2].imag()
+      + in[8+1*32/2].real() + in[8+1*32/2].imag()
+      - in[9+1*32/2].real() - in[9+1*32/2].imag()
+      - in[10+1*32/2].real() - in[10+1*32/2].imag()
+      + in[11+1*32/2].real() + in[11+1*32/2].imag()
+      - in[12+1*32/2].real() - in[12+1*32/2].imag()
+      + in[13+1*32/2].real() + in[13+1*32/2].imag()
+      + in[14+1*32/2].real() + in[14+1*32/2].imag()
+      - in[15+1*32/2].real() - in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+1*32/2].real() + in[0+1*32/2].imag()
+      + in[1+1*32/2].real() - in[1+1*32/2].imag()
+      + in[2+1*32/2].real() - in[2+1*32/2].imag()
+      - in[3+1*32/2].real() + in[3+1*32/2].imag()
+      + in[4+1*32/2].real() - in[4+1*32/2].imag()
+      - in[5+1*32/2].real() + in[5+1*32/2].imag()
+      - in[6+1*32/2].real() + in[6+1*32/2].imag()
+      + in[7+1*32/2].real() - in[7+1*32/2].imag()
+      + in[8+1*32/2].real() - in[8+1*32/2].imag()
+      - in[9+1*32/2].real() + in[9+1*32/2].imag()
+      - in[10+1*32/2].real() + in[10+1*32/2].imag()
+      + in[11+1*32/2].real() - in[11+1*32/2].imag()
+      - in[12+1*32/2].real() + in[12+1*32/2].imag()
+      + in[13+1*32/2].real() - in[13+1*32/2].imag()
+      + in[14+1*32/2].real() - in[14+1*32/2].imag()
+      - in[15+1*32/2].real() + in[15+1*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
    //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[0])<<24) | 
           (((unsigned)out[0+1])<<16) | 
           (((unsigned)out[0+2])<<8) | 
           (((unsigned)out[0+3]));
-   temp &= ~(((1<<3)-1) << (32-3-3));
-   temp |= maxCorrelationIndex << (32-3-3);
+   temp &= ~(((1<<5)-1) << (32-5-5));
+   temp |= maxCorrelationIndex << (32-5-5);
    out[0]   = (temp>>24) & 0xff;
    out[0+1] = (temp>>16) & 0xff;
    out[0+2] = (temp>>8 ) & 0xff;
@@ -288,202 +1652,782 @@ despreader_cb_impl::general_work (int noutput_items,
 
    maxCorrelationValue = 0.0;
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      - in[1+2*8/2].real() - in[1+2*8/2].imag()
-      - in[2+2*8/2].real() - in[2+2*8/2].imag()
-      - in[3+2*8/2].real() - in[3+2*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 0;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+2*8/2].real() + in[0+2*8/2].imag()
-      - in[1+2*8/2].real() + in[1+2*8/2].imag()
-      - in[2+2*8/2].real() + in[2+2*8/2].imag()
-      - in[3+2*8/2].real() + in[3+2*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 1;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      + in[1+2*8/2].real() + in[1+2*8/2].imag()
-      - in[2+2*8/2].real() - in[2+2*8/2].imag()
-      + in[3+2*8/2].real() + in[3+2*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 2;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+2*8/2].real() + in[0+2*8/2].imag()
-      + in[1+2*8/2].real() - in[1+2*8/2].imag()
-      - in[2+2*8/2].real() + in[2+2*8/2].imag()
-      + in[3+2*8/2].real() - in[3+2*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 3;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      - in[1+2*8/2].real() - in[1+2*8/2].imag()
-      + in[2+2*8/2].real() + in[2+2*8/2].imag()
-      + in[3+2*8/2].real() + in[3+2*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 4;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+2*8/2].real() + in[0+2*8/2].imag()
-      - in[1+2*8/2].real() + in[1+2*8/2].imag()
-      + in[2+2*8/2].real() - in[2+2*8/2].imag()
-      + in[3+2*8/2].real() - in[3+2*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 5;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+2*8/2].real() - in[0+2*8/2].imag()
-      + in[1+2*8/2].real() + in[1+2*8/2].imag()
-      + in[2+2*8/2].real() + in[2+2*8/2].imag()
-      - in[3+2*8/2].real() - in[3+2*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 6;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+2*8/2].real() + in[0+2*8/2].imag()
-      + in[1+2*8/2].real() - in[1+2*8/2].imag()
-      + in[2+2*8/2].real() - in[2+2*8/2].imag()
-      - in[3+2*8/2].real() + in[3+2*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
-   //printf("Despreading index: %d\n", maxCorrelationIndex);
-   temp = (((unsigned)out[0])<<24) | 
-          (((unsigned)out[0+1])<<16) | 
-          (((unsigned)out[0+2])<<8) | 
-          (((unsigned)out[0+3]));
-   temp &= ~(((1<<3)-1) << (32-6-3));
-   temp |= maxCorrelationIndex << (32-6-3);
-   out[0]   = (temp>>24) & 0xff;
-   out[0+1] = (temp>>16) & 0xff;
-   out[0+2] = (temp>>8 ) & 0xff;
-   out[0+3] = (temp    ) & 0xff;
-
-
-   maxCorrelationValue = 0.0;
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      - in[1+3*8/2].real() - in[1+3*8/2].imag()
-      - in[2+3*8/2].real() - in[2+3*8/2].imag()
-      - in[3+3*8/2].real() - in[3+3*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 0;
+      maxCorrelationIndex = 8;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() + in[0+3*8/2].imag()
-      - in[1+3*8/2].real() + in[1+3*8/2].imag()
-      - in[2+3*8/2].real() + in[2+3*8/2].imag()
-      - in[3+3*8/2].real() + in[3+3*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 1;
+      maxCorrelationIndex = 9;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      + in[1+3*8/2].real() + in[1+3*8/2].imag()
-      - in[2+3*8/2].real() - in[2+3*8/2].imag()
-      + in[3+3*8/2].real() + in[3+3*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 2;
+      maxCorrelationIndex = 10;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() + in[0+3*8/2].imag()
-      + in[1+3*8/2].real() - in[1+3*8/2].imag()
-      - in[2+3*8/2].real() + in[2+3*8/2].imag()
-      + in[3+3*8/2].real() - in[3+3*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 3;
+      maxCorrelationIndex = 11;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      - in[1+3*8/2].real() - in[1+3*8/2].imag()
-      + in[2+3*8/2].real() + in[2+3*8/2].imag()
-      + in[3+3*8/2].real() + in[3+3*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 4;
+      maxCorrelationIndex = 12;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() + in[0+3*8/2].imag()
-      - in[1+3*8/2].real() + in[1+3*8/2].imag()
-      + in[2+3*8/2].real() - in[2+3*8/2].imag()
-      + in[3+3*8/2].real() - in[3+3*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 5;
+      maxCorrelationIndex = 13;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() - in[0+3*8/2].imag()
-      + in[1+3*8/2].real() + in[1+3*8/2].imag()
-      + in[2+3*8/2].real() + in[2+3*8/2].imag()
-      - in[3+3*8/2].real() - in[3+3*8/2].imag();
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      - in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 6;
+      maxCorrelationIndex = 14;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+3*8/2].real() + in[0+3*8/2].imag()
-      + in[1+3*8/2].real() - in[1+3*8/2].imag()
-      + in[2+3*8/2].real() - in[2+3*8/2].imag()
-      - in[3+3*8/2].real() + in[3+3*8/2].imag();
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      - in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 7;
+      maxCorrelationIndex = 15;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      - in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      + in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      - in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      + in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      - in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      + in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      + in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      - in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      - in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      + in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      + in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      - in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      - in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      + in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      + in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      - in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      + in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      - in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      - in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      + in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      - in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      + in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      + in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      - in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      + in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      - in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      - in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      + in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() - in[0+2*32/2].imag()
+      + in[1+2*32/2].real() + in[1+2*32/2].imag()
+      + in[2+2*32/2].real() + in[2+2*32/2].imag()
+      - in[3+2*32/2].real() - in[3+2*32/2].imag()
+      + in[4+2*32/2].real() + in[4+2*32/2].imag()
+      - in[5+2*32/2].real() - in[5+2*32/2].imag()
+      - in[6+2*32/2].real() - in[6+2*32/2].imag()
+      + in[7+2*32/2].real() + in[7+2*32/2].imag()
+      + in[8+2*32/2].real() + in[8+2*32/2].imag()
+      - in[9+2*32/2].real() - in[9+2*32/2].imag()
+      - in[10+2*32/2].real() - in[10+2*32/2].imag()
+      + in[11+2*32/2].real() + in[11+2*32/2].imag()
+      - in[12+2*32/2].real() - in[12+2*32/2].imag()
+      + in[13+2*32/2].real() + in[13+2*32/2].imag()
+      + in[14+2*32/2].real() + in[14+2*32/2].imag()
+      - in[15+2*32/2].real() - in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+2*32/2].real() + in[0+2*32/2].imag()
+      + in[1+2*32/2].real() - in[1+2*32/2].imag()
+      + in[2+2*32/2].real() - in[2+2*32/2].imag()
+      - in[3+2*32/2].real() + in[3+2*32/2].imag()
+      + in[4+2*32/2].real() - in[4+2*32/2].imag()
+      - in[5+2*32/2].real() + in[5+2*32/2].imag()
+      - in[6+2*32/2].real() + in[6+2*32/2].imag()
+      + in[7+2*32/2].real() - in[7+2*32/2].imag()
+      + in[8+2*32/2].real() - in[8+2*32/2].imag()
+      - in[9+2*32/2].real() + in[9+2*32/2].imag()
+      - in[10+2*32/2].real() + in[10+2*32/2].imag()
+      + in[11+2*32/2].real() - in[11+2*32/2].imag()
+      - in[12+2*32/2].real() + in[12+2*32/2].imag()
+      + in[13+2*32/2].real() - in[13+2*32/2].imag()
+      + in[14+2*32/2].real() - in[14+2*32/2].imag()
+      - in[15+2*32/2].real() + in[15+2*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
    //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[1])<<24) | 
           (((unsigned)out[1+1])<<16) | 
           (((unsigned)out[1+2])<<8) | 
           (((unsigned)out[1+3]));
-   temp &= ~(((1<<3)-1) << (32-1-3));
-   temp |= maxCorrelationIndex << (32-1-3);
+   temp &= ~(((1<<5)-1) << (32-2-5));
+   temp |= maxCorrelationIndex << (32-2-5);
    out[1]   = (temp>>24) & 0xff;
    out[1+1] = (temp>>16) & 0xff;
    out[1+2] = (temp>>8 ) & 0xff;
@@ -492,100 +2436,782 @@ despreader_cb_impl::general_work (int noutput_items,
 
    maxCorrelationValue = 0.0;
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      - in[1+4*8/2].real() - in[1+4*8/2].imag()
-      - in[2+4*8/2].real() - in[2+4*8/2].imag()
-      - in[3+4*8/2].real() - in[3+4*8/2].imag();
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 0;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+4*8/2].real() + in[0+4*8/2].imag()
-      - in[1+4*8/2].real() + in[1+4*8/2].imag()
-      - in[2+4*8/2].real() + in[2+4*8/2].imag()
-      - in[3+4*8/2].real() + in[3+4*8/2].imag();
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 1;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      + in[1+4*8/2].real() + in[1+4*8/2].imag()
-      - in[2+4*8/2].real() - in[2+4*8/2].imag()
-      + in[3+4*8/2].real() + in[3+4*8/2].imag();
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 2;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+4*8/2].real() + in[0+4*8/2].imag()
-      + in[1+4*8/2].real() - in[1+4*8/2].imag()
-      - in[2+4*8/2].real() + in[2+4*8/2].imag()
-      + in[3+4*8/2].real() - in[3+4*8/2].imag();
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 3;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      - in[1+4*8/2].real() - in[1+4*8/2].imag()
-      + in[2+4*8/2].real() + in[2+4*8/2].imag()
-      + in[3+4*8/2].real() + in[3+4*8/2].imag();
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 4;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+4*8/2].real() + in[0+4*8/2].imag()
-      - in[1+4*8/2].real() + in[1+4*8/2].imag()
-      + in[2+4*8/2].real() - in[2+4*8/2].imag()
-      + in[3+4*8/2].real() - in[3+4*8/2].imag();
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 5;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+4*8/2].real() - in[0+4*8/2].imag()
-      + in[1+4*8/2].real() + in[1+4*8/2].imag()
-      + in[2+4*8/2].real() + in[2+4*8/2].imag()
-      - in[3+4*8/2].real() - in[3+4*8/2].imag();
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 6;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+4*8/2].real() + in[0+4*8/2].imag()
-      + in[1+4*8/2].real() - in[1+4*8/2].imag()
-      + in[2+4*8/2].real() - in[2+4*8/2].imag()
-      - in[3+4*8/2].real() + in[3+4*8/2].imag();
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 8;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 9;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 10;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 11;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 12;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 13;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      - in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 14;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      - in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 15;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      - in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      + in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      - in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      + in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      - in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      + in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      + in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      - in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      - in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      + in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      + in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      - in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      - in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      + in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      + in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      - in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      + in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      - in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      - in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      + in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      - in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      + in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      + in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      - in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      + in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      - in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      - in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      + in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() - in[0+3*32/2].imag()
+      + in[1+3*32/2].real() + in[1+3*32/2].imag()
+      + in[2+3*32/2].real() + in[2+3*32/2].imag()
+      - in[3+3*32/2].real() - in[3+3*32/2].imag()
+      + in[4+3*32/2].real() + in[4+3*32/2].imag()
+      - in[5+3*32/2].real() - in[5+3*32/2].imag()
+      - in[6+3*32/2].real() - in[6+3*32/2].imag()
+      + in[7+3*32/2].real() + in[7+3*32/2].imag()
+      + in[8+3*32/2].real() + in[8+3*32/2].imag()
+      - in[9+3*32/2].real() - in[9+3*32/2].imag()
+      - in[10+3*32/2].real() - in[10+3*32/2].imag()
+      + in[11+3*32/2].real() + in[11+3*32/2].imag()
+      - in[12+3*32/2].real() - in[12+3*32/2].imag()
+      + in[13+3*32/2].real() + in[13+3*32/2].imag()
+      + in[14+3*32/2].real() + in[14+3*32/2].imag()
+      - in[15+3*32/2].real() - in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+3*32/2].real() + in[0+3*32/2].imag()
+      + in[1+3*32/2].real() - in[1+3*32/2].imag()
+      + in[2+3*32/2].real() - in[2+3*32/2].imag()
+      - in[3+3*32/2].real() + in[3+3*32/2].imag()
+      + in[4+3*32/2].real() - in[4+3*32/2].imag()
+      - in[5+3*32/2].real() + in[5+3*32/2].imag()
+      - in[6+3*32/2].real() + in[6+3*32/2].imag()
+      + in[7+3*32/2].real() - in[7+3*32/2].imag()
+      + in[8+3*32/2].real() - in[8+3*32/2].imag()
+      - in[9+3*32/2].real() + in[9+3*32/2].imag()
+      - in[10+3*32/2].real() + in[10+3*32/2].imag()
+      + in[11+3*32/2].real() - in[11+3*32/2].imag()
+      - in[12+3*32/2].real() + in[12+3*32/2].imag()
+      + in[13+3*32/2].real() - in[13+3*32/2].imag()
+      + in[14+3*32/2].real() - in[14+3*32/2].imag()
+      - in[15+3*32/2].real() + in[15+3*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
    //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[1])<<24) | 
           (((unsigned)out[1+1])<<16) | 
           (((unsigned)out[1+2])<<8) | 
           (((unsigned)out[1+3]));
-   temp &= ~(((1<<3)-1) << (32-4-3));
-   temp |= maxCorrelationIndex << (32-4-3);
+   temp &= ~(((1<<5)-1) << (32-7-5));
+   temp |= maxCorrelationIndex << (32-7-5);
    out[1]   = (temp>>24) & 0xff;
    out[1+1] = (temp>>16) & 0xff;
    out[1+2] = (temp>>8 ) & 0xff;
@@ -594,202 +3220,782 @@ despreader_cb_impl::general_work (int noutput_items,
 
    maxCorrelationValue = 0.0;
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      - in[1+5*8/2].real() - in[1+5*8/2].imag()
-      - in[2+5*8/2].real() - in[2+5*8/2].imag()
-      - in[3+5*8/2].real() - in[3+5*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 0;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+5*8/2].real() + in[0+5*8/2].imag()
-      - in[1+5*8/2].real() + in[1+5*8/2].imag()
-      - in[2+5*8/2].real() + in[2+5*8/2].imag()
-      - in[3+5*8/2].real() + in[3+5*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 1;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      + in[1+5*8/2].real() + in[1+5*8/2].imag()
-      - in[2+5*8/2].real() - in[2+5*8/2].imag()
-      + in[3+5*8/2].real() + in[3+5*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 2;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+5*8/2].real() + in[0+5*8/2].imag()
-      + in[1+5*8/2].real() - in[1+5*8/2].imag()
-      - in[2+5*8/2].real() + in[2+5*8/2].imag()
-      + in[3+5*8/2].real() - in[3+5*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 3;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      - in[1+5*8/2].real() - in[1+5*8/2].imag()
-      + in[2+5*8/2].real() + in[2+5*8/2].imag()
-      + in[3+5*8/2].real() + in[3+5*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 4;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+5*8/2].real() + in[0+5*8/2].imag()
-      - in[1+5*8/2].real() + in[1+5*8/2].imag()
-      + in[2+5*8/2].real() - in[2+5*8/2].imag()
-      + in[3+5*8/2].real() - in[3+5*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 5;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+5*8/2].real() - in[0+5*8/2].imag()
-      + in[1+5*8/2].real() + in[1+5*8/2].imag()
-      + in[2+5*8/2].real() + in[2+5*8/2].imag()
-      - in[3+5*8/2].real() - in[3+5*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 6;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+5*8/2].real() + in[0+5*8/2].imag()
-      + in[1+5*8/2].real() - in[1+5*8/2].imag()
-      + in[2+5*8/2].real() - in[2+5*8/2].imag()
-      - in[3+5*8/2].real() + in[3+5*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
-   //printf("Despreading index: %d\n", maxCorrelationIndex);
-   temp = (((unsigned)out[1])<<24) | 
-          (((unsigned)out[1+1])<<16) | 
-          (((unsigned)out[1+2])<<8) | 
-          (((unsigned)out[1+3]));
-   temp &= ~(((1<<3)-1) << (32-7-3));
-   temp |= maxCorrelationIndex << (32-7-3);
-   out[1]   = (temp>>24) & 0xff;
-   out[1+1] = (temp>>16) & 0xff;
-   out[1+2] = (temp>>8 ) & 0xff;
-   out[1+3] = (temp    ) & 0xff;
-
-
-   maxCorrelationValue = 0.0;
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      - in[1+6*8/2].real() - in[1+6*8/2].imag()
-      - in[2+6*8/2].real() - in[2+6*8/2].imag()
-      - in[3+6*8/2].real() - in[3+6*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 0;
+      maxCorrelationIndex = 8;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() + in[0+6*8/2].imag()
-      - in[1+6*8/2].real() + in[1+6*8/2].imag()
-      - in[2+6*8/2].real() + in[2+6*8/2].imag()
-      - in[3+6*8/2].real() + in[3+6*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 1;
+      maxCorrelationIndex = 9;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      + in[1+6*8/2].real() + in[1+6*8/2].imag()
-      - in[2+6*8/2].real() - in[2+6*8/2].imag()
-      + in[3+6*8/2].real() + in[3+6*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 2;
+      maxCorrelationIndex = 10;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() + in[0+6*8/2].imag()
-      + in[1+6*8/2].real() - in[1+6*8/2].imag()
-      - in[2+6*8/2].real() + in[2+6*8/2].imag()
-      + in[3+6*8/2].real() - in[3+6*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 3;
+      maxCorrelationIndex = 11;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      - in[1+6*8/2].real() - in[1+6*8/2].imag()
-      + in[2+6*8/2].real() + in[2+6*8/2].imag()
-      + in[3+6*8/2].real() + in[3+6*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 4;
+      maxCorrelationIndex = 12;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() + in[0+6*8/2].imag()
-      - in[1+6*8/2].real() + in[1+6*8/2].imag()
-      + in[2+6*8/2].real() - in[2+6*8/2].imag()
-      + in[3+6*8/2].real() - in[3+6*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 5;
+      maxCorrelationIndex = 13;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() - in[0+6*8/2].imag()
-      + in[1+6*8/2].real() + in[1+6*8/2].imag()
-      + in[2+6*8/2].real() + in[2+6*8/2].imag()
-      - in[3+6*8/2].real() - in[3+6*8/2].imag();
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      - in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 6;
+      maxCorrelationIndex = 14;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+6*8/2].real() + in[0+6*8/2].imag()
-      + in[1+6*8/2].real() - in[1+6*8/2].imag()
-      + in[2+6*8/2].real() - in[2+6*8/2].imag()
-      - in[3+6*8/2].real() + in[3+6*8/2].imag();
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      - in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
-      maxCorrelationIndex = 7;
+      maxCorrelationIndex = 15;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      - in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      + in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      - in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      + in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      - in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      + in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      + in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      - in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      - in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      + in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      + in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      - in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      - in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      + in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      + in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      - in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      + in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      - in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      - in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      + in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      - in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      + in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      + in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      - in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      + in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      - in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      - in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      + in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() - in[0+4*32/2].imag()
+      + in[1+4*32/2].real() + in[1+4*32/2].imag()
+      + in[2+4*32/2].real() + in[2+4*32/2].imag()
+      - in[3+4*32/2].real() - in[3+4*32/2].imag()
+      + in[4+4*32/2].real() + in[4+4*32/2].imag()
+      - in[5+4*32/2].real() - in[5+4*32/2].imag()
+      - in[6+4*32/2].real() - in[6+4*32/2].imag()
+      + in[7+4*32/2].real() + in[7+4*32/2].imag()
+      + in[8+4*32/2].real() + in[8+4*32/2].imag()
+      - in[9+4*32/2].real() - in[9+4*32/2].imag()
+      - in[10+4*32/2].real() - in[10+4*32/2].imag()
+      + in[11+4*32/2].real() + in[11+4*32/2].imag()
+      - in[12+4*32/2].real() - in[12+4*32/2].imag()
+      + in[13+4*32/2].real() + in[13+4*32/2].imag()
+      + in[14+4*32/2].real() + in[14+4*32/2].imag()
+      - in[15+4*32/2].real() - in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+4*32/2].real() + in[0+4*32/2].imag()
+      + in[1+4*32/2].real() - in[1+4*32/2].imag()
+      + in[2+4*32/2].real() - in[2+4*32/2].imag()
+      - in[3+4*32/2].real() + in[3+4*32/2].imag()
+      + in[4+4*32/2].real() - in[4+4*32/2].imag()
+      - in[5+4*32/2].real() + in[5+4*32/2].imag()
+      - in[6+4*32/2].real() + in[6+4*32/2].imag()
+      + in[7+4*32/2].real() - in[7+4*32/2].imag()
+      + in[8+4*32/2].real() - in[8+4*32/2].imag()
+      - in[9+4*32/2].real() + in[9+4*32/2].imag()
+      - in[10+4*32/2].real() + in[10+4*32/2].imag()
+      + in[11+4*32/2].real() - in[11+4*32/2].imag()
+      - in[12+4*32/2].real() + in[12+4*32/2].imag()
+      + in[13+4*32/2].real() - in[13+4*32/2].imag()
+      + in[14+4*32/2].real() - in[14+4*32/2].imag()
+      - in[15+4*32/2].real() + in[15+4*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
    //printf("Despreading index: %d\n", maxCorrelationIndex);
    temp = (((unsigned)out[2])<<24) | 
           (((unsigned)out[2+1])<<16) | 
           (((unsigned)out[2+2])<<8) | 
           (((unsigned)out[2+3]));
-   temp &= ~(((1<<3)-1) << (32-2-3));
-   temp |= maxCorrelationIndex << (32-2-3);
+   temp &= ~(((1<<5)-1) << (32-4-5));
+   temp |= maxCorrelationIndex << (32-4-5);
    out[2]   = (temp>>24) & 0xff;
    out[2+1] = (temp>>16) & 0xff;
    out[2+2] = (temp>>8 ) & 0xff;
@@ -798,111 +4004,2361 @@ despreader_cb_impl::general_work (int noutput_items,
 
    maxCorrelationValue = 0.0;
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      - in[1+7*8/2].real() - in[1+7*8/2].imag()
-      - in[2+7*8/2].real() - in[2+7*8/2].imag()
-      - in[3+7*8/2].real() - in[3+7*8/2].imag();
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 0;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+7*8/2].real() + in[0+7*8/2].imag()
-      - in[1+7*8/2].real() + in[1+7*8/2].imag()
-      - in[2+7*8/2].real() + in[2+7*8/2].imag()
-      - in[3+7*8/2].real() + in[3+7*8/2].imag();
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 1;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      + in[1+7*8/2].real() + in[1+7*8/2].imag()
-      - in[2+7*8/2].real() - in[2+7*8/2].imag()
-      + in[3+7*8/2].real() + in[3+7*8/2].imag();
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 2;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+7*8/2].real() + in[0+7*8/2].imag()
-      + in[1+7*8/2].real() - in[1+7*8/2].imag()
-      - in[2+7*8/2].real() + in[2+7*8/2].imag()
-      + in[3+7*8/2].real() - in[3+7*8/2].imag();
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 3;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      - in[1+7*8/2].real() - in[1+7*8/2].imag()
-      + in[2+7*8/2].real() + in[2+7*8/2].imag()
-      + in[3+7*8/2].real() + in[3+7*8/2].imag();
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 4;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+7*8/2].real() + in[0+7*8/2].imag()
-      - in[1+7*8/2].real() + in[1+7*8/2].imag()
-      + in[2+7*8/2].real() - in[2+7*8/2].imag()
-      + in[3+7*8/2].real() - in[3+7*8/2].imag();
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 5;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+7*8/2].real() - in[0+7*8/2].imag()
-      + in[1+7*8/2].real() + in[1+7*8/2].imag()
-      + in[2+7*8/2].real() + in[2+7*8/2].imag()
-      - in[3+7*8/2].real() - in[3+7*8/2].imag();
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 6;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
    currentCorrelationValue =
-      - in[0+7*8/2].real() + in[0+7*8/2].imag()
-      + in[1+7*8/2].real() - in[1+7*8/2].imag()
-      + in[2+7*8/2].real() - in[2+7*8/2].imag()
-      - in[3+7*8/2].real() + in[3+7*8/2].imag();
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
    if (abs(currentCorrelationValue) > maxCorrelationValue)
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = 7;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 8;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 9;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 10;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 11;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 12;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 13;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      - in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 14;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      - in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 15;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      - in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      + in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      - in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      + in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      - in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      + in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      + in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      - in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      - in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      + in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      + in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      - in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      - in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      + in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      + in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      - in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      + in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      - in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      - in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      + in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      - in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      + in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      + in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      - in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      + in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      - in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      - in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      + in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() - in[0+5*32/2].imag()
+      + in[1+5*32/2].real() + in[1+5*32/2].imag()
+      + in[2+5*32/2].real() + in[2+5*32/2].imag()
+      - in[3+5*32/2].real() - in[3+5*32/2].imag()
+      + in[4+5*32/2].real() + in[4+5*32/2].imag()
+      - in[5+5*32/2].real() - in[5+5*32/2].imag()
+      - in[6+5*32/2].real() - in[6+5*32/2].imag()
+      + in[7+5*32/2].real() + in[7+5*32/2].imag()
+      + in[8+5*32/2].real() + in[8+5*32/2].imag()
+      - in[9+5*32/2].real() - in[9+5*32/2].imag()
+      - in[10+5*32/2].real() - in[10+5*32/2].imag()
+      + in[11+5*32/2].real() + in[11+5*32/2].imag()
+      - in[12+5*32/2].real() - in[12+5*32/2].imag()
+      + in[13+5*32/2].real() + in[13+5*32/2].imag()
+      + in[14+5*32/2].real() + in[14+5*32/2].imag()
+      - in[15+5*32/2].real() - in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+5*32/2].real() + in[0+5*32/2].imag()
+      + in[1+5*32/2].real() - in[1+5*32/2].imag()
+      + in[2+5*32/2].real() - in[2+5*32/2].imag()
+      - in[3+5*32/2].real() + in[3+5*32/2].imag()
+      + in[4+5*32/2].real() - in[4+5*32/2].imag()
+      - in[5+5*32/2].real() + in[5+5*32/2].imag()
+      - in[6+5*32/2].real() + in[6+5*32/2].imag()
+      + in[7+5*32/2].real() - in[7+5*32/2].imag()
+      + in[8+5*32/2].real() - in[8+5*32/2].imag()
+      - in[9+5*32/2].real() + in[9+5*32/2].imag()
+      - in[10+5*32/2].real() + in[10+5*32/2].imag()
+      + in[11+5*32/2].real() - in[11+5*32/2].imag()
+      - in[12+5*32/2].real() + in[12+5*32/2].imag()
+      + in[13+5*32/2].real() - in[13+5*32/2].imag()
+      + in[14+5*32/2].real() - in[14+5*32/2].imag()
+      - in[15+5*32/2].real() + in[15+5*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
    //printf("Despreading index: %d\n", maxCorrelationIndex);
-   temp = (((unsigned)out[2])<<24) | 
-          (((unsigned)out[2+1])<<16) | 
-          (((unsigned)out[2+2])<<8) | 
-          (((unsigned)out[2+3]));
-   temp &= ~(((1<<3)-1) << (32-5-3));
-   temp |= maxCorrelationIndex << (32-5-3);
-   out[2]   = (temp>>24) & 0xff;
-   out[2+1] = (temp>>16) & 0xff;
-   out[2+2] = (temp>>8 ) & 0xff;
-   out[2+3] = (temp    ) & 0xff;
+   temp = (((unsigned)out[3])<<24) | 
+          (((unsigned)out[3+1])<<16) | 
+          (((unsigned)out[3+2])<<8) | 
+          (((unsigned)out[3+3]));
+   temp &= ~(((1<<5)-1) << (32-1-5));
+   temp |= maxCorrelationIndex << (32-1-5);
+   out[3]   = (temp>>24) & 0xff;
+   out[3+1] = (temp>>16) & 0xff;
+   out[3+2] = (temp>>8 ) & 0xff;
+   out[3+3] = (temp    ) & 0xff;
+
+
+   maxCorrelationValue = 0.0;
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 0;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 1;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 2;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 3;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 4;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 5;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 6;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 7;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 8;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 9;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 10;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 11;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 12;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 13;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      - in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 14;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      - in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 15;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      - in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      + in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      - in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      + in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      - in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      + in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      + in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      - in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      - in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      + in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      + in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      - in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      - in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      + in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      + in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      - in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      + in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      - in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      - in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      + in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      - in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      + in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      + in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      - in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      + in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      - in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      - in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      + in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() - in[0+6*32/2].imag()
+      + in[1+6*32/2].real() + in[1+6*32/2].imag()
+      + in[2+6*32/2].real() + in[2+6*32/2].imag()
+      - in[3+6*32/2].real() - in[3+6*32/2].imag()
+      + in[4+6*32/2].real() + in[4+6*32/2].imag()
+      - in[5+6*32/2].real() - in[5+6*32/2].imag()
+      - in[6+6*32/2].real() - in[6+6*32/2].imag()
+      + in[7+6*32/2].real() + in[7+6*32/2].imag()
+      + in[8+6*32/2].real() + in[8+6*32/2].imag()
+      - in[9+6*32/2].real() - in[9+6*32/2].imag()
+      - in[10+6*32/2].real() - in[10+6*32/2].imag()
+      + in[11+6*32/2].real() + in[11+6*32/2].imag()
+      - in[12+6*32/2].real() - in[12+6*32/2].imag()
+      + in[13+6*32/2].real() + in[13+6*32/2].imag()
+      + in[14+6*32/2].real() + in[14+6*32/2].imag()
+      - in[15+6*32/2].real() - in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+6*32/2].real() + in[0+6*32/2].imag()
+      + in[1+6*32/2].real() - in[1+6*32/2].imag()
+      + in[2+6*32/2].real() - in[2+6*32/2].imag()
+      - in[3+6*32/2].real() + in[3+6*32/2].imag()
+      + in[4+6*32/2].real() - in[4+6*32/2].imag()
+      - in[5+6*32/2].real() + in[5+6*32/2].imag()
+      - in[6+6*32/2].real() + in[6+6*32/2].imag()
+      + in[7+6*32/2].real() - in[7+6*32/2].imag()
+      + in[8+6*32/2].real() - in[8+6*32/2].imag()
+      - in[9+6*32/2].real() + in[9+6*32/2].imag()
+      - in[10+6*32/2].real() + in[10+6*32/2].imag()
+      + in[11+6*32/2].real() - in[11+6*32/2].imag()
+      - in[12+6*32/2].real() + in[12+6*32/2].imag()
+      + in[13+6*32/2].real() - in[13+6*32/2].imag()
+      + in[14+6*32/2].real() - in[14+6*32/2].imag()
+      - in[15+6*32/2].real() + in[15+6*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
+   temp = (((unsigned)out[3])<<24) | 
+          (((unsigned)out[3+1])<<16) | 
+          (((unsigned)out[3+2])<<8) | 
+          (((unsigned)out[3+3]));
+   temp &= ~(((1<<5)-1) << (32-6-5));
+   temp |= maxCorrelationIndex << (32-6-5);
+   out[3]   = (temp>>24) & 0xff;
+   out[3+1] = (temp>>16) & 0xff;
+   out[3+2] = (temp>>8 ) & 0xff;
+   out[3+3] = (temp    ) & 0xff;
+
+
+   maxCorrelationValue = 0.0;
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 0;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 1;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 2;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 3;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 4;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 5;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 6;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 7;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 8;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 9;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 10;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 11;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 12;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 13;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      - in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 14;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      - in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 15;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 16;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 17;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 18;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 19;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 20;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 21;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      - in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      + in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 22;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      - in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      + in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 23;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 24;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 25;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      - in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      + in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      + in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      - in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 26;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      - in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      + in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      + in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      - in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 27;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      - in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      + in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      + in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      - in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      + in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      - in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      - in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      + in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 28;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      - in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      + in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      + in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      - in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      + in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      - in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      - in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      + in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 29;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() - in[0+7*32/2].imag()
+      + in[1+7*32/2].real() + in[1+7*32/2].imag()
+      + in[2+7*32/2].real() + in[2+7*32/2].imag()
+      - in[3+7*32/2].real() - in[3+7*32/2].imag()
+      + in[4+7*32/2].real() + in[4+7*32/2].imag()
+      - in[5+7*32/2].real() - in[5+7*32/2].imag()
+      - in[6+7*32/2].real() - in[6+7*32/2].imag()
+      + in[7+7*32/2].real() + in[7+7*32/2].imag()
+      + in[8+7*32/2].real() + in[8+7*32/2].imag()
+      - in[9+7*32/2].real() - in[9+7*32/2].imag()
+      - in[10+7*32/2].real() - in[10+7*32/2].imag()
+      + in[11+7*32/2].real() + in[11+7*32/2].imag()
+      - in[12+7*32/2].real() - in[12+7*32/2].imag()
+      + in[13+7*32/2].real() + in[13+7*32/2].imag()
+      + in[14+7*32/2].real() + in[14+7*32/2].imag()
+      - in[15+7*32/2].real() - in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 30;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+   currentCorrelationValue =
+      - in[0+7*32/2].real() + in[0+7*32/2].imag()
+      + in[1+7*32/2].real() - in[1+7*32/2].imag()
+      + in[2+7*32/2].real() - in[2+7*32/2].imag()
+      - in[3+7*32/2].real() + in[3+7*32/2].imag()
+      + in[4+7*32/2].real() - in[4+7*32/2].imag()
+      - in[5+7*32/2].real() + in[5+7*32/2].imag()
+      - in[6+7*32/2].real() + in[6+7*32/2].imag()
+      + in[7+7*32/2].real() - in[7+7*32/2].imag()
+      + in[8+7*32/2].real() - in[8+7*32/2].imag()
+      - in[9+7*32/2].real() + in[9+7*32/2].imag()
+      - in[10+7*32/2].real() + in[10+7*32/2].imag()
+      + in[11+7*32/2].real() - in[11+7*32/2].imag()
+      - in[12+7*32/2].real() + in[12+7*32/2].imag()
+      + in[13+7*32/2].real() - in[13+7*32/2].imag()
+      + in[14+7*32/2].real() - in[14+7*32/2].imag()
+      - in[15+7*32/2].real() + in[15+7*32/2].imag();
+   if (abs(currentCorrelationValue) > maxCorrelationValue)
+   {
+      maxCorrelationValue = abs(currentCorrelationValue);
+      maxCorrelationIndex = 31;
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+   }
+//printf("corr=%f\n", currentCorrelationValue);
+//printf("max corr=%f\n", maxCorrelationValue);
+//printf("=======================================\n");
+   //printf("Despreading index: %d\n", maxCorrelationIndex);
+   temp = (((unsigned)out[4])<<24) | 
+          (((unsigned)out[4+1])<<16) | 
+          (((unsigned)out[4+2])<<8) | 
+          (((unsigned)out[4+3]));
+   temp &= ~(((1<<5)-1) << (32-3-5));
+   temp |= maxCorrelationIndex << (32-3-5);
+   out[4]   = (temp>>24) & 0xff;
+   out[4+1] = (temp>>16) & 0xff;
+   out[4+2] = (temp>>8 ) & 0xff;
+   out[4+3] = (temp    ) & 0xff;
 
 
 
 
-   consume_each(3 * 8 / 3 * 8);
+   consume_each(5 * 8 / 5 * 32/2);
 
-   return (3);
+   return (5);
 }
 
 } /* namespace spreader */

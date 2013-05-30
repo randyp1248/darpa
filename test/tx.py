@@ -28,6 +28,13 @@ class my_top_block(gr.top_block):
         #frame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
         
         data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0, 0x0, 0xd)
+        data = data + data + data + (0xd, 0xe, 0xa, 0xd)
+
+	data = data + data + data + data
+	data = data + data + data + data
+        
+	#data = data + data + data + data + data + data + data + data + data + data + data + data + data + data
+        #data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0)
         self.source = gr.vector_source_b(data)
 
         # Spreader

@@ -31,6 +31,15 @@ class qa_print_cc (gr_unittest.TestCase):
 
     def test_001_t (self):
         # set up fg
+
+        data = ((0.5+0.5j),(-0.5-0.5j),(1+1j),(-1-1j))
+        self.source = gr.vector_source_c(data) 
+        self.printer = print_cc.print_cc() 
+        self.sink = gr.null_sink(gr.sizeof_gr_complex)
+       
+        self.tb.connect(self.source, self.printer)
+        self.tb.connect(self.printer, self.sink)
+        
         self.tb.run ()
         # check data
 

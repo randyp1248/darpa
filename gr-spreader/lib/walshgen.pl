@@ -61,6 +61,8 @@ for($row=0; $row<$spreadingWidth; ++$row)
    {
       $i=&index($row, $column);
       $q=&index($row, $column+1);
+      if ($i > 0) { $i = "+0.7071067811865475"; } else { $i = "-0.7071067811865475"; }
+      if ($q > 0) { $q = "+0.7071067811865475"; } else { $q = "-0.7071067811865475"; }
       $complex = $i . $q . "j";
       $walshRow .= "gr_complex($complex)";
       if ($column < $spreadingWidth-2)
@@ -165,10 +167,13 @@ END
       maxCorrelationIndex = $walshIndex;
       maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
    }
+//printf("corr=%f\\n", currentCorrelationValue);
 END
    }
 
    $despreaderCode .= <<END;
+//printf("max corr=%f\\n", maxCorrelationValue);
+//printf("=======================================\\n");
    //printf("Despreading index: %d\\n", maxCorrelationIndex);
    temp = (((unsigned)out[$inputBytePos])<<24) | 
           (((unsigned)out[$inputBytePos+1])<<16) | 
@@ -378,8 +383,8 @@ spreader_bc_impl::spreader_bc_impl()
                   gr_make_io_signature(MIN_IN, MAX_IN, sizeof(unsigned char)),
                   gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
 {
-   set_min_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth);
-   set_max_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth);
+   set_min_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
+   set_max_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
 }
 
 spreader_bc_impl::~spreader_bc_impl()
@@ -401,7 +406,7 @@ spreader_bc_impl::general_work (int noutput_items,
    const unsigned char* in = (unsigned char*) input_items[0];
    gr_complex* out = (gr_complex*) output_items[0];
 
-   if ((noutput_items < ($minBytes * 8 / $spreadingBits * $spreadingWidth)) ||
+   if ((noutput_items < ($minBytes * 8 / $spreadingBits * $spreadingWidth/2)) ||
        (ninput_items[0] < $minBytes))
    {
       return 0;
@@ -411,7 +416,7 @@ $spreaderCode
 
    consume_each ($minBytes);
 
-   return ($minBytes * 8 / $spreadingBits * $spreadingWidth);
+   return ($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
 }
 
 } /* namespace spreader */
@@ -556,7 +561,7 @@ despreader_cb_impl::~despreader_cb_impl()
 void
 despreader_cb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-   ninput_items_required[0] = ($minBytes * 8 / $spreadingBits * $spreadingWidth);
+   ninput_items_required[0] = ($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
 }
 
 int
@@ -575,7 +580,7 @@ despreader_cb_impl::general_work (int noutput_items,
    
 $despreaderCode
 
-   consume_each($minBytes * 8 / $spreadingBits * $spreadingWidth);
+   consume_each($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
 
    return ($minBytes);
 }

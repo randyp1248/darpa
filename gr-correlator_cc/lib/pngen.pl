@@ -324,6 +324,11 @@ print PRE_CODE <<END;
 #include <stdio.h>
 #include "TRITONS.h"
 
+#include <sys/time.h>
+#include <sys/types.h>
+#include <unistd.h>
+
+
 namespace gr {
 namespace correlator_cc {
 
@@ -401,6 +406,11 @@ preamble_insert_cc_impl::general_work (int noutput_items,
       out[samplesOutput++] = outputVal;
       out[samplesOutput++] = outputVal;
    }
+
+   // Sleep for 100ms.
+   struct timeval timeout = {0, 100000};
+   select(0,0,0,0,&timeout);
+
 
    // Tell runtime system how many input items we consumed on each input stream.
    consume_each (samplesRead);

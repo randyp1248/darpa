@@ -36,7 +36,7 @@ class qa_despreader_cb (gr_unittest.TestCase):
         self.tb = gr.top_block ()
         random.seed(None)
         self.randomBytes[:] = []
-        for x in range(0, 3):
+        for x in range(0, 5):
             self.randomBytes.append(random.randint(0,255));
 
     def tearDown (self):
