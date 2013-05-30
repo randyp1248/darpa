@@ -161,12 +161,11 @@ preamble_insert_cc_impl::general_work (int noutput_items,
       _preambleIndex = 0;
       _capsuleIndex = 0;
       _prevSample = _sequenceIQ[CODE_LENGTH-1];
+
+      // Sleep for 100ms.
+      struct timeval timeout = {0, 100000};
+      select(0,0,0,0,&timeout);
    }
-
-   // Sleep for 100ms.
-   struct timeval timeout = {0, 100000};
-   select(0,0,0,0,&timeout);
-
 
    // Tell runtime system how many input items we consumed on each input stream.
    consume_each (samplesRead);
