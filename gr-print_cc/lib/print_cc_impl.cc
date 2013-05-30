@@ -67,8 +67,8 @@ namespace gr {
             const double PI = 3.14159265;
             out[i] = in[i];
             phase = atan2(in[i].imag(), in[i].real());
-            phase *= 180 / PI;
-            printf("Sample %08d: %f+%fj: phase: %f\n", i, in[i].real(), in[i].imag(), phase);
+            phase *= 180/PI;  
+            printf("Sample %08d: %f+%fj: phase: %lf\n", i, in[i].real(), in[i].imag(), phase);
         }
 
         // Tell runtime system how many output items we produced.

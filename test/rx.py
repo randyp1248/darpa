@@ -13,7 +13,8 @@ from uhd_interface import uhd_receiver
 from uhd_interface import uhd_transmitter
 
 from correlator_cc import correlator_cc_swig as correlator_cc
-from print_cc import print_cc_swig as print_cc
+from spreader import spreader_swig as spreader
+from print_bb import print_bb_swig as print_bb
 
 import struct
 import sys
@@ -32,36 +33,42 @@ class my_top_block(gr.top_block):
         self.source = uhd_receiver(options.args, symbol_rate,
                                    2,
                                    options.rx_freq, 30,
-                                   options.spec, "RX2",
+                                   #options.spec, "RX2",
+                                   options.spec, "TX/RX",
                                    options.verbose)
         options.samples_per_symbol = self.source._sps
 
 	# Correlator block
         self.correlator = correlator_cc.correlator_cc()
 
+	# Despreader block
+	self.despreader = spreader.despreader_cb()
+
 	# Print block
-	self.printer = print_cc.print_cc()
+	self.printer = print_bb.print_bb()
 
 	# NULL sink block
-        self.nullsink = gr.null_sink(gr.sizeof_gr_complex)
+        self.nullsink = gr.null_sink(1)
  
         # RRC filter
-        nfilts = 32 
-        ntaps = nfilts * 11 * int(options.samples_per_symbol)
-        self.rrc_taps = gr.firdes.root_raised_cosine(
-            nfilts, # gain
-            nfilts, # sampling rate based on 32 fliters in resampler
-            1.0,    # symbol rate
-            1.0,    # excess bandwidth or roll-off factor
-            ntaps)
-        self.rrc_filter = gr.pfb_arb_resampler_ccf(options.samples_per_symbol, 
-                                                   self.rrc_taps)
+        #nfilts = 32 
+        #ntaps = nfilts * 11 * int(options.samples_per_symbol)
+        #self.rrc_taps = gr.firdes.root_raised_cosine(
+            #nfilts, # gain
+            #nfilts, # sampling rate based on 32 fliters in resampler
+            #1.0,    # symbol rate
+            #1.0,    # excess bandwidth or roll-off factor
+            #ntaps)
+        #self.rrc_filter = gr.pfb_arb_resampler_ccf(options.samples_per_symbol, 
+                                                   #self.rrc_taps)
 
 	# Connect the blocks
         #self.connect(self.source, self.correlator)
-        self.connect(self.source, self.rrc_filter)
-        self.connect(self.rrc_filter, self.correlator)
-        self.connect(self.correlator, self.printer)
+        #self.connect(self.source, self.rrc_filter)
+        #self.connect(self.rrc_filter, self.correlator)
+        self.connect(self.source, self.correlator)
+        self.connect(self.correlator, self.despreader)
+        self.connect(self.despreader, self.printer)
         self.connect(self.printer, self.nullsink)
        
 

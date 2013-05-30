@@ -678,7 +678,7 @@ $correlateQ
       // Reset the correlation magnitude to start looking for next peak.
       _correlationMagnitude = 0.0;
       _movingSumIndex = 0;
-      _primed = 0;
+      //_primed = 0;
    }
    else if (_primed && (mag > 4*_movingSum/CODE_LENGTH)) // 8 times the average
    {
