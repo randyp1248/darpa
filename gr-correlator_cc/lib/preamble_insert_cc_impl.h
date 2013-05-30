@@ -44,6 +44,10 @@ private:
 
    gr_complex _sequenceIQ[CODE_LENGTH];
 
+   int _preambleIndex;
+   int _capsuleIndex;
+   gr_complex _prevSample;
+
 public:
    preamble_insert_cc_impl();
    ~preamble_insert_cc_impl();

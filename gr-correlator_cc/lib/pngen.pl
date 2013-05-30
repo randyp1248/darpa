@@ -263,6 +263,10 @@ private:
 
    gr_complex _sequenceIQ[CODE_LENGTH];
 
+   int _preambleIndex;
+   int _capsuleIndex;
+   gr_complex _prevSample;
+
 public:
    preamble_insert_cc_impl();
    ~preamble_insert_cc_impl();
@@ -357,13 +361,18 @@ preamble_insert_cc_impl::preamble_insert_cc_impl()
                    gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)),
                    gr_make_io_signature(MIN_IN, MAX_IN, sizeof (gr_complex)))
 {
-   set_min_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
-   set_max_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
+   //set_min_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
+   //set_max_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
+   set_min_noutput_items(2);
 
    for(int i=0; i<CODE_LENGTH; ++i)
    {
       _sequenceIQ[i] = gr_complex(_sequenceI[i], _sequenceQ[i]);
    }
+
+   _preambleIndex = 0;
+   _capsuleIndex = 0;
+   _prevSample = _sequenceIQ[CODE_LENGTH-1];
 }
 
 preamble_insert_cc_impl::~preamble_insert_cc_impl()
@@ -373,7 +382,18 @@ preamble_insert_cc_impl::~preamble_insert_cc_impl()
 void
 preamble_insert_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-   ninput_items_required[0] = CAPSULE_SYMBOL_LENGTH;
+   // Convert from samples to symbols.  Also takes care of odd output items.
+   int ninput_items = noutput_items / 2;
+
+   // Remove the number preamble symbols left.  These do not require input symbols.
+   ninput_items -= (CODE_LENGTH-_preambleIndex);
+
+   if (ninput_items < 1)
+   {
+      ninput_items = 1;
+   }
+
+   ninput_items_required[0] = ninput_items;
 }
 
 int
@@ -385,26 +405,27 @@ preamble_insert_cc_impl::general_work (int noutput_items,
    const gr_complex* in = reinterpret_cast<const gr_complex*>(input_items[0]);
    gr_complex *out = reinterpret_cast<gr_complex*>(output_items[0]);
    int samplesOutput = 0;
-   int samplesRead = ninput_items[0];
-   gr_complex prevSample = _sequenceIQ[CODE_LENGTH-1];
+   int samplesRead = 0;
 
-   if (samplesRead > CAPSULE_SYMBOL_LENGTH)
+   for(; _preambleIndex<CODE_LENGTH && (samplesOutput+2<noutput_items); ++_preambleIndex)
    {
-      samplesRead = CAPSULE_SYMBOL_LENGTH;
+      out[samplesOutput++] = _sequenceIQ[_preambleIndex];
+      out[samplesOutput++] = _sequenceIQ[_preambleIndex];
    }
 
-   for(int i=0; i<CODE_LENGTH; ++i)
+   for(samplesRead=0; (samplesRead<ninput_items[0]) && (_capsuleIndex<CAPSULE_SYMBOL_LENGTH) && (samplesOutput+2<=noutput_items); ++samplesRead, ++_capsuleIndex)
    {
-      out[samplesOutput++] = _sequenceIQ[i];
-      out[samplesOutput++] = _sequenceIQ[i];
+      gr_complex outputVal = _prevSample *= in[samplesRead];
+      out[samplesOutput++] = outputVal;
+      out[samplesOutput++] = outputVal;
    }
 
-   for(int i=0; i<samplesRead; ++i)
+   if ((_preambleIndex >= CODE_LENGTH) && (_capsuleIndex >= CAPSULE_SYMBOL_LENGTH))
    {
-      //out[samplesOutput++] = out[samplesOutput++] = (prevSample *= in[i]);
-      gr_complex outputVal = prevSample *= in[i];
-      out[samplesOutput++] = outputVal;
-      out[samplesOutput++] = outputVal;
+      // Full frame has been output, reset the indicies for the next frame.
+      _preambleIndex = 0;
+      _capsuleIndex = 0;
+      _prevSample = _sequenceIQ[CODE_LENGTH-1];
    }
 
    // Sleep for 100ms.
