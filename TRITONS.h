@@ -58,7 +58,8 @@
 // The numerator is symbols/s, and the denominator is error cycles/s, which comes to symbols/error cycle.  All of this is
 // multiplied by the fractional allowed cycle (20 degrees).
 //#define CAPSULE_SYMBOL_LENGTH (SYMBOL_RATE / (CENTER_FREQUENCY * FREQUENCY_ERROR_PPM/1000000) * 20/360)
-#define CAPSULE_SYMBOL_LENGTH 4096
+//#define CAPSULE_SYMBOL_LENGTH 4096
+#define CAPSULE_SYMBOL_LENGTH 6528
 
 // Length of data capsule in samples.
 #define CAPSULE_SAMPLE_LENGTH (CAPSULE_SYMBOL_LENGTH * OVERSAMPLE_FACTOR)

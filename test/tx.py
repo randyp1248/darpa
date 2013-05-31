@@ -10,6 +10,7 @@ from gnuradio import digital
 from correlator_cc import correlator_cc_swig as correlator_cc
 from spreader import spreader_swig as spreader
 from rscoding_bb import rscoding_bb_swig as rscoding_bb
+from crc import crc_swig as crc
 
 # from current dir
 from uhd_interface import uhd_transmitter
@@ -29,33 +30,39 @@ class my_top_block(gr.top_block):
         #frame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
        
         zeros = (0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0)
-        frame_pad = zeros + zeros + zeros + zeros
-        frame_pad = frame_pad + frame_pad
-        frame_pad = frame_pad + frame_pad
-        
+        frame_pad = zeros + zeros
+        frame_pad = frame_pad + frame_pad 
+        frame_pad = frame_pad + frame_pad 
+        frame_pad = frame_pad + frame_pad 
+        # 160
+        frame_pad = frame_pad + zeros + zeros + zeros + zeros + zeros + zeros 
+        frame_pad = frame_pad + (0x0, 0x0, 0x0)
+
+        # 12
         data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0, 0x0, 0xd)
+        # 40
         data = data + data + data + (0xd, 0xe, 0xa, 0xd)
 
-	data = data + data + data + data + data + data
-        #data = data + (0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9 )
-        #data = data + (0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9)
-        #data = data + (0x0, 0x1, 0x2)
+        ten = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0)
+ 
+        # 223
+	data = data + data + data + data + data + ten + ten + (0xd, 0xe, 0xa)
 
-        #data = data + data
-        pad = zeros + (0xc, 0xa, 0xf, 0xe, 0xb, 0xa, 0xb, 0xe, 0x0, 0x0)
-        pad = pad + zeros + zeros
-        data = frame_pad + data + pad
-      
-        print len(data)
+        src = frame_pad + data + data + data + data + frame_pad
+
+        print len(src)
   
 	#data = data + data + data + data
         
 	#data = data + data + data + data + data + data + data + data + data + data + data + data + data + data
         #data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0)
-        self.source = gr.vector_source_b(data)
+        self.source = gr.vector_source_b(src)
+
+        # CRC TX block
+        self.crctx = crc.crctx()
 
         # RS encoding
-        #self.encoder = rscoding_bb.encode_bb()
+        self.encoder = rscoding_bb.encode_bb()
 
         # Spreader
         self.spreader = spreader.spreader_bc()
@@ -77,9 +84,10 @@ class my_top_block(gr.top_block):
         #self.connect(self.source, self.inserter)
         #self.connect(self.inserter, self.sink)
         #self.connect(self.source, self.spreader)
-        #self.connect(self.source, self.encoder)
-        #self.connect(self.encoder, self.spreader)
-        self.connect(self.source, self.spreader)
+        self.connect(self.source, self.crctx)
+        self.connect(self.crctx, self.encoder)
+        self.connect(self.encoder, self.spreader)
+        #self.connect(self.source, self.spreader)
         self.connect(self.spreader, self.inserter)
         self.connect(self.inserter, self.sink)
   

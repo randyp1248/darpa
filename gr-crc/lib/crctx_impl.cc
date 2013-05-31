@@ -30,7 +30,8 @@
 #include <digital_crc32.h>
 #include "TRITONS.h"
 #include <cstring>
-#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
+//#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
+#define FRAME_SIZE 219
 #define FILE_SIZE 80
 
 static bool debug_var = false;	
@@ -88,18 +89,18 @@ namespace gr {
 	int static initial_ninputs = ninput_items[0];		// Locks value to first read	
 	int crc32;
 
-	std::cout << "TX INPUT = " << input << std::endl;		// Print the input buffer
+	//std::cout << "TX INPUT = " << input << std::endl;		// Print the input buffer
 
 	// prepending file size to the data
 	if (flag == false) 
 	{
 	   *((int *) out) = FILE_SIZE;
-           std::cout << "TX OUTPUT with Filesize ONLY = " << out << std::endl;
+           //std::cout << "TX OUTPUT with Filesize ONLY = " << out << std::endl;
 	}	    			
 	// if we got less than framesize then we're done
 	if (ninput_items[0] < FRAME_SIZE)	
 	{
-            std::cout << "TX EOF "<< std::endl;
+           // std::cout << "TX EOF "<< std::endl;
 	    return (-1);					//terminate at end of file
 	}
 	// else, add the data
@@ -119,12 +120,12 @@ namespace gr {
 	       {
                   debug_var = true;
                }
-               std::cout << "TX OUTPUT on First Iteration with NO CRC = " << pOut << std::endl;
+               //std::cout << "TX OUTPUT on First Iteration with NO CRC = " << pOut << std::endl;
             }
 	    int crc32 = digital_crc32((const unsigned char *)out, FRAME_SIZE);						
 	    memcpy(out + FRAME_SIZE, (unsigned char *)&crc32, 4);	
 	}		
-	std::cout << "TX OUTPUT with CRC = " << out << std::endl;		
+	//std::cout << "TX OUTPUT with CRC = " << out << std::endl;		
 
 	consume_each (dataToCopy);
 	return noutput_items;			//FRAME_SIZE + 4
