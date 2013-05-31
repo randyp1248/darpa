@@ -30,7 +30,8 @@
 #include <digital_crc32.h>
 #include "TRITONS.h"
 #include <cstring>
-#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
+//#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
+#define FRAME_SIZE 219
 
 static bool debug_var_rx = false;
 
@@ -81,7 +82,7 @@ namespace gr {
 	int crctemp;
         int crcRcvd;	
 	int crc32;
-	std::cout << "RX INPUT BUFFER RECEIVED = " << input << std::endl;		// Print the input buffer
+	//std::cout << "RX INPUT BUFFER RECEIVED = " << input << std::endl;		// Print the input buffer
 
 	// if we got less than framesize then we're done
 	if (ninput_items[0] < FRAME_SIZE+4)	
@@ -114,15 +115,16 @@ namespace gr {
                   }
                   std::cout << "RX OUTPUT on First Iteration = " << out << std::endl;
                 }
+                std::cout << "CRC PASS\n" << out << std::endl;
 	    }
 	    else
 	    {
-	   	std::cout << "CRC's ARE NOT EQUAL = " << out << std::endl;		
+	   	std::cout << "CRC FAILED \n " << out << std::endl;		
 	        return (-1);					//terminate at end of file
 	    }
 	}
 
-	std::cout << "RX OUTPUT WITHOUT CRC = " << out << std::endl;		
+	//std::cout << "RX OUTPUT WITHOUT CRC = " << out << std::endl;		
 
 	consume_each (FRAME_SIZE + 4);
 	return dataToCopy;			//FRAME_SIZE

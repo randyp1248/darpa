@@ -15,6 +15,8 @@ from uhd_interface import uhd_transmitter
 from correlator_cc import correlator_cc_swig as correlator_cc
 from spreader import spreader_swig as spreader
 from print_bb import print_bb_swig as print_bb
+from rscoding_bb import rscoding_bb_swig as rscoding_bb
+from crc import crc_swig as crc
 
 import struct
 import sys
@@ -38,17 +40,25 @@ class my_top_block(gr.top_block):
                                    options.verbose)
         options.samples_per_symbol = self.source._sps
 
+        self.filesink = gr.file_sink(1, "output_file")
+
 	# Correlator block
         self.correlator = correlator_cc.correlator_cc()
 
 	# Despreader block
 	self.despreader = spreader.despreader_cb()
+  
+        # RS Decoder block
+	self.decoder = rscoding_bb.decode_bb()
+
+        # CRC RX Block
+        self.crcrx = crc.crcrx()
 
 	# Print block
 	self.printer = print_bb.print_bb()
 
 	# NULL sink block
-        self.nullsink = gr.null_sink(1)
+        #self.nullsink = gr.null_sink(1)
  
         # RRC filter
         #nfilts = 32 
@@ -68,8 +78,13 @@ class my_top_block(gr.top_block):
         #self.connect(self.rrc_filter, self.correlator)
         self.connect(self.source, self.correlator)
         self.connect(self.correlator, self.despreader)
-        self.connect(self.despreader, self.printer)
-        self.connect(self.printer, self.nullsink)
+        self.connect(self.despreader, self.decoder)
+        self.connect(self.decoder, self.crcrx)
+        #self.connect(self.crcrx, self.printer)
+        #self.connect(self.despreader, self.printer)
+        #self.connect(self.printer, self.nullsink)
+        #self.connect(self.printer, self.filesink)
+        self.connect(self.crcrx, self.filesink)
        
 
 # /////////////////////////////////////////////////////////////////////////////
