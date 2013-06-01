@@ -151,8 +151,11 @@ namespace gr {
       unsigned char *in = (unsigned char *) input_items[0];
       unsigned char *out = (unsigned char *) output_items[0];
       int		ncorrections;
+      static int rsdecode_entercount =0,rsdecode_exitcount =0;
 
       memcpy(out, in, N*sizeof(in));
+     // printf("RS Decoder Enter Count = %d Bytes Given= %d\n",++rsdecode_entercount,ninput_items[0]);
+      
 #if DEBUG_DARPA_RSDECODE    
          printf(" Printing Decoder Input array Starts \n \n");
          for(int i=0;i<N;i++)
@@ -176,6 +179,8 @@ namespace gr {
         // Tell runtime system how many input items we consumed on
         // each input stream.
         consume_each (N);
+     
+       // printf("RS Decoder Exit  Count = %d Consumed Bytes = %d\n",++rsdecode_exitcount,K);
 
         // Tell runtime system how many output items we produced.
         return K;

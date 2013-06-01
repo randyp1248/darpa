@@ -677,8 +677,9 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    lastReal = real;
    lastImag = imag;
 
-   real = (a*e + f*b) / (a*a + b*b);
-   imag = (a*f - e*b) / (a*a + b*b);
+   double denom = sqrt(a*a + b*b);
+   real = (a*e + b*f) / denom;
+   imag = (a*f - b*e) / denom;
    if (isnan(real) || isnan(imag))
    {
       real = imag = 0.0;
