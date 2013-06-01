@@ -30,7 +30,8 @@
 #include <digital_crc32.h>
 #include "TRITONS.h"
 #include <cstring>
-#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
+//#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
+#define FRAME_SIZE 219
 
 static bool debug_var_rx = false;
 
@@ -73,6 +74,7 @@ namespace gr {
 	const char * input = (const char *) input_items[0];
         char * out = (char *) output_items[0];
 	int dataToCopy = FRAME_SIZE;
+        static int crcrx_entercount =0, crcrx_exitcount =0;
 
 /***********************************************************************************************/	
 /*************** Input data, calculate CRC and Append (4 bytes) ********************************/
@@ -81,8 +83,9 @@ namespace gr {
 	int crctemp;
         int crcRcvd;	
 	int crc32;
-	std::cout << "RX INPUT BUFFER RECEIVED = " << input << std::endl;		// Print the input buffer
 
+  	//std::cout << "RX INPUT BUFFER RECEIVED = " << input << std::endl;		// Print the input buffer
+        //printf("CRC RX Enter Count =%d Bytes Given =%d\n",++crcrx_entercount,ninput_items[0]);
 	// if we got less than framesize then we're done
 	if (ninput_items[0] < FRAME_SIZE+4)	
 	{
@@ -112,17 +115,22 @@ namespace gr {
 	          {
                     debug_var_rx = true;
                   }
-                  std::cout << "RX OUTPUT on First Iteration = " << out << std::endl;
+                 // std::cout << "RX OUTPUT on First Iteration = " << out << std::endl;
                 }
+                printf("CRC PASS\n");
 	    }
 	    else
 	    {
-	   	std::cout << "CRC's ARE NOT EQUAL = " << out << std::endl;		
-	        return (-1);					//terminate at end of file
+	   	//std::cout << "CRC FAILED \n " << out << std::endl;
+                printf("CRC FAILED\n");
+                //printf("CRC RX Exit Count =%d Bytes after recomving CRC =%d\n",++crcrx_exitcount,dataToCopy);
+                consume_each(FRAME_SIZE +4);		
+	        return 0;					//terminate at end of file
 	    }
 	}
 
-	std::cout << "RX OUTPUT WITHOUT CRC = " << out << std::endl;		
+	//std::cout << "RX OUTPUT WITHOUT CRC = " << out << std::endl;		
+        //printf("CRC RX Exit Count =%d Bytes after recomving CRC =%d\n",++crcrx_exitcount,dataToCopy);
 
 	consume_each (FRAME_SIZE + 4);
 	return dataToCopy;			//FRAME_SIZE

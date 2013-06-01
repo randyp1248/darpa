@@ -363,7 +363,7 @@ preamble_insert_cc_impl::preamble_insert_cc_impl()
 {
    //set_min_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
    //set_max_noutput_items((CODE_LENGTH+CAPSULE_SYMBOL_LENGTH)*2);
-   set_min_noutput_items(2);
+   set_min_noutput_items(1024);
 
    for(int i=0; i<CODE_LENGTH; ++i)
    {
@@ -388,6 +388,10 @@ preamble_insert_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_item
    // Remove the number preamble symbols left.  These do not require input symbols.
    ninput_items -= (CODE_LENGTH-_preambleIndex);
 
+   //ninput_items = MIN(ninput_items, (CAPSULE_SYMBOL_LENGTH-_capsuleIndex));
+   ninput_items = ninput_items < (CAPSULE_SYMBOL_LENGTH-_capsuleIndex) ?
+          ninput_items : (CAPSULE_SYMBOL_LENGTH-_capsuleIndex);
+
    if (ninput_items < 1)
    {
       ninput_items = 1;
@@ -407,13 +411,20 @@ preamble_insert_cc_impl::general_work (int noutput_items,
    int samplesOutput = 0;
    int samplesRead = 0;
 
-   for(; _preambleIndex<CODE_LENGTH && (samplesOutput+2<noutput_items); ++_preambleIndex)
+   if ((_preambleIndex == 0) && (_capsuleIndex == 0))
+   {
+      // Sleep for 200ms.
+      struct timeval timeout = {0, 200000};
+      select(0,0,0,0,&timeout);
+   }
+
+   for(; (_preambleIndex<CODE_LENGTH) && (samplesOutput+2<noutput_items); ++_preambleIndex)
    {
       out[samplesOutput++] = _sequenceIQ[_preambleIndex];
       out[samplesOutput++] = _sequenceIQ[_preambleIndex];
    }
 
-   for(samplesRead=0; (samplesRead<ninput_items[0]) && (_capsuleIndex<CAPSULE_SYMBOL_LENGTH) && (samplesOutput+2<=noutput_items); ++samplesRead, ++_capsuleIndex)
+   for(samplesRead=0; (samplesRead<ninput_items[0]) && (_capsuleIndex<CAPSULE_SYMBOL_LENGTH) && (samplesOutput+2<noutput_items); ++samplesRead, ++_capsuleIndex)
    {
       gr_complex outputVal = _prevSample *= in[samplesRead];
       out[samplesOutput++] = outputVal;
@@ -426,10 +437,6 @@ preamble_insert_cc_impl::general_work (int noutput_items,
       _preambleIndex = 0;
       _capsuleIndex = 0;
       _prevSample = _sequenceIQ[CODE_LENGTH-1];
-
-      // Sleep for 100ms.
-      struct timeval timeout = {0, 100000};
-      select(0,0,0,0,&timeout);
    }
 
    // Tell runtime system how many input items we consumed on each input stream.
