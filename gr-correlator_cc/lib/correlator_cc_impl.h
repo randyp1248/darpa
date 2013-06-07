@@ -58,7 +58,7 @@ private:
    int _oddData;   // True if odd clocked data should be output
 
    double _correlationMagnitude; // Magnitude of a correlation peak.  Maintained for one sample to see if next one is stronger.
-   double _movingSumAddends[2*CODE_LENGTH];
+   double _movingSumAddends[CODE_LENGTH];
    double _movingSum;
    int _movingSumIndex;
    int _primed;

@@ -518,7 +518,7 @@ private:
    int _oddData;   // True if odd clocked data should be output
 
    double _correlationMagnitude; // Magnitude of a correlation peak.  Maintained for one sample to see if next one is stronger.
-   double _movingSumAddends[2*CODE_LENGTH];
+   double _movingSumAddends[CODE_LENGTH];
    double _movingSum;
    int _movingSumIndex;
    int _primed;
@@ -640,7 +640,7 @@ correlator_cc_impl::correlator_cc_impl()
    _primed = 0;
    _movingSum = 0.0;
    _movingSumIndex = 0;
-   for (int i=0; i<2*CODE_LENGTH; ++i)
+   for (int i=0; i<CODE_LENGTH; ++i)
       _movingSumAddends[i] = 0.0;
 }
 
@@ -677,7 +677,7 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    lastReal = real;
    lastImag = imag;
 
-   double denom = sqrt(a*a + b*b);
+   sampleType denom = sqrt(a*a + b*b);
    real = (a*e + b*f) / denom;
    imag = (a*f - b*e) / denom;
    if (isnan(real) || isnan(imag))
@@ -706,9 +706,12 @@ $correlateQ
       // Reset the correlation magnitude to start looking for next peak.
       _correlationMagnitude = 0.0;
       _movingSumIndex = 0;
-      //_primed = 0;
+      _primed = 0;
+      _movingSum = 0;
+      for (int i=0; i<CODE_LENGTH; ++i)
+         _movingSumAddends[i] = 0.0;
    }
-   else if (_primed && (mag > 4*_movingSum/CODE_LENGTH)) // 8 times the average
+   else if (_primed && (mag > 8*_movingSum/CODE_LENGTH)) // 8 times the average
    {
       printf("Peak on sample %ld\\n", _sampleNum);
       _correlationMagnitude = mag;
@@ -718,7 +721,7 @@ $correlateQ
    _movingSum -= _movingSumAddends[_movingSumIndex];
    _movingSumAddends[_movingSumIndex] = mag;
    _movingSum += mag;
-   _movingSumIndex = (_movingSumIndex+1)%(2*CODE_LENGTH);
+   _movingSumIndex = (_movingSumIndex+1)%CODE_LENGTH;
    if (!_movingSumIndex)
    {
       _primed = 1;
@@ -767,7 +770,15 @@ correlator_cc_impl::general_work (
 
          if (_oddSample == _oddData)
          {
-            out[samplesOutput++] = in[samplesRead]/_prevSample;
+
+            sampleType a = _prevSample.real();
+            sampleType b = _prevSample.imag();
+            sampleType e = in[samplesRead].real();
+            sampleType f = in[samplesRead].imag();
+
+            sampleType denom = sqrt(a*a + b*b);
+
+            out[samplesOutput++] = gr_complex((a*e + b*f) / denom, (a*f - b*e) / denom);
             _prevSample = in[samplesRead];
             --_capsuleLen;
          }
@@ -847,19 +858,19 @@ class qa_correlator_cc (gr_unittest.TestCase):
     def setUp (self):
         self.tb = gr.top_block ()
         random.seed(None)
-	self.randomSamples[:] = []
+        self.randomSamples[:] = []
         for x in range(1, $codeLength * 4):
             self.randomSamples.append(cmath.rect(1, random.uniform(0,3.141529)))
         self.recvFirstFrame[:] = []
         prev = self.pnSequence[len(self.pnSequence)-1]
         for x in range(len(self.firstFrame)):
-	    prev = prev * self.firstFrame[x]
-	    self.recvFirstFrame.append(prev)
+            prev = prev * self.firstFrame[x]
+            self.recvFirstFrame.append(prev)
         self.recvSecondFrame[:] = []
         prev = self.pnSequence[len(self.pnSequence)-1]
         for x in range(len(self.secondFrame)):
-	    prev = prev * self.secondFrame[x]
-	    self.recvSecondFrame.append(prev)
+            prev = prev * self.secondFrame[x]
+            self.recvSecondFrame.append(prev)
 
     def tearDown (self):
         self.tb = None
@@ -888,16 +899,16 @@ class qa_correlator_cc (gr_unittest.TestCase):
 
     def test_001_t (self):
         src_data =  \\
-	    tuple(self.randomSamples) +  \\
-	    self.pnSequence +  \\
-	    tuple(self.recvFirstFrame) +  \\
-	    tuple(self.randomSamples) +  \\
-	    self.pnSequence +  \\
-	    tuple(self.recvSecondFrame)
+            tuple(self.randomSamples) +  \\
+            self.pnSequence +  \\
+            tuple(self.recvFirstFrame) +  \\
+            tuple(self.randomSamples) +  \\
+            self.pnSequence +  \\
+            tuple(self.recvSecondFrame)
         src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
         expected_data =  \\
-	    self.firstFrame +  \\
-	    self.secondFrame
+            self.firstFrame +  \\
+            self.secondFrame
         source = gr.vector_source_c(src_data)
         dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
@@ -932,19 +943,19 @@ class qa_correlator_cc (gr_unittest.TestCase):
     ####################################################################################
     def test_002_t (self):
         src_data =  \\
-	    tuple(self.randomSamples) +  \\
-	    self.pnSequence +  \\
-	    tuple(self.recvFirstFrame) +  \\
-	    tuple(self.randomSamples) +  \\
-	    self.pnSequence +  \\
-	    tuple(self.recvSecondFrame)
+            tuple(self.randomSamples) +  \\
+            self.pnSequence +  \\
+            tuple(self.recvFirstFrame) +  \\
+            tuple(self.randomSamples) +  \\
+            self.pnSequence +  \\
+            tuple(self.recvSecondFrame)
         src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
         expected_data =  \\
-	    self.firstFrame +  \\
-	    self.secondFrame
+            self.firstFrame +  \\
+            self.secondFrame
         rotatedSrcData = []
         for x in range(len(src_data)):
-	    rotatedSrcData.append(src_data[x]*(0+1j))
+            rotatedSrcData.append(src_data[x]*(0+1j))
         source = gr.vector_source_c(tuple(rotatedSrcData))
         dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
@@ -978,23 +989,23 @@ class qa_correlator_cc (gr_unittest.TestCase):
     ####################################################################################
     def test_003_t (self):
         src_data =  \\
-	    tuple(self.randomSamples) +  \\
-	    self.pnSequence +  \\
-	    tuple(self.recvFirstFrame) +  \\
-	    tuple(self.randomSamples) +  \\
-	    self.pnSequence +  \\
-	    tuple(self.recvSecondFrame)
+            tuple(self.randomSamples) +  \\
+            self.pnSequence +  \\
+            tuple(self.recvFirstFrame) +  \\
+            tuple(self.randomSamples) +  \\
+            self.pnSequence +  \\
+            tuple(self.recvSecondFrame)
         src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
         expected_data =  \\
-	    self.firstFrame +  \\
-	    self.secondFrame
+            self.firstFrame +  \\
+            self.secondFrame
         rotatedSrcData = []
-	# Frequency error 1000 samples/cycle
-	phaseChangePerSample = cmath.rect(1, 2*math.pi/1000)
-	currentPhase = (1 + 0j)
+        # Frequency error 1000 samples/cycle
+        phaseChangePerSample = cmath.rect(1, 2*math.pi/1000)
+        currentPhase = (1 + 0j)
         for x in range(len(src_data)):
-	    rotatedSrcData.append(src_data[x]*currentPhase)
-	    currentPhase = currentPhase * phaseChangePerSample
+            rotatedSrcData.append(src_data[x]*currentPhase)
+            currentPhase = currentPhase * phaseChangePerSample
         source = gr.vector_source_c(tuple(rotatedSrcData))
         dut = correlator_cc.correlator_cc()
         sink = gr.vector_sink_c()
@@ -1006,15 +1017,15 @@ class qa_correlator_cc (gr_unittest.TestCase):
         #print expected_data
         #print "Results\\n"
         #print result_data
-	self.assertEqual(len(expected_data), len(result_data))
+        self.assertEqual(len(expected_data), len(result_data))
         for x in range(len(expected_data)):
-	    angle = cmath.polar(expected_data[x]/result_data[x])[1]
-	    #print "Angle = " + str(angle)
-	    #print expected_data[x]
-	    #print result_data[x]
-	    if angle > math.pi:
-	        angle = 2*math.pi - angle
-	    self.assertLess(abs(angle), 2*math.pi/400)
+            angle = cmath.polar(expected_data[x]/result_data[x])[1]
+            #print "Angle = " + str(angle)
+            #print expected_data[x]
+            #print result_data[x]
+            if angle > math.pi:
+                angle = 2*math.pi - angle
+            self.assertLess(abs(angle), 2*math.pi/400)
 
 if __name__ == '__main__':
     gr_unittest.run(qa_correlator_cc, "qa_correlator_cc.xml")
@@ -1065,12 +1076,12 @@ class qa_preamble_insert_cc (gr_unittest.TestCase):
         self.tmitSecondFrame[:] = []
         prev = self.pnSequence[len(self.pnSequence)-1]
         for x in range(len(self.firstFrame)):
-	    prev = prev * self.firstFrame[x]
-	    self.tmitFirstFrame.append(prev)
+            prev = prev * self.firstFrame[x]
+            self.tmitFirstFrame.append(prev)
         prev = self.pnSequence[len(self.pnSequence)-1]
         for x in range(len(self.secondFrame)):
-	    prev = prev * self.secondFrame[x]
-	    self.tmitSecondFrame.append(prev)
+            prev = prev * self.secondFrame[x]
+            self.tmitSecondFrame.append(prev)
 
     def tearDown (self):
         self.tb = None

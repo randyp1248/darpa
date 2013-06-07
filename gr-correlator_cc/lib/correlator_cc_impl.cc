@@ -88,7 +88,7 @@ correlator_cc_impl::correlator_cc_impl()
    _primed = 0;
    _movingSum = 0.0;
    _movingSumIndex = 0;
-   for (int i=0; i<2*CODE_LENGTH; ++i)
+   for (int i=0; i<CODE_LENGTH; ++i)
       _movingSumAddends[i] = 0.0;
 }
 
@@ -125,7 +125,7 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    lastReal = real;
    lastImag = imag;
 
-   double denom = sqrt(a*a + b*b);
+   sampleType denom = sqrt(a*a + b*b);
    real = (a*e + b*f) / denom;
    imag = (a*f - b*e) / denom;
    if (isnan(real) || isnan(imag))
@@ -662,9 +662,12 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
       // Reset the correlation magnitude to start looking for next peak.
       _correlationMagnitude = 0.0;
       _movingSumIndex = 0;
-      //_primed = 0;
+      _primed = 0;
+      _movingSum = 0;
+      for (int i=0; i<CODE_LENGTH; ++i)
+         _movingSumAddends[i] = 0.0;
    }
-   else if (_primed && (mag > 4*_movingSum/CODE_LENGTH)) // 8 times the average
+   else if (_primed && (mag > 8*_movingSum/CODE_LENGTH)) // 8 times the average
    {
       printf("Peak on sample %ld\n", _sampleNum);
       _correlationMagnitude = mag;
@@ -674,7 +677,7 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    _movingSum -= _movingSumAddends[_movingSumIndex];
    _movingSumAddends[_movingSumIndex] = mag;
    _movingSum += mag;
-   _movingSumIndex = (_movingSumIndex+1)%(2*CODE_LENGTH);
+   _movingSumIndex = (_movingSumIndex+1)%CODE_LENGTH;
    if (!_movingSumIndex)
    {
       _primed = 1;
@@ -723,7 +726,15 @@ correlator_cc_impl::general_work (
 
          if (_oddSample == _oddData)
          {
-            out[samplesOutput++] = in[samplesRead]/_prevSample;
+
+            sampleType a = _prevSample.real();
+            sampleType b = _prevSample.imag();
+            sampleType e = in[samplesRead].real();
+            sampleType f = in[samplesRead].imag();
+
+            sampleType denom = sqrt(a*a + b*b);
+
+            out[samplesOutput++] = gr_complex((a*e + b*f) / denom, (a*f - b*e) / denom);
             _prevSample = in[samplesRead];
             --_capsuleLen;
          }
