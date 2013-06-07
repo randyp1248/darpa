@@ -35,12 +35,12 @@ class qa_preamble_insert_cc (gr_unittest.TestCase):
         self.tmitSecondFrame[:] = []
         prev = self.pnSequence[len(self.pnSequence)-1]
         for x in range(len(self.firstFrame)):
-	    prev = prev * self.firstFrame[x]
-	    self.tmitFirstFrame.append(prev)
+            prev = prev * self.firstFrame[x]
+            self.tmitFirstFrame.append(prev)
         prev = self.pnSequence[len(self.pnSequence)-1]
         for x in range(len(self.secondFrame)):
-	    prev = prev * self.secondFrame[x]
-	    self.tmitSecondFrame.append(prev)
+            prev = prev * self.secondFrame[x]
+            self.tmitSecondFrame.append(prev)
 
     def tearDown (self):
         self.tb = None
