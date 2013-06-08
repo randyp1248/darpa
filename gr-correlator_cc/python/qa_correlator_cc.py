@@ -104,7 +104,6 @@ class qa_correlator_cc (gr_unittest.TestCase):
     #
     #  Test passes if the two frames are passed to the output, but no other samples
     ####################################################################################
-
     def test_001_t (self):
         src_data =  \
             tuple(self.randomSamples) +  \
@@ -234,6 +233,50 @@ class qa_correlator_cc (gr_unittest.TestCase):
             if angle > math.pi:
                 angle = 2*math.pi - angle
             self.assertLess(abs(angle), 2*math.pi/400)
+
+    ####################################################################################
+    #  test_004_t
+    #
+    #  Test the sequence:
+    #     Random samples - should not correlate, and should all be dropped, attenuated
+    #     PN Sequence - should be detected, but not output.  Don't correlate on sudden power
+    #     First frame - should be output
+    #     Random samples - should not correlate, and should all be dropped, attenuated
+    #     PN Sequence - should be detected, but not output.  Don't correlate on sudden power
+    #     First frame - should be output
+    #
+    #  Test passes if the two frames are passed to the output, but no other samples
+    ####################################################################################
+    def test_004_t (self):
+
+        attenuatedRandomSamples = []
+        # Attenuate to 1/100 of power
+        for x in range(len(self.randomSamples)):
+            attenuatedRandomSamples.append(self.randomSamples[x] / 100.0)
+        src_data =  \
+            tuple(attenuatedRandomSamples) +  \
+            self.pnSequence +  \
+            tuple(self.recvFirstFrame) +  \
+            tuple(attenuatedRandomSamples) +  \
+            self.pnSequence +  \
+            tuple(self.recvSecondFrame)
+        src_data = tuple([val for pair in zip(src_data,src_data) for val in pair])
+        expected_data =  \
+            self.firstFrame +  \
+            self.secondFrame
+        source = gr.vector_source_c(src_data)
+        dut = correlator_cc.correlator_cc()
+        sink = gr.vector_sink_c()
+        self.tb.connect(source, dut)
+        self.tb.connect(dut, sink)
+        self.tb.run()
+        result_data = sink.data()
+        #print "Expected\n"
+        #print expected_data
+        #print "Results\n"
+        #print result_data
+        self.assertEqual(expected_data, result_data)
+
 
 if __name__ == '__main__':
     gr_unittest.run(qa_correlator_cc, "qa_correlator_cc.xml")

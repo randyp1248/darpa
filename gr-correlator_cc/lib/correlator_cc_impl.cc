@@ -86,6 +86,7 @@ correlator_cc_impl::correlator_cc_impl()
    _correlationMagnitude = 0.0;
 
    _primed = 0;
+   _futureSamples = 0;
    _movingSum = 0.0;
    _movingSumIndex = 0;
    for (int i=0; i<CODE_LENGTH; ++i)
@@ -653,24 +654,53 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    double accReal = (double)accRealArr[accIndex];
    double accImag = (double)accImagArr[accIndex];
    double mag = sqrt(accReal*accReal + accImag*accImag);
-   if (_correlationMagnitude > 0.0)
+
+
+   // Treat every correlation over threshold as a new peak.  If we were tracking a peak before, reset
+   if (_primed && (mag > 8*_movingSum/CODE_LENGTH)) // 8 times the average
    {
-      // Previous sample was peak.  Check if this one is larger.
-      _oddData = _oddSample ^ ((mag > _correlationMagnitude) ? 0 : 1);
-      // Start passing capsule data out of this block.
-      _capsuleLen = CAPSULE_SYMBOL_LENGTH;
-      // Reset the correlation magnitude to start looking for next peak.
-      _correlationMagnitude = 0.0;
-      _movingSumIndex = 0;
-      _primed = 0;
-      _movingSum = 0;
-      for (int i=0; i<CODE_LENGTH; ++i)
-         _movingSumAddends[i] = 0.0;
-   }
-   else if (_primed && (mag > 8*_movingSum/CODE_LENGTH)) // 8 times the average
-   {
-      printf("Peak on sample %ld\n", _sampleNum);
       _correlationMagnitude = mag;
+      _futureSamples = 0;
+      _futureSampleOutputIndex = 0;
+      _oddData = _oddSample;
+   }
+   else if (_correlationMagnitude != 0)  // Looking at future samples for potential peak
+   {
+      if (_correlationMagnitude > 4*mag)
+      {
+         // Still looks like a peak, even when looking into future.
+	 // Save the sample to output when done
+         _futureBuffer[_futureSamples++] = gr_complex(real, imag);
+      }
+      else if ((mag > _correlationMagnitude) && (_futureSamples == 0))
+      {
+         // Next sample was bigger.  Change odd/even flag and begin again
+         _correlationMagnitude = mag;
+         _futureSamples = 0;
+         _oddData = _oddSample;
+      }
+      else
+      {
+         // Current correlation value is not less than half, and it is not the sample right after the correlation peak
+	 // This contradicts the theory that the original peak detection was really a peak.
+	 // Reset and continue looking for a peak
+	 _correlationMagnitude = 0.0;
+         _futureSamples = 0;
+      }
+
+      if (_futureSamples == FUTURE_SAMPLE_LEN)
+      {
+	 printf("Peak on sample %ld\n", _sampleNum-FUTURE_SAMPLE_LEN);
+	 // Start passing capsule data out of this block.
+	 _capsuleLen = CAPSULE_SYMBOL_LENGTH;
+	 // Reset the correlation magnitude to start looking for next peak.
+	 _correlationMagnitude = 0.0;
+	 _movingSumIndex = 0;
+	 _primed = 0;
+	 _movingSum = 0;
+	 for (int i=0; i<CODE_LENGTH; ++i)
+	    _movingSumAddends[i] = 0.0;
+      }
    }
 
    // Update the moving sum of magnitudes for threshold comparisons
@@ -720,6 +750,16 @@ correlator_cc_impl::general_work (
 
    while (samplesRemaining)
    {
+
+      if (_futureSamples == FUTURE_SAMPLE_LEN)
+      {
+	 for (_futureSampleOutputIndex |= 1; _futureSampleOutputIndex<_futureSamples &&  _capsuleLen; _futureSampleOutputIndex+=2)
+	 {
+            out[samplesOutput++] = _futureBuffer[_futureSampleOutputIndex];
+            --_capsuleLen;
+	 }
+      }
+
       while (samplesRemaining && _capsuleLen)
       {
          // Peak has been detected, output this sample (only correct clock)

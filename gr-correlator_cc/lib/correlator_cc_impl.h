@@ -34,6 +34,7 @@
 #define CODE_LENGTH (255)
 #define ACCUMULATOR_LENGTH (1<<(8+1))
 #define ACCUMULATOR_LENGTH_MASK (ACCUMULATOR_LENGTH-1)
+#define FUTURE_SAMPLE_LEN 50
 
 typedef float sampleType;
 
@@ -62,6 +63,9 @@ private:
    double _movingSum;
    int _movingSumIndex;
    int _primed;
+   int _futureSamples;
+   int _futureSampleOutputIndex;
+   gr_complex _futureBuffer[FUTURE_SAMPLE_LEN];
 
    gr_complex _prevSample;
 
