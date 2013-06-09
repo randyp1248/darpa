@@ -63,8 +63,7 @@ for($row=0; $row<$spreadingWidth; ++$row)
       $q=&index($row, $column+1);
       if ($i > 0) { $i = "+0.7071067811865475"; } else { $i = "-0.7071067811865475"; }
       if ($q > 0) { $q = "+0.7071067811865475"; } else { $q = "-0.7071067811865475"; }
-      $complex = $i . $q . "j";
-      $walshRow .= "gr_complex($complex)";
+      $walshRow .= "gr_complex($i,$q)";
       if ($column < $spreadingWidth-2)
       {
          $walshRow .=",";
