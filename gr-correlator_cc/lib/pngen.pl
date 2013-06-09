@@ -664,6 +664,9 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    static sampleType lastRealEven = 0;
    static sampleType lastImagEven = 0;
 
+   sampleType realRecv = real;
+   sampleType imagRecv = imag;
+
    sampleType& lastReal = (_oddSample ? lastRealOdd : lastRealEven);
    sampleType& lastImag = (_oddSample ? lastImagOdd : lastImagEven);
 
@@ -705,6 +708,7 @@ $correlateQ
 
 
    // Treat every correlation over threshold as a new peak.  If we were tracking a peak before, reset
+   // TODO: check also again absolute value?
    if (_primed && (mag > 8*_movingSum/CODE_LENGTH)) // 8 times the average
    {
       _correlationMagnitude = mag;
@@ -727,6 +731,12 @@ $correlateQ
          _futureSamples = 0;
          _oddData = _oddSample;
       }
+      else if (_futureSamples == 0)
+      {
+         // This is allowed because the subsequent sample may be the second sample of the symbol.
+	 // If it is smaller, than the peak mag, but larger than the max threshold, it is allowed,
+	 // and skipped.
+      }
       else
       {
          // Current correlation value is not less than half, and it is not the sample right after the correlation peak
@@ -743,11 +753,12 @@ $correlateQ
 	 _capsuleLen = CAPSULE_SYMBOL_LENGTH;
 	 // Reset the correlation magnitude to start looking for next peak.
 	 _correlationMagnitude = 0.0;
-	 _movingSumIndex = 0;
+	 _movingSumIndex = 1;
 	 _primed = 0;
 	 _movingSum = 0;
 	 for (int i=0; i<CODE_LENGTH; ++i)
 	    _movingSumAddends[i] = 0.0;
+	 _prevSample = gr_complex(realRecv, imagRecv);
       }
    }
 
@@ -766,6 +777,7 @@ $correlateQ
    // Prevent need for modulo arithematic for circular buffer.  Instead copy back to start of array.
    if (accIndex + CODE_LENGTH == ACCUMULATOR_LENGTH)
    {
+      // TODO: memcpy is better
       for(int i=0; i<CODE_LENGTH; ++i)
       {
          accRealArr[i] = accRealArr[accIndex+i];
@@ -779,7 +791,7 @@ $correlateQ
 void
 correlator_cc_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-   ninput_items_required[0] = noutput_items;
+   ninput_items_required[0] = 2*noutput_items;
 }
 
 int
@@ -801,14 +813,20 @@ correlator_cc_impl::general_work (
 
       if (_futureSamples == FUTURE_SAMPLE_LEN)
       {
-	 for (_futureSampleOutputIndex |= 1; _futureSampleOutputIndex<_futureSamples &&  _capsuleLen; _futureSampleOutputIndex+=2)
+	 for (_futureSampleOutputIndex |= 1; 
+	       _futureSampleOutputIndex<_futureSamples && (samplesOutput<noutput_items); 
+	       _futureSampleOutputIndex+=2)
 	 {
             out[samplesOutput++] = _futureBuffer[_futureSampleOutputIndex];
             --_capsuleLen;
 	 }
+	 if (_futureSampleOutputIndex>=FUTURE_SAMPLE_LEN)
+	 {
+	    _futureSamples = 0;
+	 }
       }
 
-      while (samplesRemaining && _capsuleLen)
+      while (samplesRemaining && _capsuleLen && (samplesOutput<noutput_items))
       {
          // Peak has been detected, output this sample (only correct clock)
 
@@ -822,7 +840,15 @@ correlator_cc_impl::general_work (
 
             sampleType denom = sqrt(a*a + b*b);
 
-            out[samplesOutput++] = gr_complex((a*e + b*f) / denom, (a*f - b*e) / denom);
+	    if (denom == 0)
+	    {
+	       out[samplesOutput++] = gr_complex(0,0);
+	    }
+	    else
+	    {
+	       out[samplesOutput++] = gr_complex((a*e + b*f) / denom, (a*f - b*e) / denom);
+	    }
+
             _prevSample = in[samplesRead];
             --_capsuleLen;
          }
@@ -839,11 +865,6 @@ correlator_cc_impl::general_work (
          ++samplesRead;
          --samplesRemaining;
          _oddSample ^= 1;
-         if ((_capsuleLen && (_oddSample != _oddData)) || //    peak detected and next sample is not output
-            (!_capsuleLen))                               // or peak not detected
-         {
-            _prevSample = in[samplesRead-1];
-         }
       }
    }
 
