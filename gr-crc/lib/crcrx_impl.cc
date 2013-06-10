@@ -31,7 +31,7 @@
 #include "TRITONS.h"
 #include <cstring>
 //#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
-#define FRAME_SIZE 219
+#define FRAME_SIZE 183
 
 static bool debug_var_rx = false;
 
@@ -53,6 +53,8 @@ namespace gr {
 	set_min_noutput_items(FRAME_SIZE -4);	//Fix the minimum output buffer size (Tx_Capsule - CRC)
 	set_max_noutput_items(FRAME_SIZE);	//Fix the maximum output buffer size (Tx_Capsule - CRC)
 	filesize = 0;
+        count = 0;
+        passed = 0;
     }
 
     /* Our virtual destructor */
@@ -117,13 +119,22 @@ namespace gr {
                   }
                  // std::cout << "RX OUTPUT on First Iteration = " << out << std::endl;
                 }
-                printf("CRC PASS\n");
+                count++; 
+                passed++;
+                printf("CRC PASS %d passed of %d\n", passed, count);
 	    }
 	    else
 	    {
 	   	//std::cout << "CRC FAILED \n " << out << std::endl;
-                printf("CRC FAILED\n");
+                count++;
+                printf("CRC FAILED %d passed of %d\n", passed, count);
                 //printf("CRC RX Exit Count =%d Bytes after recomving CRC =%d\n",++crcrx_exitcount,dataToCopy);
+/*
+for (int i=0; i<FRAME_SIZE; ++i)
+{
+   printf("0x%08x\n", input[i]);
+}
+*/
                 consume_each(FRAME_SIZE +4);		
 	        return 0;					//terminate at end of file
 	    }

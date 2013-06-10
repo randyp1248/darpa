@@ -37,10 +37,11 @@ class my_top_block(gr.top_block):
                                    options.rx_freq, 30,
                                    #options.spec, "RX2",
                                    options.spec, "TX/RX",
-                                   options.verbose)
+                                   1) #options.verbose)
         options.samples_per_symbol = self.source._sps
 
         self.filesink = gr.file_sink(1, "output_file")
+
 
 	# Correlator block
         self.correlator = correlator_cc.correlator_cc()
@@ -58,36 +59,57 @@ class my_top_block(gr.top_block):
 	self.printer = print_bb.print_bb()
 
 	# NULL sink block
-        #self.nullsink = gr.null_sink(1)
+        self.nullsink = gr.null_sink(1)
  
         # RRC filter
         #nfilts = 32 
         #ntaps = nfilts * 11 * int(options.samples_per_symbol)
         #self.rrc_taps = gr.firdes.root_raised_cosine(
-            #nfilts, # gain
-            #nfilts, # sampling rate based on 32 fliters in resampler
-            #1.0,    # symbol rate
+            #1.0, # gain
+            #1000000, # sampling rate based on 32 fliters in resampler
+            #symbol_rate,    # symbol rate
             #1.0,    # excess bandwidth or roll-off factor
             #ntaps)
         #self.rrc_filter = gr.pfb_arb_resampler_ccf(options.samples_per_symbol, 
-                                                   #self.rrc_taps)
+        #                                           self.rrc_taps)
+
+
+        # Design filter to get actual channel we want
+        sw_decim = 1
+        chan_coeffs = gr.firdes.low_pass (1.0,                  # gain
+                                          #sw_decim * self.samples_per_symbol(), # sampling rate
+                                          #1000000, # sampling rate
+                                          2,
+                                          #self._chbw_factor,    # midpoint of trans. band
+                                          1,    # midpoint of trans. band
+                                          0.5,                  # width of trans. band
+                                          gr.firdes.WIN_HANN)   # filter type
+        self.channel_filter = gr.fft_filter_ccc(sw_decim, chan_coeffs)
+
 
 	# Connect the blocks
         #self.connect(self.source, self.correlator)
         #self.connect(self.source, self.rrc_filter)
         #self.connect(self.rrc_filter, self.correlator)
-        self.connect(self.source, self.correlator)
+
+        # connect block input to channel filter
+	self.connect(self.source, self.channel_filter)
+        self.connect(self.channel_filter, self.correlator)
+
+
+        #self.connect(self.source, self.correlator)
         self.connect(self.correlator, self.despreader)
         self.connect(self.despreader, self.decoder)
         self.connect(self.decoder, self.crcrx)
-        #self.connect(self.crcrx, self.printer)
+        #self.connect(self.decoder, self.printer)
+        #self.connect(self.printer, self.crcrx)
         #self.connect(self.despreader, self.printer)
         #self.connect(self.printer, self.nullsink)
         #self.connect(self.printer, self.filesink)
         self.connect(self.crcrx, self.filesink)
        
 
-# /////////////////////////////////////////////////////////////////////////////
+#/////////////////////////////////////////////////////////////////////////////
 #                                   main
 # /////////////////////////////////////////////////////////////////////////////
 

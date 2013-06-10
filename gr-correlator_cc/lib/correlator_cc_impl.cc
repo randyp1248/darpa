@@ -661,7 +661,7 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 
    // Treat every correlation over threshold as a new peak.  If we were tracking a peak before, reset
    // TODO: check also again absolute value?
-   if (_primed && (mag > 8*_movingSum/CODE_LENGTH)) // 8 times the average
+   if (_primed && (mag > 10) && (mag > 6*_movingSum/CODE_LENGTH)) // 8 times the average
    {
       _correlationMagnitude = mag;
       _futureSamples = 0;
@@ -670,7 +670,7 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
    }
    else if (_correlationMagnitude != 0)  // Looking at future samples for potential peak
    {
-      if (_correlationMagnitude > 4*mag)
+      if (_correlationMagnitude > 3*mag)
       {
          // Still looks like a peak, even when looking into future.
 	 // Save the sample to output when done
@@ -760,13 +760,13 @@ correlator_cc_impl::general_work (
    int samplesOutput = 0;
    int samplesRead = 0;
 
-   while (samplesRemaining)
+   while ((samplesRemaining) && (samplesOutput<noutput_items))
    {
 
       if (_futureSamples == FUTURE_SAMPLE_LEN)
       {
 	 for (_futureSampleOutputIndex |= 1; 
-	       _futureSampleOutputIndex<_futureSamples && (samplesOutput<noutput_items); 
+	       (_futureSampleOutputIndex<FUTURE_SAMPLE_LEN) && (samplesOutput<noutput_items); 
 	       _futureSampleOutputIndex+=2)
 	 {
             out[samplesOutput++] = _futureBuffer[_futureSampleOutputIndex];

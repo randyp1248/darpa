@@ -31,6 +31,8 @@ namespace gr {
     private:
       bool flag;
       int filesize;
+      int count;
+      int passed;
     public:
       crcrx_impl();
       ~crcrx_impl();

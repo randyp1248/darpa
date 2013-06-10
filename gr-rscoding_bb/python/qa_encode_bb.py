@@ -36,7 +36,7 @@ class qa_encode_bb (gr_unittest.TestCase):
 
     def test_001_t (self):
         NN = 255
-        NROOTS = 32
+        NROOTS = 68
         #NN = 63
         #NROOTS = 8
         expected_data = []

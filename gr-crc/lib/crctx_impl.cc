@@ -31,7 +31,7 @@
 #include "TRITONS.h"
 #include <cstring>
 //#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
-#define FRAME_SIZE 219
+#define FRAME_SIZE 183
 #define FILE_SIZE 80
 
 static bool debug_var = false;	
