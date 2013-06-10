@@ -7,7 +7,8 @@
 ####################################################################################
 
 $spreadingBits = shift;
-$spreadingWidth = 1<<($spreadingBits);
+$spreadingSymbols = 1<<($spreadingBits-2);  # -1 for not bit, -1 for qpsk
+$spreadingRows = 1<<($spreadingBits-1); # -1 for not bit
 $minBytes = &lcm($spreadingBits);
 
 if ($spreadingBits < 1)
@@ -21,7 +22,7 @@ if ($spreadingBits < 1)
 
 # Start with a 2^0 x 2^0 = 1x1 matrix containing only one row of one column: 0
 $walshMatrix = "0";
-for($i=1; $i<= $spreadingBits; ++$i)
+for($i=1; $i<= $spreadingBits-1; ++$i)
 {
    @rows = split(';', $walshMatrix);
    $topHalf = "";
@@ -54,25 +55,32 @@ for($i=1; $i<= $spreadingBits; ++$i)
    #print "$out\n";
 }
 
-for($row=0; $row<$spreadingWidth; ++$row)
+for($row=0; $row<$spreadingRows; ++$row)
 {
-   $walshRow = "   {";
-   for($column=0; $column<$spreadingWidth; $column+=2)
+   $walshRow =    "   {";
+   $negWalshRow = "   {";
+   for($column=0; $column<$spreadingRows; $column+=2)
    {
       $i=&index($row, $column);
       $q=&index($row, $column+1);
       if ($i > 0) { $i = "+0.7071067811865475"; } else { $i = "-0.7071067811865475"; }
       if ($q > 0) { $q = "+0.7071067811865475"; } else { $q = "-0.7071067811865475"; }
+      if ($i > 0) { $negi = "-0.7071067811865475"; } else { $negi = "+0.7071067811865475"; }
+      if ($q > 0) { $negq = "-0.7071067811865475"; } else { $negq = "+0.7071067811865475"; }
       $walshRow .= "gr_complex($i,$q)";
-      if ($column < $spreadingWidth-2)
+      $negWalshRow .= "gr_complex($negi,$negq)";
+      if ($column < $spreadingRows-2)
       {
          $walshRow .=",";
+	 $negWalshRow .=",";
       }
    }
    $walshTable .= $walshRow . "}";
-   if ($row < $spreadingWidth-1)
+   $negWalshTable .= $negWalshRow . "}";
+   if ($row < $spreadingRows-1)
    {
       $walshTable .= ",\n";
+      $negWalshTable .= ",\n";
    }
 }
 
@@ -89,24 +97,20 @@ while ($inputBitPos < 8*$minBytes)
    $inputBitPosWithinByte = $inputBitPos % 8;
 
    $spreaderCode .= <<END;
-/*
-   printf("Spreading index: %d\\n",
-      (((
+   index = (((
          (((unsigned)in[$inputBytePos])<<24) | 
          (((unsigned)in[$inputBytePos+1])<<16) | 
          (((unsigned)in[$inputBytePos+2])<<8) | 
          (((unsigned)in[$inputBytePos+3]))
-      ) >> (32-$inputBitPosWithinByte-$spreadingBits)) & ((1<<$spreadingBits)-1))
-   );
-*/
-   memcpy(out+$spreaderOutputBufferIndex*$spreadingWidth/2, &walshTable[
-      (((
-         (((unsigned)in[$inputBytePos])<<24) | 
-         (((unsigned)in[$inputBytePos+1])<<16) | 
-         (((unsigned)in[$inputBytePos+2])<<8) | 
-         (((unsigned)in[$inputBytePos+3]))
-      ) >> (32-$inputBitPosWithinByte-$spreadingBits)) & ((1<<$spreadingBits)-1))
-   ][0], $spreadingWidth/2*sizeof(gr_complex));
+      ) >> (32-$inputBitPosWithinByte-$spreadingBits)) & ((1<<$spreadingBits)-1));
+   sign = index & 0x01;
+   index >>= 1;
+//printf("=======================================\\n");
+//printf("Spreading index: %d  sign: %d\\n", index, sign);
+   memcpy(
+      out+$spreaderOutputBufferIndex*$spreadingSymbols, 
+      (sign ? (&negWalshTable[index][0]) : (&walshTable[index][0])) , 
+      $spreadingSymbols*sizeof(gr_complex));
 END
 
    $despreaderCode .= <<END;
@@ -116,39 +120,39 @@ END
    # TODO: This can be made more efficient by using the structure of the walsh code
    # walshIndex iterates over the hypotheses for walsh codes that might have been sent.
    # chipIndex iterates over the walsh symbols actually received.
-   for($walshIndex=0; $walshIndex<$spreadingWidth; ++$walshIndex)
+   for($walshIndex=0; $walshIndex<$spreadingRows; ++$walshIndex)
    {
       $despreaderCode .= <<END;
    currentCorrelationValue =
 END
-      for($chipIndex=0; $chipIndex<$spreadingWidth/2; ++$chipIndex)
+      for($chipIndex=0; $chipIndex<$spreadingSymbols; ++$chipIndex)
       {
          if    ( (&index($walshIndex, $chipIndex*2  ) == +1) &&
                  (&index($walshIndex, $chipIndex*2+1) == +1))
          {
             $despreaderCode .= <<END;
-      + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
+      + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].real() + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].imag()
 END
          }
          elsif ( (&index($walshIndex, $chipIndex*2  ) == +1) &&
                  (&index($walshIndex, $chipIndex*2+1) == -1))
          {
             $despreaderCode .= <<END;
-      + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
+      + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].real() - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].imag()
 END
          }
          elsif ( (&index($walshIndex, $chipIndex*2  ) == -1) &&
                  (&index($walshIndex, $chipIndex*2+1) == +1))
          {
             $despreaderCode .= <<END;
-      - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
+      - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].real() + in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].imag()
 END
          }
          elsif ( (&index($walshIndex, $chipIndex*2  ) == -1) &&
                  (&index($walshIndex, $chipIndex*2+1) == -1))
          {
             $despreaderCode .= <<END;
-      - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].real() - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingWidth/2].imag()
+      - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].real() - in[$chipIndex+$spreaderOutputBufferIndex*$spreadingSymbols].imag()
 END
          }
          else
@@ -164,7 +168,7 @@ END
    {
       maxCorrelationValue = abs(currentCorrelationValue);
       maxCorrelationIndex = $walshIndex;
-      maxCorrelationSign = ((currentCorrelationValue > 1) ? 1 : 0);
+      maxCorrelationSign = ((currentCorrelationValue > 1) ? 0 : 1);
    }
 //printf("corr=%f\\n", currentCorrelationValue);
 END
@@ -173,13 +177,13 @@ END
    $despreaderCode .= <<END;
 //printf("max corr=%f\\n", maxCorrelationValue);
 //printf("=======================================\\n");
-   //printf("Despreading index: %d\\n", maxCorrelationIndex);
+//printf("Despreading index: %d  sign: %d\\n", maxCorrelationIndex, maxCorrelationSign);
    temp = (((unsigned)out[$inputBytePos])<<24) | 
           (((unsigned)out[$inputBytePos+1])<<16) | 
           (((unsigned)out[$inputBytePos+2])<<8) | 
           (((unsigned)out[$inputBytePos+3]));
    temp &= ~(((1<<$spreadingBits)-1) << (32-$inputBitPosWithinByte-$spreadingBits));
-   temp |= maxCorrelationIndex << (32-$inputBitPosWithinByte-$spreadingBits);
+   temp |= ((maxCorrelationIndex<<1)|maxCorrelationSign) << (32-$inputBitPosWithinByte-$spreadingBits);
    out[$inputBytePos]   = (temp>>24) & 0xff;
    out[$inputBytePos+1] = (temp>>16) & 0xff;
    out[$inputBytePos+2] = (temp>>8 ) & 0xff;
@@ -191,29 +195,6 @@ END
 
    $inputBitPos += $spreadingBits;
    ++$spreaderOutputBufferIndex;
-}
-
-#Verify that the rows are all orthogonal to each other.
-&orthogonalityTest;
-sub orthogonalityTest
-{
-   for ($firstRow=0; $firstRow<$spreadingWidth; ++$firstRow)
-   {
-      for ($secondRow=$firstRow+1; $secondRow<$spreadingWidth; ++$secondRow)
-      {
-         $dotProduct = 0;
-         for ($column=0; $column<$spreadingWidth; ++$column)
-         {
-            $dotProduct = $dotProduct + &index($firstRow, $column) * &index($secondRow, $column);
-         }
-         if ((($firstRow == $secondRow) && ($dotProduct != $spreadingWidth)) ||
-             (($firstRow != $secondRow) && ($dotProduct != 0)))
-         {
-            print "Error: $firstRow . $secondRow = $dotProduct\n";
-            exit 1;
-         }
-      }
-   }
 }
 
 sub index
@@ -262,11 +243,11 @@ print SPREAD_HEADER <<END;
 /* 
  * Copyright 2013 TRITONS
  * 
- * <<<=================================================================>>>
- * <<<=================================================================>>>
- * <<< This file is autogenerated from pngen.pl.  Do not edit directly >>>
- * <<<=================================================================>>>
- * <<<=================================================================>>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
+ * <<< This file is autogenerated from walshgen.pl.  Do not edit directly >>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
  *
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -295,7 +276,8 @@ namespace spreader {
 class spreader_bc_impl : public spreader_bc
 {
 private:
-   static gr_complex walshTable[$spreadingWidth][$spreadingWidth/2];
+   static gr_complex walshTable[$spreadingRows][$spreadingSymbols];
+   static gr_complex negWalshTable[$spreadingRows][$spreadingSymbols];
 
 public:
    spreader_bc_impl();
@@ -328,11 +310,11 @@ print SPREAD_CODE <<END;
  *
  * Spread input bits with an indexed walsh code and map to constellation.
  *
- * <<<=================================================================>>>
- * <<<=================================================================>>>
- * <<< This file is autogenerated from pngen.pl.  Do not edit directly >>>
- * <<<=================================================================>>>
- * <<<=================================================================>>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
+ * <<< This file is autogenerated from walshgen.pl.  Do not edit directly >>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -366,9 +348,14 @@ static const int MAX_IN = 1;
 static const int MIN_OUT = 1;
 static const int MAX_OUT = 1;
 
-gr_complex spreader_bc_impl::walshTable[$spreadingWidth][$spreadingWidth/2] = 
+gr_complex spreader_bc_impl::walshTable[$spreadingRows][$spreadingSymbols] = 
 {
 $walshTable
+};
+
+gr_complex spreader_bc_impl::negWalshTable[$spreadingRows][$spreadingSymbols] = 
+{
+$negWalshTable
 };
 
 spreader_bc::sptr
@@ -382,8 +369,8 @@ spreader_bc_impl::spreader_bc_impl()
                   gr_make_io_signature(MIN_IN, MAX_IN, sizeof(unsigned char)),
                   gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
 {
-   set_min_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
-   set_max_noutput_items($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
+   set_min_noutput_items($minBytes * 8 / $spreadingBits * $spreadingSymbols);
+   set_max_noutput_items($minBytes * 8 / $spreadingBits * $spreadingSymbols);
 }
 
 spreader_bc_impl::~spreader_bc_impl()
@@ -405,7 +392,10 @@ spreader_bc_impl::general_work (int noutput_items,
    const unsigned char* in = (unsigned char*) input_items[0];
    gr_complex* out = (gr_complex*) output_items[0];
 
-   if ((noutput_items < ($minBytes * 8 / $spreadingBits * $spreadingWidth/2)) ||
+   unsigned index;
+   unsigned sign;
+
+   if ((noutput_items < ($minBytes * 8 / $spreadingBits * $spreadingSymbols)) ||
        (ninput_items[0] < $minBytes))
    {
       return 0;
@@ -415,7 +405,7 @@ $spreaderCode
 
    consume_each ($minBytes);
 
-   return ($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
+   return ($minBytes * 8 / $spreadingBits * $spreadingSymbols);
 }
 
 } /* namespace spreader */
@@ -433,11 +423,11 @@ print DESPREAD_HEADER <<END;
 /* 
  * Copyright 2013 TRITONS
  *
- * <<<=================================================================>>>
- * <<<=================================================================>>>
- * <<< This file is autogenerated from pngen.pl.  Do not edit directly >>>
- * <<<=================================================================>>>
- * <<<=================================================================>>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
+ * <<< This file is autogenerated from walshgen.pl.  Do not edit directly >>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -500,11 +490,11 @@ print DESPREAD_CODE <<END;
  * Despread input constellation stream and correlate with each row of the
  * walsh table to determine the index bits to output.
  *
- * <<<=================================================================>>>
- * <<<=================================================================>>>
- * <<< This file is autogenerated from pngen.pl.  Do not edit directly >>>
- * <<<=================================================================>>>
- * <<<=================================================================>>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
+ * <<< This file is autogenerated from walshgen.pl.  Do not edit directly >>>
+ * <<<====================================================================>>>
+ * <<<====================================================================>>>
  * 
  * This is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -560,7 +550,7 @@ despreader_cb_impl::~despreader_cb_impl()
 void
 despreader_cb_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
 {
-   ninput_items_required[0] = ($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
+   ninput_items_required[0] = ($minBytes * 8 / $spreadingBits * $spreadingSymbols);
 }
 
 int
@@ -579,7 +569,7 @@ despreader_cb_impl::general_work (int noutput_items,
    
 $despreaderCode
 
-   consume_each($minBytes * 8 / $spreadingBits * $spreadingWidth/2);
+   consume_each($minBytes * 8 / $spreadingBits * $spreadingSymbols);
 
    return ($minBytes);
 }
@@ -599,11 +589,11 @@ print SPREAD_TESTCODE <<END;
 # 
 # Copyright 2013 TRITONS
 #
-# <<<=================================================================>>>
-# <<<=================================================================>>>
-# <<< This file is autogenerated from pngen.pl.  Do not edit directly >>>
-# <<<=================================================================>>>
-# <<<=================================================================>>>
+# <<<====================================================================>>>
+# <<<====================================================================>>>
+# <<< This file is autogenerated from walshgen.pl.  Do not edit directly >>>
+# <<<====================================================================>>>
+# <<<====================================================================>>>
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -652,11 +642,11 @@ print DESPREAD_TESTCODE <<END;
 # 
 # Copyright 2013 TRITONS
 #
-# <<<=================================================================>>>
-# <<<=================================================================>>>
-# <<< This file is autogenerated from pngen.pl.  Do not edit directly >>>
-# <<<=================================================================>>>
-# <<<=================================================================>>>
+# <<<====================================================================>>>
+# <<<====================================================================>>>
+# <<< This file is autogenerated from walshgen.pl.  Do not edit directly >>>
+# <<<====================================================================>>>
+# <<<====================================================================>>>
 # 
 # This is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -686,7 +676,7 @@ class qa_despreader_cb (gr_unittest.TestCase):
         self.tb = gr.top_block ()
         random.seed(None)
         self.randomBytes[:] = []
-        for x in range(0, $minBytes):
+        for x in range(0, $minBytes*3):
             self.randomBytes.append(random.randint(0,255));
 
     def tearDown (self):
