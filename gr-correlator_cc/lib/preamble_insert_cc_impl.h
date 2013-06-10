@@ -31,6 +31,7 @@
 #include "TRITONS.h"
 
 #define CODE_LENGTH (255)
+#define RANDOM_LENGTH 1024
 
 namespace gr {
 namespace correlator_cc {
@@ -46,6 +47,7 @@ private:
 
    int _preambleIndex;
    int _capsuleIndex;
+   int _randomIndex;
    gr_complex _prevSample;
 
 public:

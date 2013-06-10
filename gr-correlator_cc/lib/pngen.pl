@@ -250,6 +250,7 @@ print PRE_HEADER <<END;
 #include "TRITONS.h"
 
 #define CODE_LENGTH ($codeLength)
+#define RANDOM_LENGTH 1024
 
 namespace gr {
 namespace correlator_cc {
@@ -265,6 +266,7 @@ private:
 
    int _preambleIndex;
    int _capsuleIndex;
+   int _randomIndex;
    gr_complex _prevSample;
 
 public:
@@ -372,6 +374,7 @@ preamble_insert_cc_impl::preamble_insert_cc_impl()
 
    _preambleIndex = 0;
    _capsuleIndex = 0;
+   _randomIndex = 0;
    _prevSample = _sequenceIQ[CODE_LENGTH-1];
 }
 
@@ -414,8 +417,8 @@ preamble_insert_cc_impl::general_work (int noutput_items,
    if ((_preambleIndex == 0) && (_capsuleIndex == 0))
    {
       // Sleep for 200ms.
-      struct timeval timeout = {0, 200000};
-      select(0,0,0,0,&timeout);
+      //struct timeval timeout = {0, 200000};
+      //select(0,0,0,0,&timeout);
    }
 
    for(; (_preambleIndex<CODE_LENGTH) && (samplesOutput+2<noutput_items); ++_preambleIndex)
@@ -431,11 +434,19 @@ preamble_insert_cc_impl::general_work (int noutput_items,
       out[samplesOutput++] = outputVal;
    }
 
-   if ((_preambleIndex >= CODE_LENGTH) && (_capsuleIndex >= CAPSULE_SYMBOL_LENGTH))
+   for(; (samplesOutput+2<noutput_items) && (_randomIndex<RANDOM_LENGTH); ++_randomIndex)
+   {
+      gr_complex outputVal(0, 1);
+      out[samplesOutput++] = outputVal;
+      out[samplesOutput++] = outputVal;
+   }
+
+   if ((_preambleIndex >= CODE_LENGTH) && (_capsuleIndex >= CAPSULE_SYMBOL_LENGTH) && (_randomIndex >= RANDOM_LENGTH))
    {
       // Full frame has been output, reset the indicies for the next frame.
       _preambleIndex = 0;
       _capsuleIndex = 0;
+      _randomIndex = 0;
       _prevSample = _sequenceIQ[CODE_LENGTH-1];
    }
 
@@ -709,7 +720,7 @@ $correlateQ
 
    // Treat every correlation over threshold as a new peak.  If we were tracking a peak before, reset
    // TODO: check also again absolute value?
-   if (_primed && (mag > 10) && (mag > 6*_movingSum/CODE_LENGTH)) // 8 times the average
+   if (_primed && (mag > 10) && (mag > 6*_movingSum/CODE_LENGTH)) // 6 times the average
    {
       _correlationMagnitude = mag;
       _futureSamples = 0;

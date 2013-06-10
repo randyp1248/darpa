@@ -661,7 +661,7 @@ correlator_cc_impl::detect_peak(sampleType real, sampleType imag)
 
    // Treat every correlation over threshold as a new peak.  If we were tracking a peak before, reset
    // TODO: check also again absolute value?
-   if (_primed && (mag > 10) && (mag > 6*_movingSum/CODE_LENGTH)) // 8 times the average
+   if (_primed && (mag > 10) && (mag > 6*_movingSum/CODE_LENGTH)) // 6 times the average
    {
       _correlationMagnitude = mag;
       _futureSamples = 0;
