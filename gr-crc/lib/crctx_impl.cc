@@ -18,6 +18,9 @@
  * Boston, MA 02110-1301, USA.
  */
 
+ /* Modified by Dave Kier 5/9/13 for Darpa/UCSD Capstone */
+
+
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -32,7 +35,6 @@
 #include <cstring>
 //#define FRAME_SIZE CAPSULE_SYMBOL_LENGTH
 #define FRAME_SIZE 183
-#define FILE_SIZE 80
 
 static bool debug_var = false;	
 
@@ -40,39 +42,61 @@ namespace gr {
   namespace crc {
 
     crctx::sptr
-    crctx::make()
+    crctx::make(int filesize)
     {
-      return gnuradio::get_initial_sptr (new crctx_impl());
+      return gnuradio::get_initial_sptr (new crctx_impl(filesize));
     }
 
-    /* The private constructor */
-    crctx_impl::crctx_impl()
+    //**********************************************************************	
+    //**************** The private constructor *****************************
+    //**********************************************************************	
+    crctx_impl::crctx_impl(int filesize)
       : gr_block("crctx",
 		      gr_make_io_signature(1,1, sizeof (char)),	//input signature
 		      gr_make_io_signature(1,1, sizeof (char)))	//output signature
     {
 	set_min_noutput_items(FRAME_SIZE+4);	//Fix the minimum output buffer size (CRC + Capsule)
 	set_max_noutput_items(FRAME_SIZE+4);	//Fix the maximum output buffer size (CRC + Capsule)
-	flag = false;
+	firstFrameFlag = true;			//Flag for first frame = true
+	_filesize = filesize;
+	frameCounter = 0;
     }
 
-    /* Our virtual destructor */
+    /***********************************************/
+    /********** Our virtual destructor *************/
+    /***********************************************/
+    
     crctx_impl::~crctx_impl()
     { }
 
-    void
+
+    /***********************************************/
+    /**************** FOREAST **********************/
+    /***********************************************/
+                void
     crctx_impl::forecast (int noutput_items, gr_vector_int &ninput_items_required)
-    {
-        if(flag == false) 
-        {
-	   ninput_items_required[0] = FRAME_SIZE-4;	//Output - CRC(4 bytes)
-	}
-	else
+    {	
+	if((firstFrameFlag == true) && (_filesize < FRAME_SIZE-4)) 		  // First Frame is last frame: 
 	{
-	   ninput_items_required[0] = FRAME_SIZE;	//Output - CRC(4 bytes)
+	   ninput_items_required[0] = _filesize;				  // Reduce ninput to remaining amount of data
+	}       
+	if((firstFrameFlag == true) && (_filesize >= FRAME_SIZE-4)) 		  // First Frame but not last 
+        {									
+	   ninput_items_required[0] = FRAME_SIZE-4;				  // Reduce ninput by 4 bytes for filsize	
+	}
+	else if (_filesize - ((frameCounter * (FRAME_SIZE)) + 4) < FRAME_SIZE)	  // Last Frame: 
+	{
+	   ninput_items_required[0] = _filesize - ((frameCounter * (FRAME_SIZE)) + 4); // Reduce ninput to remaining amount of data
+	}
+	else	//ninput = FULL Frame of Data					  // Middle Frames
+	{
+	   ninput_items_required[0] = FRAME_SIZE;				  // ninput = FRAME_SIZE
 	}
     }
 
+    //**********************************************************************	
+    //********************* GENERAL WORK ***********************************
+    //**********************************************************************	
     int
     crctx_impl::general_work (int noutput_items,
                        gr_vector_int &ninput_items,
@@ -82,54 +106,107 @@ namespace gr {
 	const char * input = (const char *) input_items[0];
         char * out = (char *) output_items[0];
 	int dataToCopy = FRAME_SIZE;
-
-/***********************************************************************************************/	
-/*************** Input data, calculate CRC and Append (4 bytes) ********************************/
-
-	int static initial_ninputs = ninput_items[0];		// Locks value to first read	
-	int crc32;
-
-	//std::cout << "TX INPUT = " << input << std::endl;		// Print the input buffer
-
-	// prepending file size to the data
-	if (flag == false) 
+	unsigned char pad_data[FRAME_SIZE] = {0xFF};
+	for (int i=0; i<FRAME_SIZE; i++)
 	{
-	   *((int *) out) = FILE_SIZE;
-           //std::cout << "TX OUTPUT with Filesize ONLY = " << out << std::endl;
-	}	    			
-	// if we got less than framesize then we're done
-	if (ninput_items[0] < FRAME_SIZE)	
-	{
-           // std::cout << "TX EOF "<< std::endl;
-	    return (-1);					//terminate at end of file
+	   pad_data[i] = 0xFF;							//Pad with BLANK (0xFF) Characters
 	}
-	// else, add the data
-	else
-	{
-            char *pOut = out;
-	    if(flag == false) 
-	    {
-                pOut += 4;
-  		dataToCopy = FRAME_SIZE - 4;
- 		flag = true;
-	    }
-	    memcpy(pOut, input, dataToCopy);			//copy x 4byte CRC to data capsule
-            if(debug_var == false) 
-            {
-               if(flag == true) 
-	       {
-                  debug_var = true;
-               }
-               //std::cout << "TX OUTPUT on First Iteration with NO CRC = " << pOut << std::endl;
-            }
-	    int crc32 = digital_crc32((const unsigned char *)out, FRAME_SIZE);						
-	    memcpy(out + FRAME_SIZE, (unsigned char *)&crc32, 4);	
-	}		
-	//std::cout << "TX OUTPUT with CRC = " << out << std::endl;		
+        
+	//**********************************************************************************************	
+	//************** Determine if First Frame: Middle Frame or Last Frame **************************
+	//**********************************************************************************************
 
-	consume_each (dataToCopy);
-	return noutput_items;			//FRAME_SIZE + 4
-    }
+	int  crc32;
+	current_ninputs = ninput_items[0];		// Locks value to first read	
+	//std::cout << "*************** TX ninputs = " << current_ninputs << std::endl;	// Print the input buffer
+	//printf ("*** TX FILESIZE *** %d\n", _filesize);
+
+	// **************************************************************************************************
+	// First Make sure we have Data. 
+	// **************************************************************************************************
+	if ((ninput_items[0] <= 0))	
+	{
+	  //  printf ("***SORRY THERE WAS NO MORE DATA***\n");
+	    return -1;	
+	}
+	// **************************************************************************************************
+	// First Frame is the last Frame:  Prepend filesize, Copy Data, Pad with FF's, Append CRC	****
+	// **************************************************************************************************
+	if ((ninput_items[0] < FRAME_SIZE-4) && (firstFrameFlag == true))		
+	{
+	    //printf ("TX Made it to 'First/Last Frame'\n");
+	    //std::cerr <<  "TX Made it to 'First/Last Frame'\n";
+	    dataToCopy = current_ninputs;
+	    char *pOut = out;
+	    //*((int *) out) = _filesize;							
+	    memcpy (&out[0], (char *)&_filesize, 4);		    
+            pOut += 4;									
+ 	    memcpy(pOut, input,  dataToCopy);					
+	    pOut += dataToCopy;
+	    memcpy(pOut, pad_data, (FRAME_SIZE - (dataToCopy + 4)));		
+ 	    crc32 = digital_crc32((const unsigned char *)out, FRAME_SIZE);		
+	    memcpy(out + FRAME_SIZE, (unsigned char *)&crc32, 4);			
+ 	    firstFrameFlag = false;	
+	   
+	    consume_each (dataToCopy);
+	    return noutput_items;
+	}
+
+	// ******************************************************************************************************
+	// First Frame but not last   Prepend filesize, Copy Data, Append CRC				     ****
+	// ******************************************************************************************************
+	if ((ninput_items[0] >= FRAME_SIZE-4) && (firstFrameFlag == true))
+	{
+	    //printf ("TX Made it to 'First but not last Frame'\n");
+	    //std::cerr << "TX Made it to 'First but not last Frame'\n";
+            dataToCopy = FRAME_SIZE - 4;
+	    char *pOut = out;
+	    *((int *) out) = _filesize;				
+            pOut += 4;										
+	    memcpy(pOut, input, dataToCopy);				
+	    crc32 = digital_crc32((const unsigned char *)out, FRAME_SIZE);					
+	    memcpy(out + FRAME_SIZE, (unsigned char *)&crc32, 4);   	
+	    firstFrameFlag = false;
+	    ++frameCounter;					    	
+	    consume_each (dataToCopy);
+	    return noutput_items;	
+	}
+
+	// ******************************************************************************************************
+	// Middle Frame: Copy Data, Append CRC   
+	// ******************************************************************************************************
+
+	if ((ninput_items[0] >= FRAME_SIZE) && (firstFrameFlag == false))				
+	{
+            //printf ("TX Made it to 'MiddleFrame'\n"); 	
+            //std::cerr <<  "TX Made it to 'MiddleFrame'\n";
+
+  	    dataToCopy = FRAME_SIZE;				
+ 	    memcpy(out, input, dataToCopy);				
+	    crc32 = digital_crc32((const unsigned char *)out, FRAME_SIZE);					
+	    memcpy(out + dataToCopy, (unsigned char *)&crc32, 4);   	
+	    ++frameCounter;					    	
+	    consume_each (dataToCopy);
+	    return noutput_items;	
+	}
+
+	// **************************************************************************************************
+	// Last Frame -- Copy Data, Pad with FF's, Append CRC						 ****
+	// **************************************************************************************************
+	if ((ninput_items[0] < FRAME_SIZE) && (firstFrameFlag == false) && (frameCounter > 0))	
+	{
+	    //printf ("TX Made it to 'LastFrame' \n");
+	    //std::cerr << "TX Made it to 'LastFrame' \n";
+	    dataToCopy = current_ninputs;
+	    memcpy(out, input,  dataToCopy);					
+	    memcpy(out + dataToCopy, pad_data, (FRAME_SIZE - dataToCopy));	
+ 	    crc32 = digital_crc32((const unsigned char *)out, FRAME_SIZE);		
+	    memcpy(out + FRAME_SIZE, (unsigned char *)&crc32, 4);			
+  	    ++frameCounter;		
+  	    consume_each (dataToCopy);
+	    return noutput_items;
+	}
+   }
   } /* namespace crc */
 } /* namespace gr */
 

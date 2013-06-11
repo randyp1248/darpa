@@ -17,6 +17,8 @@
  * the Free Software Foundation, Inc., 51 Franklin Street,
  * Boston, MA 02110-1301, USA.
  */
+ /* Modified by Dave Kier 5/9/13 for Darpa/UCSD Capstone */
+
 
 #ifndef INCLUDED_CRC_CRCTX_IMPL_H
 #define INCLUDED_CRC_CRCTX_IMPL_H
@@ -29,10 +31,13 @@ namespace gr {
     class crctx_impl : public crctx
     {
     private:
-      bool flag;
+      bool firstFrameFlag;
+      int _filesize;
+      int current_ninputs;
+      int frameCounter;
 
     public:
-      crctx_impl();
+      crctx_impl(int filesize);
       ~crctx_impl();
 
       void forecast (int noutput_items, gr_vector_int &ninput_items_required);
