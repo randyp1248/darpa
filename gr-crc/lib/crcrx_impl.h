@@ -29,11 +29,18 @@ namespace gr {
     class crcrx_impl : public crcrx
     {
     private:
-      bool flag;
-      int filesize;
-      int count;
-      int passed;
+      bool firstFrameflag;
+      int _filesize;
+      int current_ninputs;
+      int frameCount;
+      int numOfFrames;
+      int lastFrameSize;
+      int lastFrameCount;
+      int remainder;
+			
+      //int dataToCopy;		
     public:
+      //crcrx_impl(int filesize);
       crcrx_impl();
       ~crcrx_impl();
 

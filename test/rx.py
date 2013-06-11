@@ -21,6 +21,7 @@ from crc import crc_swig as crc
 import struct
 import sys
 import time
+import os
 
 #import os
 #print os.getpid()
@@ -39,6 +40,20 @@ class my_top_block(gr.top_block):
                                    options.spec, "TX/RX",
                                    1) #options.verbose)
         options.samples_per_symbol = self.source._sps
+
+
+        RX_output_file = "RX_output_test_file"
+	_RX_output_file = 'RX_output_test_file'
+        #RX_output_file = "Ding_Dong2.wma"
+	#_RX_output_file = 'Ding_Dong2.wma'
+
+
+        RX_file_sink = gr.file_sink(gr.sizeof_char, RX_output_file)
+	RX_output_filesize = os.stat(_RX_output_file).st_size
+  
+        #print RX_output_filesize
+
+
 
         self.filesink = gr.file_sink(1, "output_file")
 
@@ -106,7 +121,8 @@ class my_top_block(gr.top_block):
         #self.connect(self.despreader, self.printer)
         #self.connect(self.printer, self.nullsink)
         #self.connect(self.printer, self.filesink)
-        self.connect(self.crcrx, self.filesink)
+        #self.connect(self.crcrx, self.filesink)
+        self.connect(self.crcrx, RX_file_sink)
        
 
 #/////////////////////////////////////////////////////////////////////////////

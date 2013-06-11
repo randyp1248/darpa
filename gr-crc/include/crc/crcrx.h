@@ -46,7 +46,8 @@ namespace gr {
         * class. crc::crcrx::make is the public interface for
         * creating new instances.
         */
-       static sptr make();
+ 	/*static sptr make(int filesize);*/
+	static sptr make();
     };
 
   } // namespace crc
