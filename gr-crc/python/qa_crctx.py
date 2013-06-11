@@ -20,7 +20,7 @@
 # ********************************************************************
 # This code was generated using gr-modtool and modified by 
 # Dave Kier to incorporate a FRAME SIZE and CRC algorithm
-# May-24-2013
+# June 7, 2013
 #*********************************************************************
 from gnuradio import gr, gr_unittest
 import crc_swig as crc
@@ -35,35 +35,42 @@ class qa_crctx (gr_unittest.TestCase):
         self.tb = None
 
     def test_001_t_crctx(self):
+	# *** FILES USED FOR TESTING *** 	
+	TX_input_file = "TX_Input_Test"
+	_TX_input_file = 'TX_Input_Test'
+
+	TX_output_file = "TX_output_test_file"
+	_TX_output_file = 'TX_output_test_file'
+
+	RX_input_file = "TX_output_test_file"
+	_RX_input_file = 'TX_output_test_file'
+
+	RX_output_file = "RX_output_test_file"
+	_RX_output_file = 'RX_output_test_file'
+        
+	# *** Start Python Implementation ***
+	print "Starting Python test 001"
+	TX_source_data = gr.file_source(gr.sizeof_char, TX_input_file) 		#located in ../build/python
+	#RX_source_data = gr.file_source(gr.sizeof_char, RX_input_file) 		#located in ../build/python
+
+	#TX_file_sink = gr.file_sink(gr.sizeof_char, TX_output_file)
+	TX_Input_filesize  = os.stat(_TX_input_file).st_size
+	#TX_output_filesize = os.stat(_TX_output_file).st_size
 	
-        print "Starting Python test 001"
+	RX_file_sink = gr.file_sink(gr.sizeof_char, RX_output_file)
+        #RX_Input_filesize  = os.stat(_RX_input_file).st_size
+	RX_output_filesize = os.stat(_RX_output_file).st_size
 	
-
-	source_data1 = gr.file_source(gr.sizeof_char, "Ding_Dong2.wma") 	#located in ../build/python
-	statinfo = os.stat('Ding_Dong1.wma')
-#	source_data1 = gr.file_source(gr.sizeof_char, "input_test_file3") 	#located in ../build/python
-#	statinfo = os.stat('input_test_file')
-	print "Size of input_test_file = ", statinfo.st_size
-
-	expected_result1 = 65, 32, 66, 32, 67, 32, 68, 32, 69, 32, 49, 50, 51, 52, 70, 32, 71, 32, 72, 32, 73, 32, 74, 32, 49, 50, 51, 52, 75, 32, 76, 32, 77, 32, 78, 32, 79, 32, 49, 50, 51, 52, 80, 32, 81, 32, 82, 32, 83, 32, 84, 32, 49, 50, 51, 52, 85, 32, 86, 32, 87, 32, 88, 32, 89, 32, 49, 50, 51, 52, 90, 32, 48, 32, 49, 32, 50, 32, 51, 32, 49, 50, 51, 52, 52, 32, 53, 32, 54, 32, 55, 32, 56, 32, 49, 50, 51, 52, 57, 32, 65, 32, 66, 32, 67, 32, 68, 10, 49, 50, 51, 52
 	
-	expected_result2 = 65, 32, 66, 32, 67, 32, 68, 32, 69, 32, 70, 32, 71, 32, 72, 32, 73, 32, 74, 32, 75, 32, 76, 32, 77, 32, 78, 32, 79, 32, 80, 32, 81, 32, 82, 32, 83, 32, 84, 32, 85, 32, 86, 32, 87, 32, 88, 32, 89, 32, 90, 32, 48, 32, 49, 32, 50, 32, 51, 32, 52, 32, 53, 32, 54, 32, 55, 32, 56, 32, 57, 32, 65, 32, 66, 32, 67, 32, 68, 10 
+	# *** Call C++ Blocks ***
+	append_crc   = crc.crctx(TX_Input_filesize)
+	remove_crc = crc.crcrx()
 
-	calc_crc = crc.crctx()
-	remove_crc = crc.crcrx()	
-	#dst = gr.vector_sink_b()
-	file_sink = gr.file_sink(gr.sizeof_char, "output_test_file3")
-	self.tb.connect(source_data1, calc_crc)
-	self.tb.connect(calc_crc, remove_crc)
-	#self.tb.connect(remove_crc, dst)
-	self.tb.connect(remove_crc, file_sink)
-
+	# *** Connect the Blocks ***
+	self.tb.connect(TX_source_data, append_crc)
+	self.tb.connect(append_crc, remove_crc)
+	self.tb.connect(remove_crc, RX_file_sink)
 	self.tb.run()	
-	#result_data = file_sink.data()
-
-	#print "********** Result2 is = ", result_data, " *********"  
-	#self.assertEqual(source_data1, file_sink.data())
-	#print "Ending Python Test 001"
 
 if __name__ == '__main__':
     gr_unittest.run(qa_crctx, "qa_crctx.xml")

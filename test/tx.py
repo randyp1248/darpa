@@ -18,6 +18,7 @@ from uhd_interface import uhd_transmitter
 from uhd_interface import uhd_receiver
 
 import time, struct, sys
+import os
 
 #import os 
 #print os.getpid()
@@ -26,6 +27,22 @@ import time, struct, sys
 class my_top_block(gr.top_block):
     def __init__(self, options):
         gr.top_block.__init__(self)
+ 
+
+        #Input Data File
+        TX_input_file = "TX_Input_Data"
+        _TX_input_file = 'TX_Input_Data'
+        #TX_input_file = "Ding_Dong2.wma"
+        #_TX_input_file = 'Ding_Dong2.wma'
+        TX_source_data = gr.file_source(gr.sizeof_char, TX_input_file)
+        TX_Input_filesize  = os.stat(_TX_input_file).st_size
+
+        #RX_output_file = "RX_output_test_file"
+	#_RX_output_file = 'RX_output_test_file'
+
+
+        #RX_file_sink = gr.file_sink(gr.sizeof_char, RX_output_file)
+	#RX_output_filesize = os.stat(_RX_output_file).st_size
 
         # Source block
         #frame = ((+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j),(+1+0j))
@@ -126,18 +143,18 @@ class my_top_block(gr.top_block):
         #src = src + src
         #src = src + src
 
-        print len(src)
+        #print len(src)
         #print len(data)
   
 	#data = data + data + data + data
         
 	#data = data + data + data + data + data + data + data + data + data + data + data + data + data + data
         #data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0)
-        self.source = gr.vector_source_b(src)
+        #self.source = gr.vector_source_b(src)
         #self.source = gr.vector_source_b(frame_pad)
 
         # CRC TX block
-        self.crctx = crc.crctx()
+        #self.crctx = crc.crctx()
 
         #src = src + src
         #src = src + src
@@ -149,18 +166,18 @@ class my_top_block(gr.top_block):
         #src = src + src
         #src = src + src
 
-        print len(src)
+        #print len(src)
         #print len(data)
   
 	#data = data + data + data + data
         
 	#data = data + data + data + data + data + data + data + data + data + data + data + data + data + data
         #data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0)
-        self.source = gr.vector_source_b(src)
+        #self.source = gr.vector_source_b(src)
         #self.source = gr.vector_source_b(frame_pad)
 
         # CRC TX block
-        self.crctx = crc.crctx()
+        #self.crctx = crc.crctx()
         #src = src + src
         #src = src + src
         #src = src + src
@@ -171,18 +188,18 @@ class my_top_block(gr.top_block):
         #src = src + src
         #src = src + src
 
-        print len(src)
+        #print len(src)
         #print len(data)
   
 	#data = data + data + data + data
         
 	#data = data + data + data + data + data + data + data + data + data + data + data + data + data + data
         #data = (0xd, 0xe, 0xa, 0xd, 0xb, 0xe, 0xe, 0xf, 0xd, 0x0)
-        self.source = gr.vector_source_b(src)
+        #self.source = gr.vector_source_b(src)
         #self.source = gr.vector_source_b(frame_pad)
 
         # CRC TX block
-        self.crctx = crc.crctx()
+        self.crctx = crc.crctx(TX_Input_filesize)
 
         # RS encoding
         self.encoder = rscoding_bb.encode_bb()
@@ -221,7 +238,7 @@ class my_top_block(gr.top_block):
         #self.connect(self.source, self.inserter)
         #self.connect(self.inserter, self.sink)
         #self.connect(self.source, self.spreader)
-        self.connect(self.source, self.crctx)
+        self.connect(TX_source_data, self.crctx)
         #self.connect(self.crctx, self.printer)
         #self.connect(self.printer, self.encoder)
         self.connect(self.crctx, self.encoder)
