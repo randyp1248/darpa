@@ -1,0 +1,25 @@
+root@node20-19:~/gnuradio/gr-digital/examples/narrowband# ls -l
+total 176
+-rwxrwxr-x 1 native native  4185 Nov 12  2012 benchmark_add_channel.py
+-rwxr-xr-x 1 root   root    6476 Jun 15 11:38 benchmark_rx3.py
+-rwxr-xr-x 1 root   root    6727 Jun 21 23:29 benchmark_rx_iab.py
+-rwxr-xr-x 1 native native  4710 Jan  2  2012 benchmark_rx.py
+-rwxr-xr-x 1 root   root    6954 May  3 07:30 benchmark_tx3.py
+-rwxr-xr-x 1 root   root    7137 Jun 21 12:25 benchmark_tx_iab.py
+-rwxr-xr-x 1 native native  5415 Jan  2  2012 benchmark_tx.py
+-rwxr-xr-x 1 root   root    6620 Jun 21 23:27 bot1_rx.py
+-rwxr-xr-x 1 root   root    6165 Jun 19 16:16 bot1_tx.py
+-rwxrwxr-x 1 native native  7786 Jan 18 12:17 digital_bert_rx.py
+-rwxr-xr-x 1 native native  5404 Jan 19  2012 digital_bert_tx.py
+-rw-r--r-- 1 native native  6707 Jan  2  2012 README
+-rw-r--r-- 1 native native  6072 Apr  9  2012 receive_path.py
+-rw-r--r-- 1 root   root    4923 Jun 14 17:59 receive_path.pyc
+-rwxr-xr-x 1 native native  5582 Jan  2  2012 rx_voice.py
+-rw-r--r-- 1 native native  4808 Jan  2  2012 transmit_path.py
+-rw-r--r-- 1 root   root    4284 Jun 14 19:13 transmit_path.pyc
+-rwxr-xr-x 1 native native 10285 Jan  2  2012 tunnel.py
+-rwxr-xr-x 1 native native  5753 Jan  2  2012 tx_voice.py
+-rw-r--r-- 1 native native  8910 Jan  2  2012 uhd_interface.py
+-rw-r--r-- 1 root   root    8146 Jun 14 17:59 uhd_interface.pyc
+root@node20-19:~/gnuradio/gr-digital/examples/narrowband# 
+
