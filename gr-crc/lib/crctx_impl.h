@@ -31,10 +31,6 @@ namespace gr {
     class crctx_impl : public crctx
     {
     private:
-      bool firstFrameFlag;
-      int _filesize;
-      int current_ninputs;
-      int frameCounter;
 
     public:
       crctx_impl(int filesize);

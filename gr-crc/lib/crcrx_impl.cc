@@ -79,6 +79,24 @@ namespace gr {
       ninput_items_required[0] = FRAME_SIZE + 4;
     }
 
+    void
+    crcrx_impl::receiveFrame(unsigned short seqNum, unsigned char subSeqNum, unsigned char* payload)
+    {
+        if (seqNum != currentSeqNum)
+	{
+	    currentSeqNum = seqNum;
+	    receptionBitmap = 0;
+	}
+        memcpy(buffer+subSeqNum*180, payload, 180);
+        receptionBitmap |= 1<<subSeqNum;
+
+	if (receptionBitmap == 0xff)
+	{
+	    // TODO: Submit the buffer to the socket server
+	    receptionBitmap = 0;
+	}
+    }
+
     //**********************************************************************	
     //********************* GENERAL WORK ***********************************
     //**********************************************************************	
