@@ -35,8 +35,8 @@ namespace spreader {
 class spreader_bc_impl : public spreader_bc
 {
 private:
-   static gr_complex walshTable[128][64];
-   static gr_complex negWalshTable[128][64];
+   static gr_complex* walshTable[128][64];
+   static gr_complex* negWalshTable[128][64];
 
 public:
    spreader_bc_impl();

@@ -57,30 +57,44 @@ for($i=1; $i<= $spreadingBits-1; ++$i)
 
 for($row=0; $row<$spreadingRows; ++$row)
 {
-   $walshRow =    "   {";
-   $negWalshRow = "   {";
    for($column=0; $column<$spreadingRows; $column+=2)
    {
       $i=&index($row, $column);
       $q=&index($row, $column+1);
-      if ($i > 0) { $i = "+0.7071067811865475"; } else { $i = "-0.7071067811865475"; }
-      if ($q > 0) { $q = "+0.7071067811865475"; } else { $q = "-0.7071067811865475"; }
-      if ($i > 0) { $negi = "-0.7071067811865475"; } else { $negi = "+0.7071067811865475"; }
-      if ($q > 0) { $negq = "-0.7071067811865475"; } else { $negq = "+0.7071067811865475"; }
-      $walshRow .= "gr_complex($i,$q)";
-      $negWalshRow .= "gr_complex($negi,$negq)";
+
+      if (($i>0) && ($q>0)) 
+      { 
+         #$walshRow .= "walshPosPos"; $negWalshRow .= "walshNegNeg"; 
+	 $walshTable .= "N";
+      }
+      if (($i>0) && ($q<0)) 
+      { 
+         #$walshRow .= "walshPosNeg"; $negWalshRow .= "walshNegPos"; 
+	 $walshTable .= "n";
+      }
+      if (($i<0) && ($q>0)) 
+      { 
+         #$walshRow .= "walshNegPos"; $negWalshRow .= "walshPosNeg"; 
+	 $walshTable .= "p";
+      }
+      if (($i<0) && ($q<0)) 
+      { 
+         #$walshRow .= "walshNegNeg"; $negWalshRow .= "walshPosPos"; 
+	 $walshTable .= "P";
+      }
+
       if ($column < $spreadingRows-2)
       {
-         $walshRow .=",";
-	 $negWalshRow .=",";
+         #$walshRow .=",";
+	 #$negWalshRow .=",";
       }
    }
-   $walshTable .= $walshRow . "}";
-   $negWalshTable .= $negWalshRow . "}";
+   #$walshTable .= $walshRow . "};";
+   #$negWalshTable .= $negWalshRow . "};";
    if ($row < $spreadingRows-1)
    {
-      $walshTable .= ",\n";
-      $negWalshTable .= ",\n";
+      #$walshTable .= ",\n";
+      #$negWalshTable .= ",\n";
    }
 }
 
@@ -109,7 +123,7 @@ while ($inputBitPos < 8*$minBytes)
 //printf("Spreading index: %d  sign: %d\\n", index, sign);
    memcpy(
       out+$spreaderOutputBufferIndex*$spreadingSymbols, 
-      (sign ? (&negWalshTable[index][0]) : (&walshTable[index][0])) , 
+      (sign ? (negWalshTable[index][0]) : (walshTable[index][0])) , 
       $spreadingSymbols*sizeof(gr_complex));
 END
 
@@ -276,8 +290,8 @@ namespace spreader {
 class spreader_bc_impl : public spreader_bc
 {
 private:
-   static gr_complex walshTable[$spreadingRows][$spreadingSymbols];
-   static gr_complex negWalshTable[$spreadingRows][$spreadingSymbols];
+   static gr_complex* walshTable[$spreadingRows][$spreadingSymbols];
+   static gr_complex* negWalshTable[$spreadingRows][$spreadingSymbols];
 
 public:
    spreader_bc_impl();
@@ -348,15 +362,14 @@ static const int MAX_IN = 1;
 static const int MIN_OUT = 1;
 static const int MAX_OUT = 1;
 
-gr_complex spreader_bc_impl::walshTable[$spreadingRows][$spreadingSymbols] = 
-{
-$walshTable
-};
+static gr_complex* walshPosPos;
+static gr_complex* walshPosNeg;
+static gr_complex* walshNegPos;
+static gr_complex* walshNegNeg;
 
-gr_complex spreader_bc_impl::negWalshTable[$spreadingRows][$spreadingSymbols] = 
-{
-$negWalshTable
-};
+gr_complex* spreader_bc_impl::walshTable[$spreadingRows][$spreadingSymbols];
+gr_complex* spreader_bc_impl::negWalshTable[$spreadingRows][$spreadingSymbols];
+char* walshData = "$walshTable";
 
 spreader_bc::sptr
 spreader_bc::make()
@@ -369,8 +382,39 @@ spreader_bc_impl::spreader_bc_impl()
                   gr_make_io_signature(MIN_IN, MAX_IN, sizeof(unsigned char)),
                   gr_make_io_signature(MIN_OUT, MAX_OUT, sizeof(gr_complex)))
 {
-   set_min_noutput_items($minBytes * 8 / $spreadingBits * $spreadingSymbols);
-   set_max_noutput_items($minBytes * 8 / $spreadingBits * $spreadingSymbols);
+    set_min_noutput_items($minBytes * 8 / $spreadingBits * $spreadingSymbols);
+    set_max_noutput_items($minBytes * 8 / $spreadingBits * $spreadingSymbols);
+    walshPosPos = new gr_complex( +0.7071067811865475, +0.7071067811865475);
+    walshPosNeg = new gr_complex( +0.7071067811865475, -0.7071067811865475);
+    walshNegPos = new gr_complex( -0.7071067811865475, +0.7071067811865475);
+    walshNegNeg = new gr_complex( -0.7071067811865475, -0.7071067811865475);
+
+    char* dataPtr = walshData;
+    for(int row=0; row<$spreadingRows; ++row)
+    {
+        for(int column=0; column<$spreadingRows/2; ++column)
+	{
+	    switch(*(dataPtr++))
+	    {
+	        case 'N':
+	            walshTable[row][column] = walshNegNeg;
+	            negWalshTable[row][column] = walshPosPos;
+		    break;
+	        case 'n':
+	            walshTable[row][column] = walshNegPos;
+	            negWalshTable[row][column] = walshPosNeg;
+		    break;
+	        case 'p':
+	            walshTable[row][column] = walshPosNeg;
+	            negWalshTable[row][column] = walshNegPos;
+		    break;
+	        case 'P':
+	            walshTable[row][column] = walshPosPos;
+	            negWalshTable[row][column] = walshNegNeg;
+		    break;
+	    }
+	}
+    }
 }
 
 spreader_bc_impl::~spreader_bc_impl()
