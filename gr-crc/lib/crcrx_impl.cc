@@ -55,14 +55,8 @@ namespace gr {
 		      gr_make_io_signature(1,1, sizeof (char)),	//input signature
 		      gr_make_io_signature(1,1, sizeof (char)))	//output signature    
     {
-//	set_min_noutput_items((_filesize % FRAME_SIZE) + 4);	//Last Frame is remainder of (filesize/FrameSize + 4)
-	set_min_noutput_items(1);				//Last Frame is remainder of (filesize/FrameSize + 4)
+	set_min_noutput_items(FRAME_SIZE);			//Last Frame is remainder of (filesize/FrameSize + 4)
 	set_max_noutput_items(FRAME_SIZE);			//Fix the maximum output buffer size (Tx_Capsule - CRC)
-	frameCount = 0;
-	lastFrameSize = (_filesize % FRAME_SIZE) + 4;
-	lastFrameCount = floor(_filesize/FRAME_SIZE);
-	firstFrameflag = true;
-	frameCount = 1;
 
    }
 
@@ -116,89 +110,29 @@ namespace gr {
 	int crctemp;
         int crcRcvd;	
 	int crc32;
-	//int remainder;
-	//int numOfFrames;
-	//int frameCount;
-	current_ninputs = ninput_items[0];					
         const char * pInput = input;
 
-	// **** Calcalulate CRC of Data and EXTRACT CRC from DATA         
+	// **** Calculate CRC of Data and EXTRACT CRC from DATA         
         crc32 = digital_crc32((const unsigned char *)input, FRAME_SIZE);	
 	memcpy((char *)&crctemp, input + FRAME_SIZE, 4);
        
-	//printf ("*** Current n Inputs = %d\n", current_ninputs);
-	
 	// Testing CRC 
 	if(crc32 == crctemp) 
         {
-           printf ("***RX CRC IS GOOD: Frame Count = %d\n", frameCount);	
+            printf ("***RX CRC IS GOOD\n");	
 
-	   //First Frame get filesize
-	   if (frameCount == 1)						
-           {
-		memcpy(&_filesize, input, 4);		
-		numOfFrames = floor((_filesize + 4)/FRAME_SIZE);
-		remainder = _filesize - ((FRAME_SIZE * numOfFrames) - 4); 	
-		printf ("*** RX FILESIZE *** %d\n", _filesize);
-		//printf ("*** RX REMAINDER = %d\n", remainder);
-		//printf ("** RX num of FRAMES: %d,\n", numOfFrames);
-		// First Frame is last Frame: skip filesize and extract data
-		if (numOfFrames == 0)					
-		{
-	    	  // std::cerr << "** RX MADE IT TO FIRST AND ONLY FRAME \n";
- 		   dataToCopy = _filesize;					
-		   pInput +=4;		
-		   memcpy(out, pInput, dataToCopy);
-   		   //printf ("****** RX OUTPUT1: %s\n", out);
-		}
-		// First Frame is not the only frame
-		else
-		{
- 	    	//   std::cerr << "** RX MADE IT TO FIRST FRAME ... There's More * \n";
-		   dataToCopy = FRAME_SIZE-4;					
-		   pInput +=4;
-		   memcpy(out, pInput, dataToCopy);
-		   //printf ("****** RX OUTPUT2: %s\n", out);
-		}
-	   }
-	   // Done with first Frame now lets get Middle Frame
-	   else if ((frameCount >= 2) && (frameCount <= numOfFrames))
-	   {		
-        	//std::cerr << "** RX MADE IT TO MIDDLE FRAME  * \n";
-		dataToCopy = FRAME_SIZE;					
-		memcpy(out, input, dataToCopy);
-		//printf ("****** RX OUTPUT3: %s\n", out);
-	   }			
-	   // Now let's get the last frame (full or partial)
-	   else if (frameCount > numOfFrames) 				
-           {
-        	//std::cerr << "** RX MADE IT TO LAST FRAME  * \n";
-		dataToCopy = remainder;						
-		memcpy(out, input, dataToCopy);
-		//printf ("****** RX OUTPUT4: %s\n", out);	
-	   }			
-	   // There must have been some problem 
- 	   else if (_filesize == 0)						
-	   {			
-        	std::cerr << "** RX there was a problem  * \n";
-		return -1;	
-	   }
-	        //printf ("****** RX File Size: %d\n", _filesize);
-		//printf ("***** RX Frame Size: %d\n", FRAME_SIZE);
-		//printf ("***** RX FrameCount: %d,\n", frameCount);
-		//printf ("** RX num of FRAMES: %d,\n", numOfFrames);
-		//printf (" RX current_ninputs: %d,\n", current_ninputs);
-		//printf (" ***************************************************************\n");
-	   ++frameCount;
-	   consume_each (FRAME_SIZE + 4);
-	   return (dataToCopy);			
+            receiveFrame(
+	        (((unsigned short)(input[0]))<<8) | ((unsigned short)(input[1])),
+	        (unsigned char)(input[2]),
+	        (unsigned char*) (input+3));
+
 	}
 	else
         {
-	   printf("BAD RX CRC: %d\n", crc32);
-	   consume_each (current_ninputs);
-	   return (0);
+	    printf("BAD RX CRC: %d\n", crc32);
         }	
+        consume_each (FRAME_SIZE + 4);
+        return 0;
     }
   } /* namespace crc */
 } /* namespace gr */

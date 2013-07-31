@@ -91,8 +91,8 @@ namespace gr {
 	{
 	    for(int subSeqNum=0; subSeqNum<8; ++subSeqNum)
 	    {
-	        out[(rep*8+subSeqNum)*187 + 0] = input[6];
-	        out[(rep*8+subSeqNum)*187 + 1] = input[7];
+	        out[(rep*8+subSeqNum)*187 + 0] = input[4];
+	        out[(rep*8+subSeqNum)*187 + 1] = input[5];
 	        out[(rep*8+subSeqNum)*187 + 2] = subSeqNum;
 		memcpy(out+(rep*8+subSeqNum)*187+3, input+subSeqNum*180, 180);					
  	        *((unsigned int*)(out+(rep*8+subSeqNum)*187+183)) = digital_crc32((const unsigned char *)(out+(rep*8+subSeqNum)*187), 183);		

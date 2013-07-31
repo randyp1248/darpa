@@ -65,22 +65,22 @@ for($row=0; $row<$spreadingRows; ++$row)
       if (($i>0) && ($q>0)) 
       { 
          #$walshRow .= "walshPosPos"; $negWalshRow .= "walshNegNeg"; 
-	 $walshTable .= "N";
+	 $walshTable .= "P";
       }
       if (($i>0) && ($q<0)) 
       { 
          #$walshRow .= "walshPosNeg"; $negWalshRow .= "walshNegPos"; 
-	 $walshTable .= "n";
+	 $walshTable .= "p";
       }
       if (($i<0) && ($q>0)) 
       { 
          #$walshRow .= "walshNegPos"; $negWalshRow .= "walshPosNeg"; 
-	 $walshTable .= "p";
+	 $walshTable .= "n";
       }
       if (($i<0) && ($q<0)) 
       { 
          #$walshRow .= "walshNegNeg"; $negWalshRow .= "walshPosPos"; 
-	 $walshTable .= "P";
+	 $walshTable .= "N";
       }
 
       if ($column < $spreadingRows-2)
@@ -121,10 +121,13 @@ while ($inputBitPos < 8*$minBytes)
    index >>= 1;
 //printf("=======================================\\n");
 //printf("Spreading index: %d  sign: %d\\n", index, sign);
-   memcpy(
-      out+$spreaderOutputBufferIndex*$spreadingSymbols, 
-      (sign ? (negWalshTable[index][0]) : (walshTable[index][0])) , 
-      $spreadingSymbols*sizeof(gr_complex));
+   for(int i=0; i<$spreadingSymbols; ++i)
+   {
+      memcpy(
+         out+$spreaderOutputBufferIndex*$spreadingSymbols+i, 
+         (sign ? (negWalshTable[index][i]) : (walshTable[index][i])), 
+         sizeof(gr_complex));
+   }
 END
 
    $despreaderCode .= <<END;
