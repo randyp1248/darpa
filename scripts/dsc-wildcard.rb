@@ -1,108 +1,147 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+# To run with default defProperty values:
+# > omf-5.4 exec dsc-wildcard.rb
+# To override defProperty values from command line:
+# > omf-5.4 exec dsc-wildcard.rb -- --team1 dsc-teamA --team2 dsc-teamC --runtime 20
+defProperty('team1','dsc-teamA','Team 1 nodes')
+defProperty('team2','dsc-teamB','Team 2 nodes')
+
+defProperty('freq', '1700000000', "Center frequency")
+defProperty('server', 'localhost', "name of pkt server")
+defProperty('port', '5123', "pkt server port")
+defProperty('runtime', 100, "Run time (s)")
+
+# Two topologies for the competitive tournament
+
+team1 = Topology["system:topo:#{property.team1}"]
+team2 = Topology["system:topo:#{property.team2}"]
+
+defApplication('test:app:bot1_rx', 'bot1_rx.py') { |a|
+  a.version(2, 0, 4)
+  a.shortDescription = ""
+  a.description = ""
+  a.path = "export LC_ALL=C;/root/gnuradio/gr-digital/examples/narrowband/bot1_rx.py"
+  a.defProperty('args', "Argument list", nil,
+                {:dynamic => false, :type => :string})
+  a.defProperty('freq', "center frequency in Hz", '-f',
+                {:dynamic => false, :type => :string})
+  a.defProperty('rx-gain', "receive gain in dB", '--rx-gain', 
+                {:dynamic => false, :type => :string})
+  a.defProperty('bitrate', "specify bitrate", '-r',
+                {:dynamic => false, :type => :string})
+  a.defProperty('modulation', "modulation: psk, cpm, qpsk, dqpsk, gfsk,qam, dbpsk, bpsk, gmsk [default=psk]", '-m', 
+                {:dynamic => false, :type => :string})
+  a.defProperty('constellation-points', "set constellation - power of two for psk, power of 4 for QAM [default=16]", '-p', 
+                {:dynamic => false, :type => :string})
+  a.defProperty('server', "server adress", '-s',
+                {:dynamic => false, :type => :string})
+  a.defProperty('port', "port number", '-o',
+                {:dynamic => false, :type => :string})
+}
+
+defApplication('test:app:bot1_tx', 'bot1_tx.py') { |a|
+  a.version(2, 0, 4)
+  a.shortDescription = ""
+  a.description = ""
+  a.path = "export LC_ALL=C;/root/gnuradio/gr-digital/examples/narrowband/bot1_tx.py"
+  a.defProperty('args', "Argument list", nil,
+                {:dynamic => false, :type => :string})
+  a.defProperty('freq', "center frequency in Hz", '-f',
+                {:dynamic => false, :type => :string})
+  a.defProperty('tx-gain', "transmit gain in dB", '--tx-gain', 
+                {:dynamic => false, :type => :string})
+  a.defProperty('tx-amplitude', "transmitter digital amplitude [0,1)  [default=0.25]", '--tx-amplitude', 
+                {:dynamic => false, :type => :string})
+  a.defProperty('bitrate', "specify bitrate", '-r',
+                {:dynamic => false, :type => :string})
+  a.defProperty('modulation', "modulation: psk, cpm, qpsk, dqpsk, gfsk,qam, dbpsk, bpsk, gmsk [default=psk]", '-m', 
+                {:dynamic => false, :type => :string})
+  a.defProperty('constellation-points', "set constellation - power of two for psk, power of 4 for QAM [default=16]", '-p',
+                {:dynamic => false, :type => :string})
+  a.defProperty('server', "server adress", '-s',
+                {:dynamic => false, :type => :string})
+  a.defProperty('port', "port number", '-o',
+                {:dynamic => false, :type => :string})
+  a.defProperty('burst', "number of packets in each burst", '-b',
+                {:dynamic => false, :type => :string})
+  a.defProperty('sleep', "msec between bursts", '-t',
+                {:dynamic => false, :type => :string})
+}
+
+defGroup('rx_node1', team1.getNodeByIndex(0).to_s ) { |n|
+ n.addApplication('test:app:bot1_rx') { |app|
+   app.setProperty('freq', property.freq)
+   app.setProperty('rx-gain','30')
+   app.setProperty('modulation','bpsk')
+   app.setProperty('bitrate','1.25M')
+   app.setProperty('server','10.10.0.10')
+   app.setProperty('port','5125')
+ }
+}
+
+defGroup('tx_node1', team1.getNodeByIndex(1).to_s ) { |n|
+ n.addApplication('test:app:bot1_tx') { |app|
+   app.setProperty('freq', property.freq)
+   app.setProperty('tx-gain','30')
+   app.setProperty('modulation','bpsk')
+   app.setProperty('bitrate','1.25M')
+   app.setProperty('tx-amplitude','0.5')
+   app.setProperty('server','10.10.0.10')  
+   app.setProperty('port','5123')
+   app.setProperty('burst','100')
+   app.setProperty('sleep','1000')
+ }
+}
+
+defGroup('rx_node2', team2.getNodeByIndex(0).to_s ) { |n|
+ n.addApplication('test:app:bot1_rx') { |app|
+   app.setProperty('freq', property.freq)
+   app.setProperty('rx-gain','30')
+   app.setProperty('modulation','dqpsk')
+   app.setProperty('bitrate','2.5M')
+   app.setProperty('server','10.10.0.10')  
+   app.setProperty('port','5125')
+ }
+}
+
+defGroup('tx_node2', team2.getNodeByIndex(1).to_s ) { |n|
+ n.addApplication('test:app:bot1_tx') { |app|
+   app.setProperty('freq', property.freq)
+   app.setProperty('tx-gain','30')
+   app.setProperty('modulation','dqpsk')
+   app.setProperty('bitrate','2.5M')
+   app.setProperty('tx-amplitude','0.5')
+   app.setProperty('server','10.10.0.10')  
+   app.setProperty('port','5123')
+   app.setProperty('burst','100')
+   app.setProperty('sleep','2000')
+ }
+}
+
+#onEvent(:ALL_UP) { 
+onEvent(:ALL_UP_AND_INSTALLED) { |event|
+  info "Give machines some time to warm up" 
+  wait 1
+
+  info "Start packet server"
+  consoleExec("/usr/local/bin/pkt_server_bot --port 5123 --duration #{property.runtime+5} --team1 #{property.team1} --team2 #{property.team2} &")
+
+  wait 2
+  info "Start benchmark_rx,tx"
+  allGroups.startApplications
+
+  wait 5
+  info "send signal to packet server to start serving packets"
+  consoleExec("/usr/local/bin/dsc_send_start.py &") # may be rename this signal
   
+  wait property.runtime
   
+  info "Stop eveything"
+  allGroups.stopApplications
 
-
-  <head>
-    <title>
-      dsc-wildcard.rb on DSC/dc_trial2 – Attachment
-     – Orbit
-    </title>
-      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <!--[if IE]><script type="text/javascript">
-      if (/^#__msie303:/.test(window.location.hash))
-        window.location.replace(window.location.hash.replace(/^#__msie303:/, '#'));
-    </script><![endif]-->
-        <link rel="search" href="/search" />
-        <link rel="help" href="/wiki/TracGuide" />
-        <link rel="alternate" href="/raw-attachment/wiki/DSC/dc_trial2/dsc-wildcard.rb" type="application/x-ruby; charset=iso-8859-15" title="Original Format" />
-        <link rel="up" href="/wiki/DSC/dc_trial2" title="DSC/dc_trial2" />
-        <link rel="start" href="/wiki" />
-        <link rel="stylesheet" href="/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/pygments/trac.css" type="text/css" /><link rel="stylesheet" href="/chrome/common/css/code.css" type="text/css" /><link rel="stylesheet" href="/chrome/tracmenus/css/tracmenus.css" type="text/css" />
-        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-      <script type="text/javascript" charset="utf-8" src="/chrome/common/js/jquery.js"></script>
-      <script type="text/javascript" charset="utf-8" src="/chrome/common/js/babel.js"></script>
-      <script type="text/javascript" charset="utf-8" src="/chrome/common/js/messages/en_US.js"></script>
-      <script type="text/javascript" charset="utf-8" src="/chrome/common/js/trac.js"></script>
-      <script type="text/javascript" charset="utf-8" src="/chrome/common/js/search.js"></script>
-      <script type="text/javascript" charset="utf-8" src="/chrome/tracmenus/js/superfish.js"></script>
-      <script type="text/javascript" charset="utf-8" src="/chrome/tracmenus/js/tracmenus.js"></script>
-      <script type="text/javascript" charset="utf-8" src="/chrome/tracmenus/js/jquery.hoverIntent.minified.js"></script>
-      <script type="text/javascript" src="/chrome/common/js/folding.js"></script>
-      <script type="text/javascript">
-        jQuery(document).ready(function($) {
-          $('#preview table.code').enableCollapsibleColumns($('#preview table.code thead th.content'));
-        });
-      </script>
-  </head>
-  <body>
-    <div id="banner">
-      <div id="header">
-        <a id="logo" href="http://www.orbit-lab.org/"><img src="/chrome/site/orbit_banner.png" alt="Orbit Logo" height="100" width="100" /></a>
-      </div>
-      <form id="search" action="/search" method="get">
-      </form>
-      <div id="metanav" class="nav">
-    <ul>
-      <li class="first"><a href="/login">Login</a></li><li><a href="/userManagement/forgotPassword">Forgot Password?</a></li><li><a href="https://www.orbit-lab.org/loginService/ControlPanel">Preferences</a></li><li><a href="/wiki/TracGuide">Help/Guide</a></li><li class="last"><a href="/about">About Trac</a></li>
-    </ul>
-  </div>
-    </div>
-    <div id="mainnav" class="nav">
-    <ul>
-      <li class="first"><a href="https://www.orbit-lab.org/schedule/">Scheduler</a></li><li class="active"><a href="/wiki">Wiki*</a><ul><li><a href="/wiki/Documentation/GettingStarted">Getting Started</a></li><li><a href="/wiki/Documentation/FAQ">FAQ</a></li><li><a href="/wiki/Documentation">Docs</a></li></ul></li><li class="last"><a href="/blog">Blog</a></li>
-    </ul>
-  </div>
-    <div id="main">
-      <div id="ctxtnav" class="nav">
-        <h2>Context Navigation</h2>
-        <ul>
-          <li class="last first"><a href="/wiki/DSC/dc_trial2">Back to DSC/dc_trial2</a></li>
-        </ul>
-        <hr />
-      </div>
-    <div id="content" class="attachment">
-        <h1><a href="/wiki/DSC/dc_trial2">DSC/dc_trial2</a>: dsc-wildcard.rb</h1>
-        <table id="info" summary="Description">
-          <tbody>
-            <tr>
-              <th scope="col">File dsc-wildcard.rb,
-                <span title="5909 bytes">5.8 KB</span>
-                (added by seskar, <a class="timeline" href="/timeline?from=2013-06-27T08%3A27%3A24-04%3A00&amp;precision=second" title="See timeline at Jun 27, 2013 8:27:24 AM">42 hours ago</a>)</th>
-            </tr>
-            <tr>
-              <td class="message searchable">
-                <p>
-Example script for competitive game
-</p>
-
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div id="preview" class="searchable">
-          
-  <table class="code"><thead><tr><th class="lineno" title="Line numbers">Line</th><th class="content"> </th></tr></thead><tbody><tr><th id="L1"><a href="#L1">1</a></th><td><span class="c1"># To run with default defProperty values:</span></td></tr><tr><th id="L2"><a href="#L2">2</a></th><td><span class="c1"># &gt; omf-5.4 exec dsc-wildcard.rb</span></td></tr><tr><th id="L3"><a href="#L3">3</a></th><td><span class="c1"># To override defProperty values from command line:</span></td></tr><tr><th id="L4"><a href="#L4">4</a></th><td><span class="c1"># &gt; omf-5.4 exec dsc-wildcard.rb -- --team1 dsc-teamA --team2 dsc-teamC --runtime 20</span></td></tr><tr><th id="L5"><a href="#L5">5</a></th><td>defProperty<span class="p">(</span><span class="s1">'team1'</span><span class="p">,</span><span class="s1">'dsc-teamA'</span><span class="p">,</span><span class="s1">'Team 1 nodes'</span><span class="p">)</span></td></tr><tr><th id="L6"><a href="#L6">6</a></th><td>defProperty<span class="p">(</span><span class="s1">'team2'</span><span class="p">,</span><span class="s1">'dsc-teamB'</span><span class="p">,</span><span class="s1">'Team 2 nodes'</span><span class="p">)</span></td></tr><tr><th id="L7"><a href="#L7">7</a></th><td></td></tr><tr><th id="L8"><a href="#L8">8</a></th><td>defProperty<span class="p">(</span><span class="s1">'freq'</span><span class="p">,</span> <span class="s1">'1700000000'</span><span class="p">,</span> <span class="s2">"Center frequency"</span><span class="p">)</span></td></tr><tr><th id="L9"><a href="#L9">9</a></th><td>defProperty<span class="p">(</span><span class="s1">'server'</span><span class="p">,</span> <span class="s1">'localhost'</span><span class="p">,</span> <span class="s2">"name of pkt server"</span><span class="p">)</span></td></tr><tr><th id="L10"><a href="#L10">10</a></th><td>defProperty<span class="p">(</span><span class="s1">'port'</span><span class="p">,</span> <span class="s1">'5123'</span><span class="p">,</span> <span class="s2">"pkt server port"</span><span class="p">)</span></td></tr><tr><th id="L11"><a href="#L11">11</a></th><td>defProperty<span class="p">(</span><span class="s1">'runtime'</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="s2">"Run time (s)"</span><span class="p">)</span></td></tr><tr><th id="L12"><a href="#L12">12</a></th><td></td></tr><tr><th id="L13"><a href="#L13">13</a></th><td><span class="c1"># Two topologies for the competitive tournament</span></td></tr><tr><th id="L14"><a href="#L14">14</a></th><td></td></tr><tr><th id="L15"><a href="#L15">15</a></th><td>team1 <span class="o">=</span> <span class="no">Topology</span><span class="o">[</span><span class="s2">"system:topo:</span><span class="si">#{</span>property<span class="o">.</span>team1<span class="si">}</span><span class="s2">"</span><span class="o">]</span></td></tr><tr><th id="L16"><a href="#L16">16</a></th><td>team2 <span class="o">=</span> <span class="no">Topology</span><span class="o">[</span><span class="s2">"system:topo:</span><span class="si">#{</span>property<span class="o">.</span>team2<span class="si">}</span><span class="s2">"</span><span class="o">]</span></td></tr><tr><th id="L17"><a href="#L17">17</a></th><td></td></tr><tr><th id="L18"><a href="#L18">18</a></th><td>defApplication<span class="p">(</span><span class="s1">'test:app:bot1_rx'</span><span class="p">,</span> <span class="s1">'bot1_rx.py'</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span>a<span class="o">|</span></td></tr><tr><th id="L19"><a href="#L19">19</a></th><td>  a<span class="o">.</span>version<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></td></tr><tr><th id="L20"><a href="#L20">20</a></th><td>  a<span class="o">.</span>shortDescription <span class="o">=</span> <span class="s2">""</span></td></tr><tr><th id="L21"><a href="#L21">21</a></th><td>  a<span class="o">.</span>description <span class="o">=</span> <span class="s2">""</span></td></tr><tr><th id="L22"><a href="#L22">22</a></th><td>  a<span class="o">.</span>path <span class="o">=</span> <span class="s2">"export LC_ALL=C;/root/gnuradio/gr-digital/examples/narrowband/bot1_rx.py"</span></td></tr><tr><th id="L23"><a href="#L23">23</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'args'</span><span class="p">,</span> <span class="s2">"Argument list"</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span></td></tr><tr><th id="L24"><a href="#L24">24</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L25"><a href="#L25">25</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'freq'</span><span class="p">,</span> <span class="s2">"center frequency in Hz"</span><span class="p">,</span> <span class="s1">'-f'</span><span class="p">,</span></td></tr><tr><th id="L26"><a href="#L26">26</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L27"><a href="#L27">27</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'rx-gain'</span><span class="p">,</span> <span class="s2">"receive gain in dB"</span><span class="p">,</span> <span class="s1">'--rx-gain'</span><span class="p">,</span> </td></tr><tr><th id="L28"><a href="#L28">28</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L29"><a href="#L29">29</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'bitrate'</span><span class="p">,</span> <span class="s2">"specify bitrate"</span><span class="p">,</span> <span class="s1">'-r'</span><span class="p">,</span></td></tr><tr><th id="L30"><a href="#L30">30</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L31"><a href="#L31">31</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'modulation'</span><span class="p">,</span> <span class="s2">"modulation: psk, cpm, qpsk, dqpsk, gfsk,qam, dbpsk, bpsk, gmsk [default=psk]"</span><span class="p">,</span> <span class="s1">'-m'</span><span class="p">,</span> </td></tr><tr><th id="L32"><a href="#L32">32</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L33"><a href="#L33">33</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'constellation-points'</span><span class="p">,</span> <span class="s2">"set constellation - power of two for psk, power of 4 for QAM [default=16]"</span><span class="p">,</span> <span class="s1">'-p'</span><span class="p">,</span> </td></tr><tr><th id="L34"><a href="#L34">34</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L35"><a href="#L35">35</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'server'</span><span class="p">,</span> <span class="s2">"server adress"</span><span class="p">,</span> <span class="s1">'-s'</span><span class="p">,</span></td></tr><tr><th id="L36"><a href="#L36">36</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L37"><a href="#L37">37</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'port'</span><span class="p">,</span> <span class="s2">"port number"</span><span class="p">,</span> <span class="s1">'-o'</span><span class="p">,</span></td></tr><tr><th id="L38"><a href="#L38">38</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L39"><a href="#L39">39</a></th><td><span class="p">}</span></td></tr><tr><th id="L40"><a href="#L40">40</a></th><td></td></tr><tr><th id="L41"><a href="#L41">41</a></th><td>defApplication<span class="p">(</span><span class="s1">'test:app:bot1_tx'</span><span class="p">,</span> <span class="s1">'bot1_tx.py'</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span>a<span class="o">|</span></td></tr><tr><th id="L42"><a href="#L42">42</a></th><td>  a<span class="o">.</span>version<span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span></td></tr><tr><th id="L43"><a href="#L43">43</a></th><td>  a<span class="o">.</span>shortDescription <span class="o">=</span> <span class="s2">""</span></td></tr><tr><th id="L44"><a href="#L44">44</a></th><td>  a<span class="o">.</span>description <span class="o">=</span> <span class="s2">""</span></td></tr><tr><th id="L45"><a href="#L45">45</a></th><td>  a<span class="o">.</span>path <span class="o">=</span> <span class="s2">"export LC_ALL=C;/root/gnuradio/gr-digital/examples/narrowband/bot1_tx.py"</span></td></tr><tr><th id="L46"><a href="#L46">46</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'args'</span><span class="p">,</span> <span class="s2">"Argument list"</span><span class="p">,</span> <span class="kp">nil</span><span class="p">,</span></td></tr><tr><th id="L47"><a href="#L47">47</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L48"><a href="#L48">48</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'freq'</span><span class="p">,</span> <span class="s2">"center frequency in Hz"</span><span class="p">,</span> <span class="s1">'-f'</span><span class="p">,</span></td></tr><tr><th id="L49"><a href="#L49">49</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L50"><a href="#L50">50</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'tx-gain'</span><span class="p">,</span> <span class="s2">"transmit gain in dB"</span><span class="p">,</span> <span class="s1">'--tx-gain'</span><span class="p">,</span> </td></tr><tr><th id="L51"><a href="#L51">51</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L52"><a href="#L52">52</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'tx-amplitude'</span><span class="p">,</span> <span class="s2">"transmitter digital amplitude [0,1)  [default=0.25]"</span><span class="p">,</span> <span class="s1">'--tx-amplitude'</span><span class="p">,</span> </td></tr><tr><th id="L53"><a href="#L53">53</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L54"><a href="#L54">54</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'bitrate'</span><span class="p">,</span> <span class="s2">"specify bitrate"</span><span class="p">,</span> <span class="s1">'-r'</span><span class="p">,</span></td></tr><tr><th id="L55"><a href="#L55">55</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L56"><a href="#L56">56</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'modulation'</span><span class="p">,</span> <span class="s2">"modulation: psk, cpm, qpsk, dqpsk, gfsk,qam, dbpsk, bpsk, gmsk [default=psk]"</span><span class="p">,</span> <span class="s1">'-m'</span><span class="p">,</span> </td></tr><tr><th id="L57"><a href="#L57">57</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L58"><a href="#L58">58</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'constellation-points'</span><span class="p">,</span> <span class="s2">"set constellation - power of two for psk, power of 4 for QAM [default=16]"</span><span class="p">,</span> <span class="s1">'-p'</span><span class="p">,</span></td></tr><tr><th id="L59"><a href="#L59">59</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L60"><a href="#L60">60</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'server'</span><span class="p">,</span> <span class="s2">"server adress"</span><span class="p">,</span> <span class="s1">'-s'</span><span class="p">,</span></td></tr><tr><th id="L61"><a href="#L61">61</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L62"><a href="#L62">62</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'port'</span><span class="p">,</span> <span class="s2">"port number"</span><span class="p">,</span> <span class="s1">'-o'</span><span class="p">,</span></td></tr><tr><th id="L63"><a href="#L63">63</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L64"><a href="#L64">64</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'burst'</span><span class="p">,</span> <span class="s2">"number of packets in each burst"</span><span class="p">,</span> <span class="s1">'-b'</span><span class="p">,</span></td></tr><tr><th id="L65"><a href="#L65">65</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L66"><a href="#L66">66</a></th><td>  a<span class="o">.</span>defProperty<span class="p">(</span><span class="s1">'sleep'</span><span class="p">,</span> <span class="s2">"msec between bursts"</span><span class="p">,</span> <span class="s1">'-t'</span><span class="p">,</span></td></tr><tr><th id="L67"><a href="#L67">67</a></th><td>                <span class="p">{</span><span class="ss">:dynamic</span> <span class="o">=&gt;</span> <span class="kp">false</span><span class="p">,</span> <span class="ss">:type</span> <span class="o">=&gt;</span> <span class="ss">:string</span><span class="p">})</span></td></tr><tr><th id="L68"><a href="#L68">68</a></th><td><span class="p">}</span></td></tr><tr><th id="L69"><a href="#L69">69</a></th><td></td></tr><tr><th id="L70"><a href="#L70">70</a></th><td>defGroup<span class="p">(</span><span class="s1">'rx_node1'</span><span class="p">,</span> team1<span class="o">.</span>getNodeByIndex<span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span>to_s <span class="p">)</span> <span class="p">{</span> <span class="o">|</span>n<span class="o">|</span></td></tr><tr><th id="L71"><a href="#L71">71</a></th><td> n<span class="o">.</span>addApplication<span class="p">(</span><span class="s1">'test:app:bot1_rx'</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span>app<span class="o">|</span></td></tr><tr><th id="L72"><a href="#L72">72</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'freq'</span><span class="p">,</span> property<span class="o">.</span>freq<span class="p">)</span></td></tr><tr><th id="L73"><a href="#L73">73</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'rx-gain'</span><span class="p">,</span><span class="s1">'30'</span><span class="p">)</span></td></tr><tr><th id="L74"><a href="#L74">74</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'modulation'</span><span class="p">,</span><span class="s1">'bpsk'</span><span class="p">)</span></td></tr><tr><th id="L75"><a href="#L75">75</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'bitrate'</span><span class="p">,</span><span class="s1">'1.25M'</span><span class="p">)</span></td></tr><tr><th id="L76"><a href="#L76">76</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'server'</span><span class="p">,</span><span class="s1">'10.10.0.10'</span><span class="p">)</span></td></tr><tr><th id="L77"><a href="#L77">77</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'port'</span><span class="p">,</span><span class="s1">'5125'</span><span class="p">)</span></td></tr><tr><th id="L78"><a href="#L78">78</a></th><td> <span class="p">}</span></td></tr><tr><th id="L79"><a href="#L79">79</a></th><td><span class="p">}</span></td></tr><tr><th id="L80"><a href="#L80">80</a></th><td></td></tr><tr><th id="L81"><a href="#L81">81</a></th><td>defGroup<span class="p">(</span><span class="s1">'tx_node1'</span><span class="p">,</span> team1<span class="o">.</span>getNodeByIndex<span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>to_s <span class="p">)</span> <span class="p">{</span> <span class="o">|</span>n<span class="o">|</span></td></tr><tr><th id="L82"><a href="#L82">82</a></th><td> n<span class="o">.</span>addApplication<span class="p">(</span><span class="s1">'test:app:bot1_tx'</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span>app<span class="o">|</span></td></tr><tr><th id="L83"><a href="#L83">83</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'freq'</span><span class="p">,</span> property<span class="o">.</span>freq<span class="p">)</span></td></tr><tr><th id="L84"><a href="#L84">84</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'tx-gain'</span><span class="p">,</span><span class="s1">'30'</span><span class="p">)</span></td></tr><tr><th id="L85"><a href="#L85">85</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'modulation'</span><span class="p">,</span><span class="s1">'bpsk'</span><span class="p">)</span></td></tr><tr><th id="L86"><a href="#L86">86</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'bitrate'</span><span class="p">,</span><span class="s1">'1.25M'</span><span class="p">)</span></td></tr><tr><th id="L87"><a href="#L87">87</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'tx-amplitude'</span><span class="p">,</span><span class="s1">'0.5'</span><span class="p">)</span></td></tr><tr><th id="L88"><a href="#L88">88</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'server'</span><span class="p">,</span><span class="s1">'10.10.0.10'</span><span class="p">)</span>  </td></tr><tr><th id="L89"><a href="#L89">89</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'port'</span><span class="p">,</span><span class="s1">'5123'</span><span class="p">)</span></td></tr><tr><th id="L90"><a href="#L90">90</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'burst'</span><span class="p">,</span><span class="s1">'100'</span><span class="p">)</span></td></tr><tr><th id="L91"><a href="#L91">91</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'sleep'</span><span class="p">,</span><span class="s1">'1000'</span><span class="p">)</span></td></tr><tr><th id="L92"><a href="#L92">92</a></th><td> <span class="p">}</span></td></tr><tr><th id="L93"><a href="#L93">93</a></th><td><span class="p">}</span></td></tr><tr><th id="L94"><a href="#L94">94</a></th><td></td></tr><tr><th id="L95"><a href="#L95">95</a></th><td>defGroup<span class="p">(</span><span class="s1">'rx_node2'</span><span class="p">,</span> team2<span class="o">.</span>getNodeByIndex<span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span>to_s <span class="p">)</span> <span class="p">{</span> <span class="o">|</span>n<span class="o">|</span></td></tr><tr><th id="L96"><a href="#L96">96</a></th><td> n<span class="o">.</span>addApplication<span class="p">(</span><span class="s1">'test:app:bot1_rx'</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span>app<span class="o">|</span></td></tr><tr><th id="L97"><a href="#L97">97</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'freq'</span><span class="p">,</span> property<span class="o">.</span>freq<span class="p">)</span></td></tr><tr><th id="L98"><a href="#L98">98</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'rx-gain'</span><span class="p">,</span><span class="s1">'30'</span><span class="p">)</span></td></tr><tr><th id="L99"><a href="#L99">99</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'modulation'</span><span class="p">,</span><span class="s1">'dqpsk'</span><span class="p">)</span></td></tr><tr><th id="L100"><a href="#L100">100</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'bitrate'</span><span class="p">,</span><span class="s1">'2.5M'</span><span class="p">)</span></td></tr><tr><th id="L101"><a href="#L101">101</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'server'</span><span class="p">,</span><span class="s1">'10.10.0.10'</span><span class="p">)</span>  </td></tr><tr><th id="L102"><a href="#L102">102</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'port'</span><span class="p">,</span><span class="s1">'5125'</span><span class="p">)</span></td></tr><tr><th id="L103"><a href="#L103">103</a></th><td> <span class="p">}</span></td></tr><tr><th id="L104"><a href="#L104">104</a></th><td><span class="p">}</span></td></tr><tr><th id="L105"><a href="#L105">105</a></th><td></td></tr><tr><th id="L106"><a href="#L106">106</a></th><td>defGroup<span class="p">(</span><span class="s1">'tx_node2'</span><span class="p">,</span> team2<span class="o">.</span>getNodeByIndex<span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span>to_s <span class="p">)</span> <span class="p">{</span> <span class="o">|</span>n<span class="o">|</span></td></tr><tr><th id="L107"><a href="#L107">107</a></th><td> n<span class="o">.</span>addApplication<span class="p">(</span><span class="s1">'test:app:bot1_tx'</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span>app<span class="o">|</span></td></tr><tr><th id="L108"><a href="#L108">108</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'freq'</span><span class="p">,</span> property<span class="o">.</span>freq<span class="p">)</span></td></tr><tr><th id="L109"><a href="#L109">109</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'tx-gain'</span><span class="p">,</span><span class="s1">'30'</span><span class="p">)</span></td></tr><tr><th id="L110"><a href="#L110">110</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'modulation'</span><span class="p">,</span><span class="s1">'dqpsk'</span><span class="p">)</span></td></tr><tr><th id="L111"><a href="#L111">111</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'bitrate'</span><span class="p">,</span><span class="s1">'2.5M'</span><span class="p">)</span></td></tr><tr><th id="L112"><a href="#L112">112</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'tx-amplitude'</span><span class="p">,</span><span class="s1">'0.5'</span><span class="p">)</span></td></tr><tr><th id="L113"><a href="#L113">113</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'server'</span><span class="p">,</span><span class="s1">'10.10.0.10'</span><span class="p">)</span>  </td></tr><tr><th id="L114"><a href="#L114">114</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'port'</span><span class="p">,</span><span class="s1">'5123'</span><span class="p">)</span></td></tr><tr><th id="L115"><a href="#L115">115</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'burst'</span><span class="p">,</span><span class="s1">'100'</span><span class="p">)</span></td></tr><tr><th id="L116"><a href="#L116">116</a></th><td>   app<span class="o">.</span>setProperty<span class="p">(</span><span class="s1">'sleep'</span><span class="p">,</span><span class="s1">'2000'</span><span class="p">)</span></td></tr><tr><th id="L117"><a href="#L117">117</a></th><td> <span class="p">}</span></td></tr><tr><th id="L118"><a href="#L118">118</a></th><td><span class="p">}</span></td></tr><tr><th id="L119"><a href="#L119">119</a></th><td></td></tr><tr><th id="L120"><a href="#L120">120</a></th><td><span class="c1">#onEvent(:ALL_UP) { </span></td></tr><tr><th id="L121"><a href="#L121">121</a></th><td>onEvent<span class="p">(</span><span class="ss">:ALL_UP_AND_INSTALLED</span><span class="p">)</span> <span class="p">{</span> <span class="o">|</span>event<span class="o">|</span></td></tr><tr><th id="L122"><a href="#L122">122</a></th><td>  info <span class="s2">"Give machines some time to warm up"</span> </td></tr><tr><th id="L123"><a href="#L123">123</a></th><td>  wait <span class="mi">1</span></td></tr><tr><th id="L124"><a href="#L124">124</a></th><td></td></tr><tr><th id="L125"><a href="#L125">125</a></th><td>  info <span class="s2">"Start packet server"</span></td></tr><tr><th id="L126"><a href="#L126">126</a></th><td>  consoleExec<span class="p">(</span><span class="s2">"/usr/local/bin/pkt_server_bot --port 5123 --duration </span><span class="si">#{</span>property<span class="o">.</span>runtime<span class="o">+</span><span class="mi">5</span><span class="si">}</span><span class="s2"> --team1 </span><span class="si">#{</span>property<span class="o">.</span>team1<span class="si">}</span><span class="s2"> --team2 </span><span class="si">#{</span>property<span class="o">.</span>team2<span class="si">}</span><span class="s2"> &amp;"</span><span class="p">)</span></td></tr><tr><th id="L127"><a href="#L127">127</a></th><td></td></tr><tr><th id="L128"><a href="#L128">128</a></th><td>  wait <span class="mi">2</span></td></tr><tr><th id="L129"><a href="#L129">129</a></th><td>  info <span class="s2">"Start benchmark_rx,tx"</span></td></tr><tr><th id="L130"><a href="#L130">130</a></th><td>  allGroups<span class="o">.</span>startApplications</td></tr><tr><th id="L131"><a href="#L131">131</a></th><td></td></tr><tr><th id="L132"><a href="#L132">132</a></th><td>  wait <span class="mi">5</span></td></tr><tr><th id="L133"><a href="#L133">133</a></th><td>  info <span class="s2">"send signal to packet server to start serving packets"</span></td></tr><tr><th id="L134"><a href="#L134">134</a></th><td>  consoleExec<span class="p">(</span><span class="s2">"/usr/local/bin/dsc_send_start.py &amp;"</span><span class="p">)</span> <span class="c1"># may be rename this signal</span></td></tr><tr><th id="L135"><a href="#L135">135</a></th><td>  </td></tr><tr><th id="L136"><a href="#L136">136</a></th><td>  wait property<span class="o">.</span>runtime</td></tr><tr><th id="L137"><a href="#L137">137</a></th><td>  </td></tr><tr><th id="L138"><a href="#L138">138</a></th><td>  info <span class="s2">"Stop eveything"</span></td></tr><tr><th id="L139"><a href="#L139">139</a></th><td>  allGroups<span class="o">.</span>stopApplications</td></tr><tr><th id="L140"><a href="#L140">140</a></th><td></td></tr><tr><th id="L141"><a href="#L141">141</a></th><td>  wait  <span class="mi">2</span></td></tr><tr><th id="L142"><a href="#L142">142</a></th><td>  consoleExec<span class="p">(</span><span class="s2">"ssh root@</span><span class="si">#{</span>team1<span class="o">.</span>getNodeByIndex<span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span>to_s<span class="si">}</span><span class="s2"> 'pkill python' "</span><span class="p">)</span> <span class="c1"># Just in case kill rx side</span></td></tr><tr><th id="L143"><a href="#L143">143</a></th><td>  consoleExec<span class="p">(</span><span class="s2">"ssh root@</span><span class="si">#{</span>team2<span class="o">.</span>getNodeByIndex<span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span>to_s<span class="si">}</span><span class="s2"> 'pkill python' "</span><span class="p">)</span> <span class="c1"># Just in case kill rx side</span></td></tr><tr><th id="L144"><a href="#L144">144</a></th><td>  </td></tr><tr><th id="L145"><a href="#L145">145</a></th><td>  info <span class="s2">"Finish it."</span> </td></tr><tr><th id="L146"><a href="#L146">146</a></th><td>  <span class="no">Experiment</span><span class="o">.</span>done</td></tr><tr><th id="L147"><a href="#L147">147</a></th><td><span class="p">}</span></td></tr></tbody></table>
-
-        </div>
-    </div>
-    <div id="altlinks">
-      <h3>Download in other formats:</h3>
-      <ul>
-        <li class="last first">
-          <a rel="nofollow" href="/raw-attachment/wiki/DSC/dc_trial2/dsc-wildcard.rb">Original Format</a>
-        </li>
-      </ul>
-    </div>
-    </div>
-    <div id="footer" lang="en" xml:lang="en"><hr />
-      <a id="tracpowered" href="http://trac.edgewall.org/"><img src="/chrome/common/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
-      <p class="left">Powered by <a href="/about"><strong>Trac 1.0.1</strong></a><br />
-        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
-      <p class="right">Orbit WEB pages<br /><a href="http://www.orbit-lab.org/">http://www.orbit-lab.org/</a></p>
-    </div>
-  </body>
-</html>
+  wait  2
+  consoleExec("ssh root@#{team1.getNodeByIndex(0).to_s} 'pkill python' ") # Just in case kill rx side
+  consoleExec("ssh root@#{team2.getNodeByIndex(0).to_s} 'pkill python' ") # Just in case kill rx side
+  
+  info "Finish it." 
+  Experiment.done
+}

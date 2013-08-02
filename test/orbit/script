@@ -1,0 +1,4 @@
+#!/bin/sh
+cd ~/gnuradio/darpa
+export LD_LIBRARY_PATH=/usr/local/lib
+LD_PRELOAD=/usr/local/lib/libgnuradio-digital-3.6.4.1.so ./tx.py $*
